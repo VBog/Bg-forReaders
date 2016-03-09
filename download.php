@@ -1,0 +1,33 @@
+<?php
+// имя запрашиваемого файла
+$file_name = $_GET['file'];
+
+// убедимся, что это файл, прежде чем что-нибудь делать!
+if(is_file($file_name)) {
+
+	// специально для IE
+	if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off');	}
+    // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
+    if (ob_get_level()) { ob_end_clean(); }
+
+	// выберем mime-тип файла в зависимости от расширения
+	switch(strtolower(substr(strrchr($file_name, '.'), 1))) {
+		case 'pdf': $mime = 'application/pdf'; break;
+		case 'fb2': $mime = 'application/x-fictionbook'; break;
+		case 'epub': $mime = 'application/epub+zip'; break;
+		case 'mobi': $mime = 'application/x-mobipocket-ebook'; break;
+		default: $mime = 'application/force-download';
+	}
+	header('Pragma: public'); 	// обязательно
+	header('Expires: 0');		// no cache
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Last-Modified: '.gmdate ('D, d M Y H:i:s', filemtime ($file_name)).' GMT');
+	header('Cache-Control: private',false);
+	header('Content-Type: '.$mime);
+	header('Content-Disposition: attachment; filename="'.basename($file_name).'"');
+	header('Content-Transfer-Encoding: binary');
+	header('Content-Length: '.filesize($file_name));	// размер файла
+	header('Connection: close');
+	readfile($file_name);								// отдача файла
+	exit();
+}
