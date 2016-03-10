@@ -17,11 +17,13 @@ $debug_file = dirname(__FILE__ )."/forreaders.log";
 if (file_exists ($debug_file) ) unlink ($debug_file);
 error_log(date ("j-m-Y H:i"). " ===================== Start the batch mode =====================". PHP_EOL, 3, $debug_file);
 $bg_forreaders = new BgForReaders();
-	
+if (isset($_GET['id'])) {
+	$id_list = explode ( ',' , $_GET['id'] );
+	$cnt = count($id_list);
+} else $cnt = 1;
 
 $posts = get_posts( array('numberposts' => -1 ) );
 foreach ($posts as $post){ 
-	error_log(date ("j-m-Y H:i"). " ".$post->post_name, 3, $debug_file);
 	// Исключения 
 	$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );	// если запрещены некоторые категории
 	foreach($ex_cats as $cat) {
@@ -32,9 +34,14 @@ foreach ($posts as $post){
 			}
 		}
 	}
-	$starttime =  microtime(true);
-	$bg_forreaders->generate ($post->ID);
-	error_log(" - files generated in ".round((microtime(true)-$starttime)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+	for ($i=0; $i < $cnt; $i++){ 
+		if (!isset($id_list) || $post->ID == $id_list[$i]) {
+			error_log(date ("j-m-Y H:i"). " ".$post->post_name, 3, $debug_file);
+			$starttime =  microtime(true);
+			$bg_forreaders->generate ($post->ID);
+			error_log(" - files generated in ".round((microtime(true)-$starttime)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+		}
+	}
 }
 error_log(date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL, 3, $debug_file);
 exit;

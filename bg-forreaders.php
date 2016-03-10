@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.2
+Version: 0.3
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.2' );
+define( 'BG_FORREADERS_VERSION', '0.3' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -218,8 +218,8 @@ class BgForReaders
 // Portable Document Format (PDF)
 	public function topdf ($html, $options) {
 
-		ini_set("pcre.backtrack_limit","3000000");
-		ini_set("memory_limit", "256M");
+//		ini_set("pcre.backtrack_limit","3000000");
+//		ini_set("memory_limit", "256M");
 		require_once "lib/mpdf60/mpdf.php";
 		$filepdf = $options["filename"] . '.pdf';
 		
@@ -233,53 +233,6 @@ class BgForReaders
 		}
 		$pdf->WriteHTML($html);
 		$pdf->Output($filepdf, 'F');
-		return;
-	}
-// Portable Document Format (PDF)
-	public function topdf2 ($html, $options) {
-
-		ini_set("pcre.backtrack_limit","3000000");
-		ini_set("memory_limit", "256M");
-		require_once "lib/dompdf/dompdf_config.inc.php";
-		$filepdf = $options["filename"] . '.pdf';
-		
-		$dompdf = new DOMPDF();
-		$dompdf->load_html($html);
-		$dompdf->render();
-
-		$output = $dompdf->output();
-		file_put_contents($filepdf, $output);
-		return;
-	}
-// Portable Document Format (PDF)
-	public function topdf3 ($html, $options) {
-
-		require_once "lib/fpdf181/fpdf.php";
-		$filepdf = $options["filename"] . '.pdf';
-		
-		//create a FPDF object
-		$pdf=new FPDF();
-		//set document properties
-		$pdf->SetAuthor($options["author"]);
-		$pdf->SetTitle($options["title"]);
-		//set font for the entire document
-		$pdf->SetFont('Times','B',20);
-		$pdf->SetTextColor(50,60,100);
-		//set up a page
-		$pdf->AddPage('P');
-		$pdf->SetDisplayMode(real,'default');
-		//insert an image and make it a link
-//		$pdf->Image('logo.png',10,20,33,0,' ','http://www.fpdf.org/');
-		//display the title with a border around it
-		$pdf->SetXY(50,20);
-		$pdf->SetDrawColor(50,60,100);
-		$pdf->Cell(100,10,$options["title"],1,0,'C',0);
-		//Set x and y position for the main text, reduce font size and write content
-		$pdf->SetXY (10,50);
-		$pdf->SetFontSize(10);
-		$pdf->Write(5,$html);
-		//Output the document
-		$pdf->Output($filepdf,'F');
 		return;
 	}
 // Electronic Publication (ePub)
