@@ -13,7 +13,7 @@ function bg_forreaders_options_page() {
 	?>
 	<div class="wrap">
 		<h2><?php _e('Plugin\'s &#171;For Readers&#187; settings', 'bg-forreaders') ?></h2>
-		<div id="bg_hlnames_resalt"></div>
+		<div id="bg_forreaders_resalt"></div>
 		<p><?php printf( __( 'Version', 'bg-forreaders' ).' <b>'.bg_forreaders_version().'</b>' ); ?></p>
 
 		<h2 class="nav-tab-wrapper">
@@ -23,7 +23,7 @@ function bg_forreaders_options_page() {
 			<?php } ?>
 		</h2>
 
-		<form id="bg_hlnames_options" method="post" action="options.php">
+		<form id="bg_forreaders_options" method="post" action="options.php">
 			<?php wp_nonce_field('update-options'); ?>
 
 			<!-- Общие Настройки -->
@@ -40,6 +40,14 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
+				<tr valign="top">
+				<th scope="row"><?php _e('Type of download links', 'bg-forreaders') ?></th>
+				<td>
+				<input type="radio" name="bg_forreaders_links" <?php if(get_option('bg_forreaders_links') == "php") echo "checked" ?> value="php" /> <?php _e('using download php-script', 'bg-forreaders') ?><br /> 
+				<input type="radio" name="bg_forreaders_links" <?php if(get_option('bg_forreaders_links') == "html") echo "checked" ?> value="html" /> <?php _e('using html5 atribute "download"', 'bg-forreaders') ?>
+				</td>
+				</tr>
+				
 				<tr valign="top">
 				<th scope="row"><?php _e('Location of download links', 'bg-forreaders') ?></th>
 				<td>
@@ -85,19 +93,34 @@ function bg_forreaders_options_page() {
 				</tr>
 
 				<tr valign="top">
-				<th scope="row"><?php _e('When will created files for the readers?', 'bg-forreaders') ?></th>
+				<th scope="row"><?php _e('When will created files for readers?', 'bg-forreaders') ?></th>
 				<td>
 				<input type="checkbox" name="bg_forreaders_while_displayed" <?php if(get_option('bg_forreaders_while_displayed')) echo "checked" ?> value="on" /> <?php _e('while current post is displayed', 'bg-forreaders') ?><br /> 
 				<input type="checkbox" name="bg_forreaders_while_saved" <?php if(get_option('bg_forreaders_while_saved')) echo "checked" ?> value="on" /> <?php _e('while current post is saved', 'bg-forreaders') ?>
 				</td>
 				</tr>
 				
+				<tr valign="top">
+				<th scope="row"><?php _e('Time limit', 'bg-forreaders') ?></th>
+				<td>
+				<input type="number" name="bg_forreaders_time_limit" value="<?php echo get_option('bg_forreaders_time_limit'); ?>" min="0" /> <?php _e('sec.', 'bg-forreaders') ?>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Batch mode', 'bg-forreaders') ?></th>
+				<td>
+				<?php printf (__('You can use script %s<br>to generate files for readers in batch mode. ', 'bg-forreaders'), '<span style="background: gray; color: white">'.plugins_url( 'forreaders.php', dirname(__FILE__) ).'</span>') ?>
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
-							bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_zoom, bg_forreaders_single, 
-							bg_forreaders_excat, bg_forreaders_author_field, bg_forreaders_while_displayed, bg_forreaders_while_saved" />
+							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_zoom, 
+							bg_forreaders_single, bg_forreaders_excat, bg_forreaders_author_field, bg_forreaders_while_displayed, 
+							bg_forreaders_while_saved, bg_forreaders_time_limit" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />

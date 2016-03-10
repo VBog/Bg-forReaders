@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.1
+Version: 0.2
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.1' );
+define( 'BG_FORREADERS_VERSION', '0.2' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -129,11 +129,12 @@ function bg_forreaders_proc($content) {
 	foreach ($formats as $type => $document_type) {
 		if (get_option('bg_forreaders_'.$type) == 'on') {
 			$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), $post->post_title, $document_type);
-			$href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."?file=".$post->post_name.".".$type;
+			if (get_option('bg_forreaders_links') == 'php') $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."?file=".$post->post_name.".".$type;
+			else $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."/".$post->post_name.".".$type;
 			if ($zoom) {
-				$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s"></a></div>', $type, $href,	$title);
+				$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s" download></a></div>', $type, $href,	$title);
 			} else {
-				$forreaders .= sprintf ('<span><a href="%s" title="%s">%s</a></span><br>', $href, $title, sprintf(__('Download as %s','bg-forreaders'), $document_type));
+				$forreaders .= sprintf ('<span><a href="%s" title="%s" download>%s</a></span><br>', $href, $title, sprintf(__('Download as %s','bg-forreaders'), $document_type));
 			}
 		}
 	}
@@ -144,22 +145,29 @@ function bg_forreaders_proc($content) {
 }
 
 // Функция генерации файлов для чтения при сохранении поста
-function bg_forreaders_save( $post_ID, $post, $update ) {
+function bg_forreaders_save( $id ) {
 	global $formats;
+
+	$post = get_post($id);
+	if( isset($post) && ($post->post_type == 'post' || $post->post_type == 'page') ) { 		// убедимся что мы редактируем нужный тип поста
+		if( get_current_screen()->id != 'post' && get_current_screen()->id != 'post') return; 	// убедимся что мы на нужной странице админки
+		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 							// пропустим если это автосохранение
+		if ( ! current_user_can('edit_post', $id ) ) return; 									// убедимся что пользователь может редактировать запись
 	
-// 	Удаление старых версий файлов для чтения
-	$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
-	foreach ($formats as $type => $document_type) {
-		if (file_exists ($filename.$type)) unlink ($filename.$type);
-	}
-// 	Генерация файлов для чтения
-	if (get_option('bg_forreaders_while_saved')) {
-		$bg_forreaders = new BgForReaders();
-		$bg_forreaders->generate ($post_ID);
+	// 	Удаление старых версий файлов для чтения
+		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
+		foreach ($formats as $type => $document_type) {
+			if (file_exists ($filename.".".$type)) unlink ($filename.".".$type);
+		}
+	// 	Генерация файлов для чтения
+		if (get_option('bg_forreaders_while_saved')) {
+			$bg_forreaders = new BgForReaders();
+			$bg_forreaders->generate ($id);
+		}
 	}
 }
 add_action( 'save_post', 'bg_forreaders_save' );
-
+//add_action('wp_insert_post_data', 'bg_forreaders_save', 20, 2 );
 
 // Hook for adding admin menus
 if ( is_admin() ){ 				// admin actions
@@ -211,6 +219,7 @@ class BgForReaders
 	public function topdf ($html, $options) {
 
 		ini_set("pcre.backtrack_limit","3000000");
+		ini_set("memory_limit", "256M");
 		require_once "lib/mpdf60/mpdf.php";
 		$filepdf = $options["filename"] . '.pdf';
 		
@@ -224,6 +233,53 @@ class BgForReaders
 		}
 		$pdf->WriteHTML($html);
 		$pdf->Output($filepdf, 'F');
+		return;
+	}
+// Portable Document Format (PDF)
+	public function topdf2 ($html, $options) {
+
+		ini_set("pcre.backtrack_limit","3000000");
+		ini_set("memory_limit", "256M");
+		require_once "lib/dompdf/dompdf_config.inc.php";
+		$filepdf = $options["filename"] . '.pdf';
+		
+		$dompdf = new DOMPDF();
+		$dompdf->load_html($html);
+		$dompdf->render();
+
+		$output = $dompdf->output();
+		file_put_contents($filepdf, $output);
+		return;
+	}
+// Portable Document Format (PDF)
+	public function topdf3 ($html, $options) {
+
+		require_once "lib/fpdf181/fpdf.php";
+		$filepdf = $options["filename"] . '.pdf';
+		
+		//create a FPDF object
+		$pdf=new FPDF();
+		//set document properties
+		$pdf->SetAuthor($options["author"]);
+		$pdf->SetTitle($options["title"]);
+		//set font for the entire document
+		$pdf->SetFont('Times','B',20);
+		$pdf->SetTextColor(50,60,100);
+		//set up a page
+		$pdf->AddPage('P');
+		$pdf->SetDisplayMode(real,'default');
+		//insert an image and make it a link
+//		$pdf->Image('logo.png',10,20,33,0,' ','http://www.fpdf.org/');
+		//display the title with a border around it
+		$pdf->SetXY(50,20);
+		$pdf->SetDrawColor(50,60,100);
+		$pdf->Cell(100,10,$options["title"],1,0,'C',0);
+		//Set x and y position for the main text, reduce font size and write content
+		$pdf->SetXY (10,50);
+		$pdf->SetFontSize(10);
+		$pdf->Write(5,$html);
+		//Output the document
+		$pdf->Output($filepdf,'F');
 		return;
 	}
 // Electronic Publication (ePub)
@@ -241,7 +297,7 @@ class BgForReaders
 		$html = preg_replace("/\<hr.*?\>/is", "", $html);
 		$html = preg_replace("/align\s?=\s?\"?(center|left|right|justify)\"?/is", "", $html);
 		//$html = preg_replace('#\<a\s*\t*\r?\n?href=\"[^\#](.*?)\".*?\>(.*?)\<\/a\>#si', "<a l:href=\"$1\">$2</a>", $html);
-		$epub->setGenerator('mPDF version 6.0, https://github.com/mpdf/mpdf');
+		$epub->setGenerator('DrUUID RFC4122 library for PHP5 by J. King (http://jkingweb.ca/)');
 		$epub->setTitle($title); //setting specific options to the EPub library
 		$epub->setIdentifier($guid, EPub::IDENTIFIER_URI); 
 		$iso6391 = ( '' == get_locale() ) ? 'en' : strtolower( substr(get_locale(), 0, 2) ); // only ISO 639-1	
@@ -330,6 +386,7 @@ class BgForReaders
 			"filename"=>$filename,
 			"subject" => (count(wp_get_post_categories($post->ID))) ? implode(' ,',array_map("get_cat_name", wp_get_post_categories($post->ID))) : __("Unknown subject")
 		);
+		set_time_limit ( intval(get_option('bg_forreaders_time_limit')) );
 		if (!file_exists ($filename.".pdf") && get_option('bg_forreaders_pdf') == 'on') $this->topdf($html, $options);
 		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($html, $options);
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($html, $options);
@@ -349,16 +406,17 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_epab', 'on');
 	add_option('bg_forreaders_mobi', 'on');
 	add_option('bg_forreaders_fb2', 'on');
-	add_option('bg_forreaders_zoom', '1');
-	add_option('bg_forreaders_prompt', '');
+	add_option('bg_forreaders_links', 'php');
 	add_option('bg_forreaders_before', 'on');
 	add_option('bg_forreaders_after', '');
+	add_option('bg_forreaders_prompt', '');
+	add_option('bg_forreaders_zoom', '1');
 	add_option('bg_forreaders_single', '');
 	add_option('bg_forreaders_excat', '');
 	add_option('bg_forreaders_author_field', 'post');
 	add_option('bg_forreaders_while_displayed', 'on');
 	add_option('bg_forreaders_while_saved', 'on');
-
+	add_option('bg_forreaders_time_limit', '60');
 }
 function bg_forreaders_delete_options (){
 
@@ -366,13 +424,15 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_epub');
 	delete_option('bg_forreaders_mobi');
 	delete_option('bg_forreaders_fb2');
-	delete_option('bg_forreaders_zoom');
-	delete_option('bg_forreaders_prompt');
+	delete_option('bg_forreaders_links');
 	delete_option('bg_forreaders_before');
 	delete_option('bg_forreaders_after');
+	delete_option('bg_forreaders_prompt');
+	delete_option('bg_forreaders_zoom');
 	delete_option('bg_forreaders_single');
 	delete_option('bg_forreaders_excat');
 	delete_option('bg_forreaders_author_field');
 	delete_option('bg_forreaders_while_displayed');
 	delete_option('bg_forreaders_while_saved');
+	delete_option('bg_forreaders_time_limit');
 }
