@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.3
+Version: 0.4
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.3' );
+define( 'BG_FORREADERS_VERSION', '0.4' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -356,7 +356,7 @@ function bg_forreaders_add_options (){
 
 	delete_option('bg_forreaders_while_starttime');
 	add_option('bg_forreaders_pdf', 'on');
-	add_option('bg_forreaders_epab', 'on');
+	add_option('bg_forreaders_epub', 'on');
 	add_option('bg_forreaders_mobi', 'on');
 	add_option('bg_forreaders_fb2', 'on');
 	add_option('bg_forreaders_links', 'php');
