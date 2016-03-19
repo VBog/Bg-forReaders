@@ -7,12 +7,15 @@
  * использует плагин Bg forReaders и должен распологаться в каталоге плагина
  *
  */
-?>
-<?php
 header("Content-type: text/html; charset: UTF-8");
-$absolute_path = explode('wp-content', $_SERVER['SCRIPT_FILENAME']);
-$wp_load = $absolute_path[0] . 'wp-load.php';
-require_once($wp_load);
+if(!defined('PATH')):
+//	$value_const = str_replace('wp-content/plugins', '', dirname(__DIR__));
+	$value_const =  dirname(dirname(dirname(__DIR__)));
+	define("PATH", $value_const);
+else: 
+	exit();
+endif; 
+require_once(PATH.'/wp-load.php');
 
 if (isset($argv[1])) {
 	$arg = $argv[1];
@@ -24,9 +27,14 @@ if (isset($argv[1])) {
 }
 // else exit; // Запрет запуска не из консоли
 
+$e=explode("=",$argv[2]);
+$echo_on = ("echo" == $e[0]);
+
+
 $debug_file = dirname(__FILE__ )."/forreaders.log";
 if (file_exists ($debug_file) ) unlink ($debug_file);
 error_log(date ("j-m-Y H:i"). " ===================== Start the batch mode =====================". PHP_EOL, 3, $debug_file);
+if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Start the batch mode =====================". PHP_EOL;
 $bg_forreaders = new BgForReaders();
 $starttime =  microtime(true);
 
@@ -35,6 +43,7 @@ if (isset($_GET['id'])) {
 	$id_list = explode ( ',' , $_GET['id'] );
 	$cnt = count($id_list);
 	error_log(" List of posts (".$cnt."): ".$_GET['id']. PHP_EOL, 3, $debug_file);
+	if ($echo_on) echo " List of posts (".$cnt."): ".$_GET['id']. PHP_EOL;
 
 	$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => 0, 'orderby' => 'ID');
 	for ($i = 0; $i < $cnt; $i++){
@@ -42,15 +51,18 @@ if (isset($_GET['id'])) {
 		
 		if ($post) {
 			error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
+			if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
 			$the_time =  microtime(true);
 			$bg_forreaders->generate ($post->ID);
 			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+			if ($echo_on) echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
 		}
 	}
 // Иначе если указан параметр all, то обрабатываем все посты
 } elseif (isset($_GET['all'])) {
 	$cnt = wp_count_posts()->publish;
 	error_log(" All posts (".$cnt.")". PHP_EOL, 3, $debug_file);
+	if ($echo_on) echo " All posts (".$cnt.")". PHP_EOL;
 
 	for ($i = 0; $i < $cnt; $i++){
 		$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => $i, 'orderby' => 'ID');
@@ -63,11 +75,13 @@ if (isset($_GET['id'])) {
 			foreach((get_the_category()) as $category) { 
 				if (trim($cat) == $category->category_nicename) {
 					error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
+					if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
 					continue 3;
 				}
 			}
 		}
 		error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
+		if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
 		$the_time =  microtime(true);
 		$bg_forreaders->generate ($post->ID);
 		error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
@@ -75,4 +89,6 @@ if (isset($_GET['id'])) {
 }
 error_log("TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL, 3, $debug_file);
 error_log(date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL, 3, $debug_file);
+if ($echo_on) echo "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL;
+if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL;
 exit;
