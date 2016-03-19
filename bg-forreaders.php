@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.4
+Version: 0.5
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,12 +35,33 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.4' );
+define( 'BG_FORREADERS_VERSION', '0.5' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_STORAGE_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_STORAGE_URI  ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
+
+define( 'BG_FORREADERS_ALLOWED_TAGS',
+"div,
+h1[align],
+h2[align],
+h3[align],
+h4[align],
+h5[align],
+h6[align],
+p[align],
+br,
+ol,
+table,
+a[href|name|id],
+b,
+strong,
+i,
+em,
+u,
+sub,
+sup");
 
 $bg_forreaders_start_time = microtime(true);
 $bg_forreaders_debug_file = dirname(__FILE__ )."/forreaders.log";
@@ -132,7 +153,7 @@ function bg_forreaders_proc($content) {
 			if (get_option('bg_forreaders_links') == 'php') $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."?file=".$post->post_name.".".$type;
 			else $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."/".$post->post_name.".".$type;
 			if ($zoom) {
-				$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s" download></a></div>', $type, $href,	$title);
+				$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s" download></a></div>', $type, $href, $title);
 			} else {
 				$forreaders .= sprintf ('<span><a href="%s" title="%s" download>%s</a></span><br>', $href, $title, sprintf(__('Download as %s','bg-forreaders'), $document_type));
 			}
@@ -159,6 +180,7 @@ function bg_forreaders_save( $id ) {
 		foreach ($formats as $type => $document_type) {
 			if (file_exists ($filename.".".$type)) unlink ($filename.".".$type);
 		}
+		if (file_exists ($filename.".html")) unlink ($filename.".html");
 	// 	Генерация файлов для чтения
 		if (get_option('bg_forreaders_while_saved')) {
 			$bg_forreaders = new BgForReaders();
@@ -194,32 +216,39 @@ class BgForReaders
 // Подготовка контента к публикации
 	public function prepare ($content) {
 
-		$content = do_shortcode (  $content );
-//		$content = preg_replace("/\<img src=(\"?)\//i", "<img src=$1http://azbyka.ru/", $content);
-//		$content = preg_replace("/href\s?=\s?(\"?)\//i", "href=$1http://azbyka.ru/", $content);
-		$content = preg_replace("/\<img style=\".*?\>/is", "", $content);
-//		$content = str_replace('<div style="text-align: center;"><img style="height: 26px;" src="/design/dividers_13.gif" alt="Виньетка" /></div>', '', $content);
-//		$content = str_replace('<img style="height:26px;" alt="Виньетка" src="'.dirname(__FILE__).'/design/dividers_13.gif">', '', $content);
-		$content = str_replace('<!--nextpage-->', '', $content);
-		$content = str_replace('<!--more-->', '', $content);
-		$content = str_replace('id =', 'name = ', $content);
-		$content = str_replace('id=', 'name = ', $content);
-		$content = str_replace('^', '', $content);
-		$content = str_replace('<li>', '<p>• ', $content); 
-		$content = str_replace('</li>', '</p>', $content);
-		$content = str_replace('<ul>', '', $content);
-		$content = str_replace('</ul>', '', $content);
-		$content = preg_replace("#\r\n\r\n\&nbsp;#s", "", $content);
-		$content = preg_replace("#\r\n\&nbsp;#s", "", $content);
-		$content = preg_replace("#\r\n\r\n\r\n#s", "", $content);
-		$content = preg_replace("#\r\n\r\n#s", "</p><p>", $content);
+		require_once "lib/BgClearHTML.php";
+		$сhtml = new BgClearHTML();
+		
+		// Массив разрешенных тегов и атрибутов
+		$allow_attributes = array ();
+		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_allowed_tags'));
+
+		// Выполнить все шорт-коды
+		$content = do_shortcode ( $content );
+
+		// Оставляем в тексте только разрешенные теги и итрибуты
+		$content = $сhtml->prepare ($content, $allow_attributes);
+
+		// Дополнительная обработка тега <a>
+//		$content = preg_replace('/(<a.*?)id=(.*?\>)/is', "\\1name=\\2", $content);
+
+		// Заменяем <br> на <br /> 	
+		$content = str_replace('<br>', '<br />', $content);
+		
+		// Исправляем неправильно-введенные XHTML (HTML) теги
+		$content = balanceTags( $content, true );	
+		
+		// Делаем текст кода читабельным 
+		$content = $сhtml->addEOL ($content);
+
 		return $content;
 	}
+
 // Portable Document Format (PDF)
 	public function topdf ($html, $options) {
 
-//		ini_set("pcre.backtrack_limit","3000000");
-//		ini_set("memory_limit", "256M");
+		ini_set("pcre.backtrack_limit","3000000");
+		ini_set("memory_limit", "256M");
 		require_once "lib/mpdf60/mpdf.php";
 		$filepdf = $options["filename"] . '.pdf';
 		
@@ -315,12 +344,40 @@ class BgForReaders
 		return $put;
 	}
 	
+// Упрощенный html (html)
+	public function tohtml ($html, $options) {
+
+		$filehtml = $options["filename"] . '.html';
+									
+		$opt = array(
+			"title"=> $options["title"],
+			"author"=> $options["author"]
+		);
+		$html = "<html>\n"
+		. "<head>"
+		. "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
+		. "<title>" . $options["title"] . "</title>\n"
+		. "</head>\n"
+		. "<body>\n"
+		. "<p>" .$options["author"]. "</p>\n"
+		. $html
+		."</body></html>";
+
+		$put = file_put_contents($filehtml, $html);
+		return $put;
+	}
+	
 // Создание файлов для чтения
 	public function generate ($id) {
 		
 		$post = get_post($id);
-		$html = $this->prepare($post->post_content);
+		$plink = get_permalink($id);
+		$html = $post->post_content;
+		$html = preg_replace("/". preg_quote( $plink, '/' ).'.*?#/is', '#', $html);
 		$html = '<h1 class="entry-title">' . $post->post_title . '</h1>'.$html;
+		$html = $this->prepare($html);
+
+		
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
 		if (get_option('bg_forreaders_author_field') == 'post') {
 			// Автор - автор поста
@@ -344,6 +401,8 @@ class BgForReaders
 		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($html, $options);
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($html, $options);
 		if (!file_exists ($filename.".fb2") && get_option('bg_forreaders_fb2') == 'on') $this->tofb2($html, $options);
+//		if (!file_exists ($filename.".html")) $this->tohtml($html, $options);
+		$this->tohtml($html, $options);
 		return;
 	}
 }
@@ -370,6 +429,8 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_while_displayed', 'on');
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_time_limit', '60');
+
+	add_option('bg_forreaders_allowed_tags', BG_FORREADERS_ALLOWED_TAGS);
 }
 function bg_forreaders_delete_options (){
 
@@ -388,4 +449,6 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_while_displayed');
 	delete_option('bg_forreaders_while_saved');
 	delete_option('bg_forreaders_time_limit');
+
+	delete_option('bg_forreaders_allowed_tags');
 }

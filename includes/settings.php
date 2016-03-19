@@ -18,6 +18,7 @@ function bg_forreaders_options_page() {
 
 		<h2 class="nav-tab-wrapper">
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e('General', 'bg-forreaders') ?></a>
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('Simple HTML', 'bg-forreaders') ?></a>
 			<?php foreach ($formats as $type => $document_type) { ?>
 				<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=<?php echo $type ?>" class="nav-tab <?php echo $active_tab == $type ? 'nav-tab-active' : ''; ?>"><?php echo $document_type ?></a>
 			<?php } ?>
@@ -121,6 +122,28 @@ function bg_forreaders_options_page() {
 							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_zoom, 
 							bg_forreaders_single, bg_forreaders_excat, bg_forreaders_author_field, bg_forreaders_while_displayed, 
 							bg_forreaders_while_saved, bg_forreaders_time_limit" />
+
+				<p class="submit">
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				</p>
+
+				<!-- Подготовка HTML -->
+			<?php } elseif ($active_tab == 'html') { ?>
+				<table class="form-table">
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
+				<td>
+				<textarea name="bg_forreaders_allowed_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_allowed_tags'); ?></textarea><br>
+				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+				</table>
+
+				<input type="hidden" name="action" value="update" />
+				<input type="hidden" name="page_options" value="bg_forreaders_allowed_tags" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
