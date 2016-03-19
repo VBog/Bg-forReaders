@@ -401,8 +401,8 @@ class BgForReaders
 		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($html, $options);
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($html, $options);
 		if (!file_exists ($filename.".fb2") && get_option('bg_forreaders_fb2') == 'on') $this->tofb2($html, $options);
-//		if (!file_exists ($filename.".html")) $this->tohtml($html, $options);
-		$this->tohtml($html, $options);
+		if (!file_exists ($filename.".html")) $this->tohtml($html, $options);
+//		$this->tohtml($html, $options);
 		return;
 	}
 }
