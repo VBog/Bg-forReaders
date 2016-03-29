@@ -10,7 +10,8 @@ class BgClearHTML {
 		$listattr =	explode( ",", $str );
 		foreach ($listattr as $attr) {
 			preg_match('/([a-z0-9]+)(\[([\|a-z0-9]+)\])?/is', $attr, $mt);
-			$allow_attributes[$mt[1]] = $mt[3];
+			if (isset($mt[3])) $allow_attributes[$mt[1]] = $mt[3];
+			else $allow_attributes[$mt[1]] = "";
 		}
 		return $allow_attributes;
 	}
@@ -19,14 +20,11 @@ class BgClearHTML {
 	public function prepare ($content, $allow_attributes) {
 		// Удаляем JS-скрипты
 		$content = preg_replace("/<script.*?script>/s", "", $content);
-		
-		// Заменяем символы конца строки на пробел	
-		$content = preg_replace("#\r\n\&nbsp;#s", " ", $content);
-		$content = preg_replace("#\r\n#s", " ", $content);
-		// Заменяем &nbsp; на пробел 	
-		$content = str_replace('&nbsp;', " ", $content);
-		// Удаляем двойные пробелы	
-		$content = preg_replace('/[\s]+/s', " ", $content);
+		// Заменяем пробелы и символы конца строки
+		$content = $this->replaceSpaces($content);
+		// Заменяем <br/> и <hr/> на <br /> и <hr />
+			$content = str_replace("<br/>", "<br />", $content);
+			$content = str_replace("<hr/>", "<hr />", $content);
 
 		// Списки
 		if (!array_key_exists ( "ol" , $allow_attributes )) {
@@ -76,7 +74,7 @@ class BgClearHTML {
 		$content = strip_tags($content, $allow_tags);
 		
 		// Проверяем все оставшиеся открывающие теги и их атрибуты
-		$template = '/<([a-z][a-z0-9]*\b)[^>](.*?)(\/?\>)/is';
+		$template = '/<([a-z][a-z0-9]*\b)([^>]*?)(\/?\>)/is';
 		preg_match_all($template, $content, $matches, PREG_OFFSET_CAPTURE);
 
 		$text = "";
@@ -112,11 +110,28 @@ class BgClearHTML {
 		// Делаем текст кода читабельным 
 		$lines = array ("html", "head", "body", "div", "h1", "h2", "h3", "h4", "h5", "h6", "p", "ol", "ul");
 		foreach ($lines as $tag) {
-			$content = preg_replace('#</'.$tag.'>\s*#is', '</'.$tag.'>'.PHP_EOL.PHP_EOL, $content);
+			$content = preg_replace('#</'.$tag.'>\s*#is', '</'.$tag.'>'.PHP_EOL, $content);
 		}
 		$content = preg_replace('#</li>\s*#is', '</li>'.PHP_EOL, $content);
 		$content = preg_replace('#<br>\s*#is', '<br>'.PHP_EOL, $content);
 		$content = preg_replace('#<br />\s*#is', '<br />'.PHP_EOL, $content);
+		
+		return $content;
+	}
+	
+	public function replaceSpaces ($content) {
+		
+		// Заменяем символы конца строки на пробел	
+		$content = preg_replace("#\r\n\&nbsp;#s", " ", $content);
+		$content = preg_replace("#\r\n#s", " ", $content);
+		// Заменяем &nbsp; на пробел 	
+		$content = str_replace('&nbsp;', ' ', $content);
+		// Удаляем двойные пробелы	
+		$content = preg_replace('/\s+/s', " ", $content);
+		$content = str_replace('  ', ' ', $content);
+		// Удаляем пробелы из начала и конца строки
+		$content = trim($content);
+		
 		
 		return $content;
 	}
