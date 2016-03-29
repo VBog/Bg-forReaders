@@ -21,7 +21,7 @@ function bg_forreaders_options_page() {
 			<?php foreach ($formats as $type => $document_type) { ?>
 				<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=<?php echo $type ?>" class="nav-tab <?php echo $active_tab == $type ? 'nav-tab-active' : ''; ?>"><?php echo $document_type ?></a>
 			<?php } ?>
-			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('Simple HTML', 'bg-forreaders') ?></a>
+<!--			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('Simple HTML', 'bg-forreaders') ?></a> -->
 		</h2>
 
 		<form id="bg_forreaders_options" method="post" action="options.php">
@@ -151,13 +151,16 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
 				<td>
-				<?php _e('See <a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html">Simple HTML tab</a>', 'bg-forreaders') ?>
+				<textarea name="bg_forreaders_pdf_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_pdf_tags'); ?></textarea><br>
+				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_pdf_css" />
+				<input type="hidden" name="page_options" value="bg_forreaders_pdf_css, bg_forreaders_pdf_tags" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -170,7 +173,7 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('CSS styles table for ePub', 'bg-forreaders') ?></th>
 				<td>
-				<textarea name="bg_forreaders_pdf_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_epub_css'); ?></textarea><br>
+				<textarea name="bg_forreaders_epub_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_epub_css'); ?></textarea><br>
 				<i><?php _e('Enter the css styling table for display text in ePub-reader.', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
@@ -178,11 +181,21 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
 				<td>
-				<?php _e('See <a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html">Simple HTML tab</a>', 'bg-forreaders') ?>
+				<textarea name="bg_forreaders_epub_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_epub_tags'); ?></textarea><br>
+				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
 
 				</table>
+
+				<input type="hidden" name="action" value="update" />
+				<input type="hidden" name="page_options" value="bg_forreaders_epub_css, bg_forreaders_epub_tags" />
+
+				<p class="submit">
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				</p>
 			<!-- Файл mobi -->
 			<?php } elseif ($active_tab == 'mobi') { ?>
 				<table class="form-table">
@@ -190,11 +203,22 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
 				<td>
-				<?php _e('See <a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html">Simple HTML tab</a>', 'bg-forreaders') ?>
+				<textarea name="bg_forreaders_mobi_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_mobi_tags'); ?></textarea><br>
+				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
+				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
 
 				</table>
+
+				<input type="hidden" name="action" value="update" />
+				<input type="hidden" name="page_options" value="bg_forreaders_mobi_tags" />
+
+				<p class="submit">
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				</p>
+
 			<!-- Файл fb2 -->
 			<?php } elseif ($active_tab == 'fb2') { ?>
 				<table class="form-table">
