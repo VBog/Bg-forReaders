@@ -213,7 +213,6 @@ $this->images ($content, $options).
 				}, $content);
 
 		// Якори выносим в отдельный тег
-		// Оставляем только внутренние ссылки (#)
 		$content = preg_replace_callback('/<a\s+([^>]*?)>/is', 
 			function ($match) {
 				if (preg_match('/(name|id)\s*=\s*([\"\'])([^>]*?)(\2)/is', $match[1], $mt))
@@ -221,8 +220,7 @@ $this->images ($content, $options).
 				else $a = '';
 
 				if (preg_match('/href\s*=\s*([\"\'])([^>]*?)(\1)/is', $match[1], $mt)) {
-					if($mt[2][0] == '#') $a .= '<a l:href="'.$mt[2].'">';
-					else $a .= '<a>';
+					$a .= '<a l:href="'.$mt[2].'">';
 				} else $a .= '<a>';
 
 				return $a;	

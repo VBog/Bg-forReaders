@@ -7,6 +7,7 @@ class BgClearHTML {
 		// Ключ - тег, 
 		// Значение - перечень разрешенных атрибутов, разделенных вертикальной чертой,
 		// если Значение "*" - разрешены все атрибуты
+		$str = preg_replace('/\s+/is','',$str);
 		$listattr =	explode( ",", $str );
 		foreach ($listattr as $attr) {
 			preg_match('/([a-z0-9]+)(\[([\|a-z0-9]+)\])?/is', $attr, $mt);

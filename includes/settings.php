@@ -157,10 +157,18 @@ function bg_forreaders_options_page() {
 				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_pdf_extlinks" <?php if(get_option('bg_forreaders_pdf_extlinks')) echo "checked" ?> value="on" />
+				</td>
+				</tr>
+				
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_pdf_css, bg_forreaders_pdf_tags" />
+				<input type="hidden" name="page_options" value="bg_forreaders_pdf_css, bg_forreaders_pdf_tags, bg_forreaders_pdf_extlinks" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -188,10 +196,17 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
+				<tr valign="top">
+				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_epub_extlinks" <?php if(get_option('bg_forreaders_epub_extlinks')) echo "checked" ?> value="on" />
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_epub_css, bg_forreaders_epub_tags" />
+				<input type="hidden" name="page_options" value="bg_forreaders_epub_css, bg_forreaders_epub_tags, bg_forreaders_epub_extlinks" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -199,6 +214,14 @@ function bg_forreaders_options_page() {
 			<!-- Файл mobi -->
 			<?php } elseif ($active_tab == 'mobi') { ?>
 				<table class="form-table">
+
+				<tr valign="top">
+				<th scope="row"><?php _e('CSS styles table for mobi', 'bg-forreaders') ?></th>
+				<td>
+				<textarea name="bg_forreaders_mobi_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_mobi_css'); ?></textarea><br>
+				<i><?php _e('Enter the css styling table for display text in mobi-reader.', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
 
 				<tr valign="top">
 				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
@@ -210,10 +233,17 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
+				<tr valign="top">
+				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_mobi_extlinks" <?php if(get_option('bg_forreaders_mobi_extlinks')) echo "checked" ?> value="on" />
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_mobi_tags" />
+				<input type="hidden" name="page_options" value="bg_forreaders_mobi_css, bg_forreaders_mobi_tags, bg_forreaders_mobi_extlinks" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -250,10 +280,18 @@ function bg_forreaders_options_page() {
 				<i><?php _e('(For example, &amp;quot;,&amp;nbsp;[ ],&amp;hellip;[...])', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_fb2_extlinks" <?php if(get_option('bg_forreaders_fb2_extlinks')) echo "checked" ?> value="on" />
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_fb2_css, bg_forreaders_fb2_tags, bg_forreaders_fb2_entities" />
+				<input type="hidden" name="page_options" value="bg_forreaders_fb2_css, bg_forreaders_fb2_tags, bg_forreaders_fb2_entities, bg_forreaders_fb2_extlinks" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
