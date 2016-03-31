@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.6.2
+Version: 0.6.3
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,54 +35,30 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.6.2' );
+define( 'BG_FORREADERS_VERSION', '0.6.3' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_STORAGE_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_STORAGE_URI  ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
 
-define( 'BG_FORREADERS_ALLOWED_TAGS',
+// Для всех форматов
+define( 'BG_FORREADERS_CSS', "");
+define( 'BG_FORREADERS_TAGS',
 "img[src|alt],div[id],blockquote[id],
 h1[align|id],h2[align|id],h3[align|id],h4[align|id],h5[align|id],h6[align|id],
 hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
 table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
 b,strong,i,em,u,sub,sup,strike,code");
-
-define( 'BG_FORREADERS_PDF_CSS', "");
-define( 'BG_FORREADERS_PDF_TAGS',
-"img[src|alt],div[id],blockquote[id],
-h1[align|id],h2[align|id],h3[align|id],h4[align|id],h5[align|id],h6[align|id],
-hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
-table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
-b,strong,i,em,u,sub,sup,strike,code");
-
-define( 'BG_FORREADERS_EPUB_CSS', "");
-define( 'BG_FORREADERS_EPUB_TAGS',
-"img[src|alt],div[id],blockquote[id],
-h1[align|id],h2[align|id],h3[align|id],h4[align|id],h5[align|id],h6[align|id],
-hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
-table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
-b,strong,i,em,u,sub,sup,strike,code");
-
-define( 'BG_FORREADERS_MOBI_CSS', "");
-define( 'BG_FORREADERS_MOBI_TAGS',
-"img[src|alt],div[id],blockquote[id],
-h1[align|id],h2[align|id],h3[align|id],h4[align|id],h5[align|id],h6[align|id],
-hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
-table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
-b,strong,i,em,u,sub,sup,strike,code");
-
-define( 'BG_FORREADERS_FB2_CSS', "");
+// Дополнительные ограничения только для FB2
 define( 'BG_FORREADERS_FB2_TAGS',
 "img[src|alt],div[id],blockquote[id],
 h1[id],h2[id],h3[id],h4[id],h5[id],h6[id],
-hr,p[id],br,ol[id],ul[id],li[id],a[href|name|id],
+hr,p[id],br,li[id],a[href|name|id],
 table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
 b,strong,i,em,u,sub,sup,strike,code");
 define( 'BG_FORREADERS_FB2_ENTITIES',
 "&amp;,&lt;,&gt;,&apos;,&quot;,&nbsp;[ ],&hellip;[...],&ndash;[-],&mdash;[—],&oacute;[o]");
-
 
 $bg_forreaders_start_time = microtime(true);
 $bg_forreaders_debug_file = dirname(__FILE__ )."/forreaders.log";
@@ -251,6 +227,19 @@ class BgForReaders {
 		// Исправляем неправильно-введенные XHTML (HTML) теги
 		$content = balanceTags( $content, true );	
 
+//		Очищаем текст от лишних тегов разметки
+		$сhtml = new BgClearHTML();
+		// Массив разрешенных тегов и атрибутов
+		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_tags'));
+		// Оставляем в тексте только разрешенные теги и атрибуты
+		$content = $сhtml->prepare ($content, $allow_attributes);
+		$content = $this->idtoname($content);
+		$content = $this->clearanchor($content);
+		if (!get_option('bg_forreaders_extlinks')) $content = $this->removehref($content);
+		// Исправляем неправильно-введенные XHTML (HTML) теги
+		$content = balanceTags( $content, true );	
+
+
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
 		if (get_option('bg_forreaders_author_field') == 'post') {
 			// Автор - автор поста
@@ -297,23 +286,11 @@ class BgForReaders {
 		require_once "lib/mpdf60/mpdf.php";
 		$filepdf = $options["filename"] . '.pdf';
 		
-//		Очищаем текст от лишних тегов разметки
-		$сhtml = new BgClearHTML();
-		// Массив разрешенных тегов и атрибутов
-		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_pdf_tags'));
-		// Оставляем в тексте только разрешенные теги и атрибуты
-		$html = $сhtml->prepare ($html, $allow_attributes);
-		$html = $this->idtoname($html);
-		$html = $this->clearanchor($html);
-		if (!get_option('bg_forreaders_pdf_extlinks')) $html = $this->removehref($html);
-		// Исправляем неправильно-введенные XHTML (HTML) теги
-		$html = balanceTags( $html, true );	
-
 		$pdf = new mPDF();
 		$pdf->SetTitle($options["title"]);
 		$pdf->SetAuthor($options["author"]);
 		//$pdf->showImageErrors = true;
-		$cssData = get_option('bg_forreaders_pdf_css');
+		$cssData = get_option('bg_forreaders_css');
 		if ($cssData != "") {
 			$pdf->WriteHTML($cssData,1);	// The parameter 1 tells that this is css/style only and no body/html/text
 		}
@@ -327,19 +304,7 @@ class BgForReaders {
 // ePub uses XHTML 1.1, preferably strict.
 		require_once "lib/PHPePub/EPub.php";
 		$fileepub = $options["filename"] . '.epub';
-		$cssData = get_option('bg_forreaders_epub_css');
-
-//		Очищаем текст от лишних тегов разметки
-		$сhtml = new BgClearHTML();
-		// Массив разрешенных тегов и атрибутов
-		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_epub_tags'));
-		// Оставляем в тексте только разрешенные теги и атрибуты
-		$html = $сhtml->prepare ($html, $allow_attributes);
-		$html = $this->idtoname($html);
-		$html = $this->clearanchor($html);
-		if (!get_option('bg_forreaders_epub_extlinks')) $html = $this->removehref($html);
-		// Исправляем неправильно-введенные XHTML (HTML) теги
-		$html = balanceTags( $html, true );	
+		$cssData = get_option('bg_forreaders_css');
 
 // The mandatory fields		
 		$epub = new EPub();
@@ -377,18 +342,6 @@ class BgForReaders {
 		require_once "lib/phpMobi/MOBIClass/MOBI.php";
 		$filemobi = $options["filename"] . '.mobi';
 
-//		Очищаем текст от лишних тегов разметки
-		$сhtml = new BgClearHTML();
-		// Массив разрешенных тегов и атрибутов
-		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_mobi_tags'));
-		// Оставляем в тексте только разрешенные теги и атрибуты
-		$html = $сhtml->prepare ($html, $allow_attributes);
-		$html = $this->idtoname($html);
-		$html = $this->clearanchor($html);
-		if (!get_option('bg_forreaders_mobi_extlinks')) $html = $this->removehref($html);
-		// Исправляем неправильно-введенные XHTML (HTML) теги
-		$html = balanceTags( $html, true );	
-
 		$html =
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 		. "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n"
@@ -397,7 +350,7 @@ class BgForReaders {
 		. "<head>"
 		. "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
 		. "<style type=\"text/css\">\n"
-		. get_option('bg_forreaders_mobi_css')
+		. get_option('bg_forreaders_css')
 		. "</style>\n"
 		. "<title>" . $options["title"] . "</title>\n"
 		. "</head>\n"
@@ -426,12 +379,10 @@ class BgForReaders {
 			"author"=> $options["author"],
 			"genre"=> $options["genre"],
 			"lang"=> $options["lang"],
-			"css"=> get_option('bg_forreaders_fb2_css'), 
-			"tags"=> get_option('bg_forreaders_fb2_tags'),
-			"entities" => get_option('bg_forreaders_fb2_entities')
+			"css"=> get_option('bg_forreaders_css'), 
+			"tags"=> BG_FORREADERS_FB2_TAGS,
+			"entities" => BG_FORREADERS_FB2_ENTITIES
 		);
-
-		if (!get_option('bg_forreaders_fb2_extlinks')) $html = $this->removehref($html);
 
 		$fb2 = new sFB2();
 		$html = $fb2->prepare($html, $opt);
@@ -444,12 +395,6 @@ class BgForReaders {
 
 		$filehtml = $options["filename"] . '.html';
 									
-//		Очищаем текст от лишних тегов разметки
-		$сhtml = new BgClearHTML();
-		// Массив разрешенных тегов и атрибутов
-		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_allowed_tags'));
-		// Оставляем в тексте только разрешенные теги и атрибуты
-		$html = $сhtml->prepare ($html, $allow_attributes);
 		$html = $сhtml->addEOL ($html);
 
 		$html = 
@@ -544,25 +489,28 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_time_limit', '60');
 
-	add_option('bg_forreaders_allowed_tags', BG_FORREADERS_ALLOWED_TAGS);
-	
-	add_option('bg_forreaders_pdf_css', BG_FORREADERS_PDF_CSS);
-	add_option('bg_forreaders_pdf_tags', BG_FORREADERS_PDF_TAGS);
-	add_option('bg_forreaders_pdf_extlinks', 'on');
-	
-	add_option('bg_forreaders_epub_css', BG_FORREADERS_EPUB_CSS);
-	add_option('bg_forreaders_epub_tags', BG_FORREADERS_EPUB_TAGS);
-	add_option('bg_forreaders_epub_extlinks', 'on');
-	
-	add_option('bg_forreaders_mobi_css', BG_FORREADERS_EPUB_CSS);
-	add_option('bg_forreaders_mobi_tags', BG_FORREADERS_MOBI_TAGS);
-	add_option('bg_forreaders_mobi_extlinks', 'on');
-	
-	add_option('bg_forreaders_fb2_css', BG_FORREADERS_FB2_CSS);
-	add_option('bg_forreaders_fb2_tags', BG_FORREADERS_FB2_TAGS);
-	add_option('bg_forreaders_fb2_entities', BG_FORREADERS_FB2_ENTITIES);
-	add_option('bg_forreaders_fb2_extlinks', 'on');
+	add_option('bg_forreaders_css', BG_FORREADERS_CSS);
+	add_option('bg_forreaders_tags', BG_FORREADERS_TAGS);
+	add_option('bg_forreaders_extlinks', 'on');
+// Ниже - удалить
+	delete_option('bg_forreaders_allowed_tags');
 
+	delete_option('bg_forreaders_pdf_css');
+	delete_option('bg_forreaders_pdf_tags');
+	delete_option('bg_forreaders_pdf_extlinks');
+
+	delete_option('bg_forreaders_epub_css');
+	delete_option('bg_forreaders_epub_tags');
+	delete_option('bg_forreaders_epub_extlinks');
+
+	delete_option('bg_forreaders_mobi_css');
+	delete_option('bg_forreaders_mobi_tags');
+	delete_option('bg_forreaders_mobi_extlinks');
+
+	delete_option('bg_forreaders_fb2_css');
+	delete_option('bg_forreaders_fb2_tags');
+	delete_option('bg_forreaders_fb2_entities');
+	delete_option('bg_forreaders_fb2_extlinks');
 }
 function bg_forreaders_delete_options (){
 
@@ -583,22 +531,7 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_while_saved');
 	delete_option('bg_forreaders_time_limit');
 
-	delete_option('bg_forreaders_allowed_tags');
-
-	delete_option('bg_forreaders_pdf_css');
-	delete_option('bg_forreaders_pdf_tags');
-	delete_option('bg_forreaders_pdf_extlinks');
-
-	delete_option('bg_forreaders_epub_css');
-	delete_option('bg_forreaders_epub_tags');
-	delete_option('bg_forreaders_epub_extlinks');
-
-	delete_option('bg_forreaders_mobi_css');
-	delete_option('bg_forreaders_mobi_tags');
-	delete_option('bg_forreaders_mobi_extlinks');
-
-	delete_option('bg_forreaders_fb2_css');
-	delete_option('bg_forreaders_fb2_tags');
-	delete_option('bg_forreaders_fb2_entities');
-	delete_option('bg_forreaders_fb2_extlinks');
+	delete_option('bg_forreaders_css');
+	delete_option('bg_forreaders_tags');
+	delete_option('bg_forreaders_extlinks');
 }

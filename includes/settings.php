@@ -18,10 +18,9 @@ function bg_forreaders_options_page() {
 
 		<h2 class="nav-tab-wrapper">
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e('General', 'bg-forreaders') ?></a>
-			<?php foreach ($formats as $type => $document_type) { ?>
-				<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=<?php echo $type ?>" class="nav-tab <?php echo $active_tab == $type ? 'nav-tab-active' : ''; ?>"><?php echo $document_type ?></a>
-			<?php } ?>
-<!--			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('Simple HTML', 'bg-forreaders') ?></a> -->
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=options" class="nav-tab <?php echo $active_tab == 'options' ? 'nav-tab-active' : ''; ?>"><?php _e('Options', 'bg-forreaders') ?></a>
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=css" class="nav-tab <?php echo $active_tab == 'css' ? 'nav-tab-active' : ''; ?>"><?php _e('CSS', 'bg-forreaders') ?></a> 
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('HTML', 'bg-forreaders') ?></a> 
 		</h2>
 
 		<form id="bg_forreaders_options" method="post" action="options.php">
@@ -87,22 +86,6 @@ function bg_forreaders_options_page() {
 				</tr>
 
 				<tr valign="top">
-				<th scope="row"><?php _e('Custom field for author name', 'bg-forreaders') ?></th>
-				<td>
-				<input type="text" name="bg_forreaders_author_field" value="<?php echo get_option('bg_forreaders_author_field'); ?>" size="60" /><br>
-				<i><?php _e('(if you specify as "post", author is post author)', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Genre', 'bg-forreaders') ?></th>
-				<td>
-				<input type="text" name="bg_forreaders_genre" value="<?php echo get_option('bg_forreaders_genre'); ?>" size="60" /><br>
-				<i><?php _e('(if you specify as "genre", genre is content of custom fields "genre")', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
 				<th scope="row"><?php _e('When will created files for readers?', 'bg-forreaders') ?></th>
 				<td>
 				<input type="checkbox" name="bg_forreaders_while_displayed" <?php if(get_option('bg_forreaders_while_displayed')) echo "checked" ?> value="on" /> <?php _e('while current post is displayed', 'bg-forreaders') ?><br /> 
@@ -129,195 +112,93 @@ function bg_forreaders_options_page() {
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
 							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_zoom, 
-							bg_forreaders_single, bg_forreaders_excat, bg_forreaders_author_field, bg_forreaders_genre, 
+							bg_forreaders_single, bg_forreaders_excat,
 							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_time_limit" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 
-				<!-- Файл PDF -->
-			<?php } elseif ($active_tab == 'pdf') { ?>
+			<?php } elseif ($active_tab == 'options') { ?>
+
+				<table class="form-table">
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Custom field for author name', 'bg-forreaders') ?></th>
+				<td>
+				<input type="text" name="bg_forreaders_author_field" value="<?php echo get_option('bg_forreaders_author_field'); ?>" size="60" /><br>
+				<i><?php _e('(if you specify as "post", author is post author)', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Genre', 'bg-forreaders') ?></th>
+				<td>
+				<input type="text" name="bg_forreaders_genre" value="<?php echo get_option('bg_forreaders_genre'); ?>" size="60" /><br>
+				<i><?php _e('(if you specify as "genre", genre is content of custom fields "genre")', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
+				</table>
+
+				<input type="hidden" name="action" value="update" />
+				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_genre" />
+
+				<p class="submit">
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				</p>
+
+				<!-- Настройка таблицы стилей -->
+			<?php } elseif ($active_tab == 'css') { ?>
 				<table class="form-table">
 
 				<tr valign="top">
 				<th scope="row"><?php _e('CSS styles table for PDF', 'bg-forreaders') ?></th>
 				<td>
-				<textarea name="bg_forreaders_pdf_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_pdf_css'); ?></textarea><br>
-				<i><?php _e('Enter the css styling table for display text in PDF-reader.', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_pdf_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_pdf_tags'); ?></textarea><br>
-				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
-				<td>
-				<input type="checkbox" name="bg_forreaders_pdf_extlinks" <?php if(get_option('bg_forreaders_pdf_extlinks')) echo "checked" ?> value="on" />
+				<textarea name="bg_forreaders_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_css'); ?></textarea><br>
+				<i><?php _e('Enter the css styling table for display text in readers.', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
 				
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_pdf_css, bg_forreaders_pdf_tags, bg_forreaders_pdf_extlinks" />
+				<input type="hidden" name="page_options" value="bg_forreaders_css" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 					
-				<!-- Файл ePub -->
-			<?php } elseif ($active_tab == 'epub') { ?>
-				<table class="form-table">
-
-				<tr valign="top">
-				<th scope="row"><?php _e('CSS styles table for ePub', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_epub_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_epub_css'); ?></textarea><br>
-				<i><?php _e('Enter the css styling table for display text in ePub-reader.', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_epub_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_epub_tags'); ?></textarea><br>
-				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
-				<td>
-				<input type="checkbox" name="bg_forreaders_epub_extlinks" <?php if(get_option('bg_forreaders_epub_extlinks')) echo "checked" ?> value="on" />
-				</td>
-				</tr>
-
-				</table>
-
-				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_epub_css, bg_forreaders_epub_tags, bg_forreaders_epub_extlinks" />
-
-				<p class="submit">
-				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
-				</p>
-			<!-- Файл mobi -->
-			<?php } elseif ($active_tab == 'mobi') { ?>
-				<table class="form-table">
-
-				<tr valign="top">
-				<th scope="row"><?php _e('CSS styles table for mobi', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_mobi_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_mobi_css'); ?></textarea><br>
-				<i><?php _e('Enter the css styling table for display text in mobi-reader.', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_mobi_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_mobi_tags'); ?></textarea><br>
-				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
-				<td>
-				<input type="checkbox" name="bg_forreaders_mobi_extlinks" <?php if(get_option('bg_forreaders_mobi_extlinks')) echo "checked" ?> value="on" />
-				</td>
-				</tr>
-
-				</table>
-
-				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_mobi_css, bg_forreaders_mobi_tags, bg_forreaders_mobi_extlinks" />
-
-				<p class="submit">
-				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
-				</p>
-
-			<!-- Файл fb2 -->
-			<?php } elseif ($active_tab == 'fb2') { ?>
-				<table class="form-table">
-
-				<tr valign="top">
-				<th scope="row"><?php _e('CSS styles table for Fiction Books', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_fb2_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_fb2_css'); ?></textarea><br>
-				<i><?php _e('Enter the css styling table for display text in fb2-reader.', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_fb2_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_fb2_tags'); ?></textarea><br>
-				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Allowed html-entities', 'bg-forreaders') ?></th>
-				<td>
-				<textarea name="bg_forreaders_fb2_entities" rows="10" cols="60"><?php echo htmlentities( get_option('bg_forreaders_fb2_entities') ); ?></textarea><br>
-				<i><?php _e('Enter the allowed html-entities separated by commas.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('Near in brackets enter the any symbols for replaced it in text.', 'bg-forreaders') ?></i><br>
-				<i><?php _e('(For example, &amp;quot;,&amp;nbsp;[ ],&amp;hellip;[...])', 'bg-forreaders') ?></i>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
-				<td>
-				<input type="checkbox" name="bg_forreaders_fb2_extlinks" <?php if(get_option('bg_forreaders_fb2_extlinks')) echo "checked" ?> value="on" />
-				</td>
-				</tr>
-
-				</table>
-
-				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_fb2_css, bg_forreaders_fb2_tags, bg_forreaders_fb2_entities, bg_forreaders_fb2_extlinks" />
-
-				<p class="submit">
-				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
-				</p>
-
-				<!-- Подготовка HTML -->
+				<!-- Ограничение использования HTML-тегов и их атрибутов -->
 			<?php } elseif ($active_tab == 'html') { ?>
 				<table class="form-table">
 
 				<tr valign="top">
 				<th scope="row"><?php _e('Allowed tags and attributes', 'bg-forreaders') ?></th>
 				<td>
-				<textarea name="bg_forreaders_allowed_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_allowed_tags'); ?></textarea><br>
+				<textarea name="bg_forreaders_tags" rows="10" cols="60"><?php echo get_option('bg_forreaders_tags'); ?></textarea><br>
 				<i><?php _e('Enter the allowed tags separated by commas.', 'bg-forreaders') ?></i><br>
 				<i><?php _e('Near in brackets enter the allowed attributes separated by vertical bar.', 'bg-forreaders') ?></i><br>
 				<i><?php _e('(For example, a[href|name|id],b,strong,i,em,u)', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_extlinks" <?php if(get_option('bg_forreaders_extlinks')) echo "checked" ?> value="on" />	<i><?php _e('(If not allowed, the attribute href="..." with external link will removed from tag <a>).', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_allowed_tags" />
+				<input type="hidden" name="page_options" value="bg_forreaders_tags, bg_forreaders_extlinks" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
+
 			<?php } ?>
 			
 		</form>
