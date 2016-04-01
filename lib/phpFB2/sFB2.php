@@ -28,6 +28,7 @@ $this->discription ($content, $options).
 <title><p>' .$options['title']. '</p></title>'
 .$this->body ($content, $options).
 '</body>'.
+(($options['cover'])?$this->create_binary($options['cover']):'').
 $this->images ($content, $options).
 '</FictionBook>';
 
@@ -41,16 +42,19 @@ $this->images ($content, $options).
 	
 	function discription ($content, $options) {
 		$authorName = explode(" ", $options['author']);
-		$firstName = (isset($authorName[0]))?$authorName[0]:"";
-		$lastName = (isset($authorName[1]))?$authorName[1]:"";
+		$firstName = (isset($authorName[1]))?$authorName[1]:"";
+		$lastName = (isset($authorName[0]))?$authorName[0]:"";
 		$content ='<description>
 <title-info>
 <genre>' .$options['genre']. '</genre>
-<author><first-name>' .$firstName.  '</first-name>
+<author>
+<first-name>' .$firstName.  '</first-name>
 <last-name>' .$lastName. '</last-name>
 </author>
 <book-title>' .$options['title']. '</book-title>
-<lang>' .$options['lang']. '</lang>
+<lang>' .$options['lang']. '</lang>'.
+(($options['cover'])?('<coverpage><image l:href="#' .basename($options['cover']). '"/></coverpage>'):'').
+'<date value="' .date ( 'Y-m-d' ). '">' .date ( 'd.m.Y' ). '</date>
 </title-info>
 <document-info>
 <id>4bef652469d2b65a5dfee7d5bf9a6d75-AAAA-' . md5($options['title']) . '</id>
@@ -58,6 +62,9 @@ $this->images ($content, $options).
 <date xml:lang="' .$options['lang']. '">' .date ( 'd.m.Y' ). '</date>
 <version>1</version>
 </document-info>
+<publish-info>
+<publisher>' .$options['publisher']. '</publisher> 
+</publish-info>
 </description>';
 
 		return $content;
@@ -254,29 +261,33 @@ $this->images ($content, $options).
 		$cnt = count($matches[0]);
 		for ($i=0; $i<$cnt; $i++) {
 			preg_match($template, $matches[0][$i][0], $mt);
-			$path = $mt[3];
-			$filename = basename($path);
-			$ext = substr(strrchr($filename, '.'), 1);
-			switch ($ext) {
-				case 'jpg':
-				case 'jpeg':
-					 $type = 'jpeg';
-					 break;
-				case 'gif':
-				case 'png':
-					 $type = 'png';
-					 break;
-				default:
-					return "";
-			}
-			if ($ext == 'gif') {
-				$filename = str_replace ('gif', 'png', $filename);
-				$image = $this->giftopng ($path);
-			}
-			else $image = file_get_contents($path);
-			$text .= '<binary id="'.$filename.'" content-type="image/'.$type.'">'.base64_encode ($image).'</binary>';
+			$text .= $this->create_binary($mt[3]);
 		}
 		return $text;
+	}
+	function create_binary ($path) {
+		$filename = basename($path);
+		$ext = substr(strrchr($filename, '.'), 1);
+		switch ($ext) {
+			case 'jpg':
+			case 'jpeg':
+				 $type = 'jpeg';
+				 break;
+			case 'gif':
+			case 'png':
+				 $type = 'png';
+				 break;
+			default:
+				return "";
+		}
+		if ($ext == 'gif') {
+			$filename = str_replace ('gif', 'png', $filename);
+			$image = $this->giftopng ($path);
+		}
+		else $image = file_get_contents($path);
+		$text = '<binary id="'.$filename.'" content-type="image/'.$type.'">'.base64_encode ($image).'</binary>'.PHP_EOL;
+
+		return $text;		
 	}
 	function giftopng ($path) {
 		$img = imagecreatefromgif($path); 

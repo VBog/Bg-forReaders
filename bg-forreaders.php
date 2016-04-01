@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.6.3
+Version: 0.7.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.6.3' );
+define( 'BG_FORREADERS_VERSION', '0.7.0' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -254,14 +254,23 @@ class BgForReaders {
 			$genre = get_post_meta($post->ID, 'genre', true);
 		} else $genre = get_option('bg_forreaders_genre');
 		
+		// Определяем язык блога
 		$lang = get_bloginfo('language');	
 		$lang = substr($lang,0, 2);
+		
+		// Миниатюра поста
+		$upload_dir = wp_upload_dir();
+		$attachment_data = wp_get_attachment_metadata(get_post_thumbnail_id($post->ID, 'full'));
+		if ($attachment_data['file']) $image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
+		else $image_path = '';
+
 		
 		$options = array(
 			"title"=> $post->post_title,
 			"author"=> $author,
 			"guid"=>$post->guid,
 			"url"=>$post->guid,
+			"thumb"=>$image_path,
 			"filename"=>$filename,
 			"lang"=>$lang,
 			"genre"=>$genre,
@@ -275,6 +284,7 @@ class BgForReaders {
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($content, $options);
 		if (!file_exists ($filename.".fb2") && get_option('bg_forreaders_fb2') == 'on') $this->tofb2($content, $options);
 //		if (!file_exists ($filename.".html")) $this->tohtml($content, $options);
+
 		return;
 	}
 
@@ -289,6 +299,13 @@ class BgForReaders {
 		$pdf = new mPDF();
 		$pdf->SetTitle($options["title"]);
 		$pdf->SetAuthor($options["author"]);
+		$pdf->SetSubject($options["subject"]);
+		$pdf->h2bookmarks = array('H1'=>0, 'H2'=>1, 'H3'=>2);
+		if ($options["thumb"]) {
+			$html = '<div style="position: relative; left:0; right: 0; top: 0; bottom: 0;">
+						<img src="'.$options["thumb"].'" style="width: 210mm; height: 297mm; margin: 1mm;" />
+					</div>'.$html;
+		}
 		//$pdf->showImageErrors = true;
 		$cssData = get_option('bg_forreaders_css');
 		if ($cssData != "") {
@@ -331,6 +348,7 @@ class BgForReaders {
 		. $html
 		."\n</body>\n</html>\n";
 		
+		if ($options["thumb"]) $epub->setCoverImage($options["thumb"]);
 		$epub->addChapter("Book", "Book.html", $html, false, EPub::EXTERNAL_REF_ADD, '');
 		$epub->finalize();
 		$put = file_put_contents($fileepub, $epub->getBook());
@@ -358,12 +376,19 @@ class BgForReaders {
 		. $html
 		."\n</body>\n</html>\n";
 		$mobi = new MOBI();
-		$opt = array(
-			"title"=>  $options["title"],
-			"author"=> $options["author"],
-			"subject"=> $options["subject"]
-		);
-		$mobi->setOptions($opt);				
+		$mobi_content = new MOBIFile();
+		$mobi_content->set("title", $options["title"]);
+		$mobi_content->set("author", $options["author"]);
+		$mobi_content->set("publishingdate", date('d-m-Y'));
+
+		$mobi_content->set("source", $options["url"]);
+		$mobi_content->set("publisher", get_bloginfo( 'name' ), get_bloginfo( 'url' ));
+		$mobi_content->set("subject", $options["subject"]);
+		if ($options["thumb"]) {
+			$mobi_content->appendImage($this->imageCreateFrom($options["thumb"]));
+			$mobi_content->appendPageBreak();
+		}
+		$mobi->setContentProvider($mobi_content);
 		$mobi->setData($html);
 		$mobi->save($filemobi);		
 		return;
@@ -379,6 +404,8 @@ class BgForReaders {
 			"author"=> $options["author"],
 			"genre"=> $options["genre"],
 			"lang"=> $options["lang"],
+			"cover"=> $options["thumb"],
+			"publisher"=>get_bloginfo( 'name' )." ".get_bloginfo( 'url' ),
 			"css"=> get_option('bg_forreaders_css'), 
 			"tags"=> BG_FORREADERS_FB2_TAGS,
 			"entities" => BG_FORREADERS_FB2_ENTITIES
@@ -450,6 +477,24 @@ class BgForReaders {
 		
 		return $html;
 	}
+	function imageCreateFrom($filepath) {
+		$type = substr(strrchr($filepath, '.'), 1);
+	    switch ($type) {
+	        case 'gif' :
+	            $im = imageCreateFromGif($filepath);
+	        break;
+	        case 'jpg' :
+	        case 'jpeg' :
+	            $im = imageCreateFromJpeg($filepath);
+	        break;
+	        case 'png' :
+	            $im = imageCreateFromPng($filepath);
+	        break;
+			default:
+	        return false;
+	    }
+	    return $im;
+	}
 		
 }
 // Функция оставляет в строке только буквенно-цифровые символы, 
@@ -485,7 +530,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_excat', '');
 	add_option('bg_forreaders_author_field', 'post');
 	add_option('bg_forreaders_genre', 'genre');
-	add_option('bg_forreaders_while_displayed', 'on');
+	add_option('bg_forreaders_while_displayed', '');
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_time_limit', '60');
 
