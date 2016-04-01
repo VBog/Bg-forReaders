@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.7.0
+Version: 0.7.1
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.7.0' );
+define( 'BG_FORREADERS_VERSION', '0.7.1' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -132,7 +132,11 @@ function bg_forreaders_proc($content) {
 	$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );				// если запрещены некоторые категории
 	foreach($ex_cats as $cat) {
 		foreach((get_the_category()) as $category) { 
-			if (trim($cat) == $category->category_nicename) return $content;
+			if (get_option('bg_forreaders_cats') == 'excluded') {
+				if (trim($cat) == $category->category_nicename) return $content;
+			} else {
+				if (trim($cat) != $category->category_nicename) return $content;
+			}
 		}
 	}
 
@@ -527,6 +531,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_prompt', '');
 	add_option('bg_forreaders_zoom', '1');
 	add_option('bg_forreaders_single', '');
+	add_option('bg_forreaders_cats', 'excluded');
 	add_option('bg_forreaders_excat', '');
 	add_option('bg_forreaders_author_field', 'post');
 	add_option('bg_forreaders_genre', 'genre');
@@ -569,6 +574,7 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_prompt');
 	delete_option('bg_forreaders_zoom');
 	delete_option('bg_forreaders_single');
+	delete_option('bg_forreaders_cats');
 	delete_option('bg_forreaders_excat');
 	delete_option('bg_forreaders_author_field');
 	delete_option('bg_forreaders_genre');
