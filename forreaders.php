@@ -69,17 +69,34 @@ if (isset($_GET['id'])) {
 		$posts_array = get_posts($args);
 		$post = $posts_array[0];
 
-		// Исключения 
-		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );	// если запрещены некоторые категории
+		if ($post->post_type == 'post') :
+		// Исключения - категории
+		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		// если запрещены некоторые категории
 		foreach($ex_cats as $cat) {
-			foreach((get_the_category()) as $category) { 
-				if (trim($cat) == $category->category_nicename) {
-					error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
-					if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
-					continue 3;
+			if (get_option('bg_forreaders_cats') == 'excluded') {
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) {
+						error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
+						if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
+						continue 3;
+					}
 				}
+			} else {
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) {
+						error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
+						if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
+						break 2;
+				}
+				continue 3;
 			}
 		}
+		elseif ($post->post_type == 'page') :
+		// Исключение - произвольное поле not_for_readers
+		$for_readers = get_post_meta($post->ID, 'for_readers', true);
+		if (!$for_readers) continue;
+		endif;
+		
 		error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
 		if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
 		$the_time =  microtime(true);

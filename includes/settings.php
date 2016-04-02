@@ -60,7 +60,14 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Prompt to download', 'bg-forreaders') ?></th>
 				<td>
-				<input type="text" name="bg_forreaders_prompt" value="<?php echo get_option('bg_forreaders_prompt'); ?>" size="60" />
+				<input type="text" name="bg_forreaders_prompt" value="<?php echo get_option('bg_forreaders_prompt'); ?>" size="60" /> <?php _e('you can use html-tags in the text', 'bg-forreaders') ?>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Separator', 'bg-forreaders') ?></th>
+				<td>
+				<input type="text" name="bg_forreaders_separator" value="<?php echo get_option('bg_forreaders_separator'); ?>" size="60" /> <?php _e('you can use html-tags in the text', 'bg-forreaders') ?>
 				</td>
 				</tr>
 
@@ -113,8 +120,8 @@ function bg_forreaders_options_page() {
 
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
-							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_zoom, 
-							bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
+							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_separator,
+							bg_forreaders_zoom, bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
 							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_time_limit" />
 
 				<p class="submit">

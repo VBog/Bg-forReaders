@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.7.1
+Version: 0.7.2
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.7.1' );
+define( 'BG_FORREADERS_VERSION', '0.7.2' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -88,6 +88,7 @@ add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
 function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
 	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/index.php')) @copy( "../".BG_FORREADERS_PATH.'/download.php', "../".BG_FORREADERS_STORAGE_PATH.'/index.php' );
+	bg_forreaders_add_options ();
 }
 register_activation_hook( __FILE__, 'bg_forreaders_activate' );
 
@@ -127,33 +128,46 @@ function bg_forreaders_proc($content) {
 	$bg_forreaders = new BgForReaders();
 	
 	// Исключения 
-	if (!is_object($post)) return $content;										// если не пост
-	if (get_option('bg_forreaders_single') && !is_single() ) return $content;	// если не одиночная статья (опция)
-	$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );				// если запрещены некоторые категории
-	foreach($ex_cats as $cat) {
-		foreach((get_the_category()) as $category) { 
+	if (!is_object($post)) return $content;		// если не пост
+	
+	switch ($post->post_type) :
+	case 'post' :
+		if (get_option('bg_forreaders_single') && !is_single() ) return $content;	// если не одиночная статья (опция)
+		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );				// если запрещены некоторые категории
+		foreach($ex_cats as $cat) {
 			if (get_option('bg_forreaders_cats') == 'excluded') {
-				if (trim($cat) == $category->category_nicename) return $content;
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) return;
+				}
 			} else {
-				if (trim($cat) != $category->category_nicename) return $content;
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) break 2;
+				}
+				return;
 			}
 		}
-	}
-
+	break;
+	case 'page' :
+		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
+		if (!$for_readers_field) return $content;
+	break;
+	default:
+		return $content;
+	endswitch;
 	// Генерация файлов для чтения при открытии страницы, если они отсутствуют
 	if (get_option('bg_forreaders_while_displayed')) {
 		$bg_forreaders->generate ($post->ID);
 	}
 	
 	$zoom = get_option('bg_forreaders_zoom');
-	$forreaders = get_option('bg_forreaders_prompt');
-	$forreaders .= '<div class="bg_forreaders">';
+	$forreaders = "";
 	foreach ($formats as $type => $document_type) {
-		if (get_option('bg_forreaders_'.$type) == 'on') {
+		$filename = $post->post_name.".".$type;
+		if (get_option('bg_forreaders_'.$type) == 'on' && file_exists(BG_FORREADERS_STORAGE."/".$filename)) {
 			$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), $post->post_title, $document_type);
 			$link_type = get_option('bg_forreaders_links');
-			if ($link_type == 'php') $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."?file=".$post->post_name.".".$type;
-			else $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."/".$post->post_name.".".$type;
+			if ($link_type == 'php') $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."?file=".$filename;
+			else $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."/".$filename;
 			$download = ($link_type == 'html5')? ' download':'';
 			if ($zoom) {
 				$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s"%s></a></div>', $type, $href, $title, $download);
@@ -162,9 +176,10 @@ function bg_forreaders_proc($content) {
 			}
 		}
 	}
-	$forreaders .= '</div>';
-	
-	$content = (get_option('bg_forreaders_before') ? $forreaders : '') .$content. (get_option('bg_forreaders_after') ? $forreaders : '');
+	if ($forreaders) {
+		$forreaders = get_option('bg_forreaders_prompt').'<div class="bg_forreaders">'.$forreaders.'</div>'.get_option('bg_forreaders_separator');
+		$content = (get_option('bg_forreaders_before') ? $forreaders : '') .$content. (get_option('bg_forreaders_after') ? $forreaders : '');
+	}
 	return $content;
 }
 
@@ -173,10 +188,32 @@ function bg_forreaders_save( $id ) {
 	global $formats;
 
 	$post = get_post($id);
-	if( isset($post) && ($post->post_type == 'post' || $post->post_type == 'page') ) { 		// убедимся что мы редактируем нужный тип поста
-		if( get_current_screen()->id != 'post' && get_current_screen()->id != 'post') return; 	// убедимся что мы на нужной странице админки
-		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 							// пропустим если это автосохранение
-		if ( ! current_user_can('edit_post', $id ) ) return; 									// убедимся что пользователь может редактировать запись
+	if( isset($post) && ($post->post_type == 'post' || $post->post_type == 'page') ) { 			// убедимся что мы редактируем нужный тип поста
+		switch (get_current_screen()->id) :										// убедимся что мы на нужной странице админки
+		case 'post' :
+			$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		// если запрещены некоторые категории
+			foreach($ex_cats as $cat) {
+				if (get_option('bg_forreaders_cats') == 'excluded') {
+					foreach((get_the_category()) as $category) { 
+						if (trim($cat) == $category->category_nicename) return;
+					}
+				} else {
+					foreach((get_the_category()) as $category) { 
+						if (trim($cat) == $category->category_nicename) break 2;
+					}
+					return;
+				}
+			}
+		break;
+		case 'page' :
+			$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
+			if (!$for_readers_field) return $content;
+		break;
+		default:
+			return;
+		endswitch;
+		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 			// пропустим если это автосохранение
+		if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
 	
 	// 	Удаление старых версий файлов для чтения
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
@@ -191,7 +228,7 @@ function bg_forreaders_save( $id ) {
 		}
 	}
 }
-add_action( 'save_post', 'bg_forreaders_save' );
+add_action( 'save_post', 'bg_forreaders_save', 10 );
 //add_action('wp_insert_post_data', 'bg_forreaders_save', 20, 2 );
 
 // Hook for adding admin menus
@@ -209,6 +246,40 @@ function bg_forreaders_version() {
 	$plugin_data = get_plugin_data( __FILE__  );
 	return $plugin_data['Version'];
 }
+/*****************************************************************************************
+	Добавляем блок в боковую колонку на страницах редактирования страниц
+	
+******************************************************************************************/
+add_action('admin_init', 'bg_forreaders_extra_fields', 1);
+// Создание блока
+function bg_forreaders_extra_fields() {
+    add_meta_box( 'bg_forreaders_extra_fields', __('For Readers', 'bg-forreaders'), 'bg_forreaders_extra_fields_box_func', 'page', 'side', 'low'  );
+}
+// Добавление полей
+function bg_forreaders_extra_fields_box_func( $post ){
+	wp_nonce_field( basename( __FILE__ ), 'bg_forreaders_extra_fields_nonce' );
+	$html .= '<label><input type="checkbox" name="bg_forreaders_for_readers"';
+	$html .= (get_post_meta($post->ID, 'for_readers',true)) ? ' checked="checked"' : '';
+	$html .= ' /> '.__('create files for readers', 'bg-forreaders').'</label>';
+ 
+	echo $html;
+}
+// Сохранение значений произвольных полей при сохранении поста
+add_action('save_post', 'bg_forreaders_extra_fields_update', 0);
+
+// Сохранение значений произвольных полей при сохранении поста
+function bg_forreaders_extra_fields_update( $post_id ){
+
+	// проверяем, пришёл ли запрос со страницы с метабоксом
+	if ( !isset( $_POST['bg_forreaders_extra_fields_nonce'] )
+	|| !wp_verify_nonce( $_POST['bg_forreaders_extra_fields_nonce'], basename( __FILE__ ) ) ) return $post_id;
+	// проверяем, является ли запрос автосохранением
+	if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;
+	// проверяем, права пользователя, может ли он редактировать записи
+	if ( !current_user_can( 'edit_post', $post_id ) ) return $post_id;
+	update_post_meta($post_id, 'for_readers', $_POST['bg_forreaders_for_readers']);
+}
+
 
 /*****************************************************************************************
 	Класс плагина
@@ -305,16 +376,19 @@ class BgForReaders {
 		$pdf->SetAuthor($options["author"]);
 		$pdf->SetSubject($options["subject"]);
 		$pdf->h2bookmarks = array('H1'=>0, 'H2'=>1, 'H3'=>2);
-		if ($options["thumb"]) {
-			$html = '<div style="position: relative; left:0; right: 0; top: 0; bottom: 0;">
-						<img src="'.$options["thumb"].'" style="width: 210mm; height: 297mm; margin: 1mm;" />
-					</div>'.$html;
-		}
-		//$pdf->showImageErrors = true;
 		$cssData = get_option('bg_forreaders_css');
 		if ($cssData != "") {
 			$pdf->WriteHTML($cssData,1);	// The parameter 1 tells that this is css/style only and no body/html/text
 		}
+		if ($options["thumb"]) {
+			$pdf->AddPage('','','','','on');
+			$pdf->WriteHTML(
+				'<div style="position: relative; left:0; right: 0; top: 0; bottom: 0;">
+					<img src="'.$options["thumb"].'" style="width: 210mm; height: 297mm; margin: 1mm;" />
+				</div>');
+		}
+		//$pdf->showImageErrors = true;
+		$pdf->AddPage('','','','','on');
 		$pdf->WriteHTML($html);
 		$pdf->Output($filepdf, 'F');
 		return;
@@ -529,8 +603,9 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_before', 'on');
 	add_option('bg_forreaders_after', '');
 	add_option('bg_forreaders_prompt', '');
+	add_option('bg_forreaders_separator', '');
 	add_option('bg_forreaders_zoom', '1');
-	add_option('bg_forreaders_single', '');
+	add_option('bg_forreaders_single', 'on');
 	add_option('bg_forreaders_cats', 'excluded');
 	add_option('bg_forreaders_excat', '');
 	add_option('bg_forreaders_author_field', 'post');
@@ -572,6 +647,7 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_before');
 	delete_option('bg_forreaders_after');
 	delete_option('bg_forreaders_prompt');
+	delete_option('bg_forreaders_separator');
 	delete_option('bg_forreaders_zoom');
 	delete_option('bg_forreaders_single');
 	delete_option('bg_forreaders_cats');
