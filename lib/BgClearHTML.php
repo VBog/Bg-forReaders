@@ -1,22 +1,6 @@
 <?php
 class BgClearHTML {
 	
-	// Формирует массив разрешенных тегов и атрибутов из строки
-	public function strtoarray ($str) {
-		$allow_attributes = array ();
-		// Ключ - тег, 
-		// Значение - перечень разрешенных атрибутов, разделенных вертикальной чертой,
-		// если Значение "*" - разрешены все атрибуты
-		$str = preg_replace('/\s+/is','',$str);
-		$listattr =	explode( ",", $str );
-		foreach ($listattr as $attr) {
-			preg_match('/([a-z0-9]+)(\[([\|a-z0-9]+)\])?/is', $attr, $mt);
-			if (isset($mt[3])) $allow_attributes[$mt[1]] = $mt[3];
-			else $allow_attributes[$mt[1]] = "";
-		}
-		return $allow_attributes;
-	}
-	
 	// Оставляет в тексте только разрешенные теги и атрибуты
 	public function prepare ($content, $allow_attributes) {
 		// Удаляем JS-скрипты
@@ -56,14 +40,12 @@ class BgClearHTML {
 		
 		// Таблицы 
 		if (!array_key_exists ( "table" , $allow_attributes )) {
-			unset($allow_attributes['thead'], $allow_attributes['tbody'], $allow_attributes['tfoot'], $allow_attributes['td']);
-			$content = preg_replace('/<th(.*?)>/is', '<p\1>• ', $content); 		
-			$content = str_replace('</th>', '</p>', $content);
+			unset($allow_attributes['thead'], $allow_attributes['tbody'], $allow_attributes['tfoot'], $allow_attributes['th'], $allow_attributes['td']);
 			$content = preg_replace('/<tr(.*?)>/is', '<p\1>• ', $content); 		
 			$content = str_replace('</tr>', '</p>', $content);
 		} else {
-			if (!array_key_exists ( "th" , $allow_attributes )) $allow_attributes['th'] = "";
 			if (!array_key_exists ( "tr" , $allow_attributes )) $allow_attributes['tr'] = "";
+			if (!array_key_exists ( "th" , $allow_attributes )) $allow_attributes['th'] = "";
 			if (!array_key_exists ( "td" , $allow_attributes )) $allow_attributes['td'] = "";
 		}
 
@@ -104,6 +86,22 @@ class BgClearHTML {
 		$content = $text.substr($content, $start);
 		
 		return $content;
+	}
+	
+	// Формирует массив разрешенных тегов и атрибутов из строки
+	public function strtoarray ($str) {
+		$allow_attributes = array ();
+		// Ключ - тег, 
+		// Значение - перечень разрешенных атрибутов, разделенных вертикальной чертой,
+		// если Значение "*" - разрешены все атрибуты
+		$str = preg_replace('/\s+/is','',$str);
+		$listattr =	explode( ",", $str );
+		foreach ($listattr as $attr) {
+			preg_match('/([a-z0-9]+)(\[([\|a-z0-9]+)\])?/is', $attr, $mt);
+			if (isset($mt[3])) $allow_attributes[$mt[1]] = $mt[3];
+			else $allow_attributes[$mt[1]] = "";
+		}
+		return $allow_attributes;
 	}
 	
 	// Добавляет символы конца строки к закрывающим тегам блоков и строк, в также к тегу br
