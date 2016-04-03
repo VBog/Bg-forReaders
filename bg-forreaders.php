@@ -50,15 +50,6 @@ h1[align|id],h2[align|id],h3[align|id],h4[align|id],h5[align|id],h6[align|id],
 hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
 table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
 b,strong,i,em,u,sub,sup,strike,code");
-// Дополнительные ограничения только для FB2
-define( 'BG_FORREADERS_FB2_TAGS',
-"img[src|alt],div[id],blockquote[id],
-h1[id],h2[id],h3[id],h4[id],h5[id],h6[id],
-hr,p[id],br,li[id],a[href|name|id],
-table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
-b,strong,i,em,u,sub,sup,strike,code");
-define( 'BG_FORREADERS_FB2_ENTITIES',
-"&amp;,&lt;,&gt;,&apos;,&quot;,&nbsp;[ ],&hellip;[...],&ndash;[-],&mdash;[—],&oacute;[o]");
 
 $bg_forreaders_start_time = microtime(true);
 $bg_forreaders_debug_file = dirname(__FILE__ )."/forreaders.log";
@@ -482,6 +473,7 @@ class BgForReaders {
 			"author"=> $options["author"],
 			"genre"=> $options["genre"],
 			"lang"=> $options["lang"],
+			"version"=> '1.0',
 			"cover"=> $options["thumb"],
 			"publisher"=>get_bloginfo( 'name' )." ".get_bloginfo( 'url' ),
 			"css"=> get_option('bg_forreaders_css'), 

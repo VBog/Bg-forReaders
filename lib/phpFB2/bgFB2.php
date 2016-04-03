@@ -6,33 +6,52 @@
 class bgFB2 {
 	public function prepare ($content, $options) {
 		
+		// Разрешенные HTML-теги для FB2
+		define( 'BG_FB2_TAGS',
+		"img[src|alt],div[id],blockquote[id],
+		h1[id],h2[id],h3[id],h4[id],h5[id],h6[id],
+		hr,p[id],br,li[id],a[href|name|id],
+		table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
+		b,strong,i,em,u,sub,sup,strike,code");
+		// Разрешенные HTML-сущности для FB2
+		define( 'BG_FB2_ENTITIES',
+		"&amp;,&lt;,&gt;,&apos;,&quot;,&nbsp;[ ],&hellip;[...],&ndash;[-],&mdash;[—],&oacute;[o]");
+		
 		/* Оставляем только разрешенные теги и атрибуты */
 //		require_once "../BgClearHTML.php";
 		$сhtml = new BgClearHTML();
 		
 		// Массив разрешенных тегов и атрибутов 
-		$allow_attributes = array ();
-		$allow_attributes = $сhtml->strtoarray ($options['tags']);
+//		$allow_attributes = array ();
+		$allow_attributes = $сhtml->strtoarray ( BG_FB2_TAGS );
 		// Оставляем в тексте только разрешенные теги и атрибуты
 		$content = $сhtml->prepare ($content, $allow_attributes);
 
 		// Заменяем HTML-сущности
-		$content = $this->replaceEntities($content, $options['entities']);
+		$content = $this->replaceEntities( $content, BG_FB2_ENTITIES );
 
 		/* Преобразуем html в fb2 */
-		$content = '<?xml version="1.0" encoding="UTF-8"?>
-<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
-<stylesheet type="text/css">' .$options['css']. '</stylesheet>'.
+		$content = '<?xml version="1.0" encoding="UTF-8"?>'. PHP_EOL .
+'<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">'. PHP_EOL .
+'<stylesheet type="text/css">' .$options['css']. '</stylesheet>'. PHP_EOL .
 $this->discription ($content, $options).
-'<body>
-<title><p>' .$options['title']. '</p></title>'
-.$this->body ($content, $options).
-'</body>'.
+'<body>'. PHP_EOL .
+'<title><p>' .$options['title']. '</p></title>'. PHP_EOL .
+$this->body ($content, $options).
+'</body>'. PHP_EOL .
 (($options['cover'])?$this->create_binary($options['cover']):'').
 $this->images ($content, $options).
 '</FictionBook>';
 
-		return $сhtml->addEOL ($content);
+		// Добавляем символы конца строки
+		$content = $сhtml->addEOL ($content);
+		$block_end = array('section', 'title', 'subtitle', 'cite', 'table'); 
+		foreach ($block_end as $tag) {
+			$content = str_replace('</'.$tag.'>', '</'.$tag.'>'. PHP_EOL,  $content);
+		}
+		$content = str_replace('<empty-line/>', '<empty-line/>'. PHP_EOL,  $content);
+		
+		return $content;
 	}
 
 	public function save ($file, $content) {
@@ -44,28 +63,28 @@ $this->images ($content, $options).
 		$authorName = explode(" ", $options['author']);
 		$firstName = (isset($authorName[1]))?$authorName[1]:"";
 		$lastName = (isset($authorName[0]))?$authorName[0]:"";
-		$content ='<description>
-<title-info>
-<genre>' .$options['genre']. '</genre>
-<author>
-<first-name>' .$firstName.  '</first-name>
-<last-name>' .$lastName. '</last-name>
-</author>
-<book-title>' .$options['title']. '</book-title>
-<lang>' .$options['lang']. '</lang>'.
-(($options['cover'])?('<coverpage><image l:href="#' .basename($options['cover']). '"/></coverpage>'):'').
-'<date value="' .date ( 'Y-m-d' ). '">' .date ( 'd.m.Y' ). '</date>
-</title-info>
-<document-info>
-<id>4bef652469d2b65a5dfee7d5bf9a6d75-AAAA-' . md5($options['title']) . '</id>
-<author><nickname>' .$options['author']. '</nickname></author>
-<date xml:lang="' .$options['lang']. '">' .date ( 'd.m.Y' ). '</date>
-<version>1</version>
-</document-info>
-<publish-info>
-<publisher>' .$options['publisher']. '</publisher> 
-</publish-info>
-</description>';
+		$content ='<description>'. PHP_EOL .
+'<title-info>'. PHP_EOL .
+'<genre>' .$options['genre']. '</genre>'. PHP_EOL .
+'<author>'. PHP_EOL .
+'<first-name>' .$firstName.  '</first-name>'. PHP_EOL .
+'<last-name>' .$lastName. '</last-name>'. PHP_EOL .
+'</author>'.
+'<book-title>' .$options['title']. '</book-title>'. PHP_EOL .
+'<lang>' .$options['lang']. '</lang>'. PHP_EOL .
+(($options['cover'])?('<coverpage><image l:href="#' .basename($options['cover']). '"/></coverpage>'. PHP_EOL):'').
+'<date value="' .date ( 'Y-m-d' ). '">' .date ( 'd.m.Y' ). '</date>'. PHP_EOL .
+'</title-info>'. PHP_EOL .
+'<document-info>'. PHP_EOL .
+'<id>4bef652469d2b65a5dfee7d5bf9a6d75-AAAA-' . md5($options['title']) . '</id>'. PHP_EOL .
+'<author><nickname>' .$options['author']. '</nickname></author>'. PHP_EOL .
+'<date xml:lang="' .$options['lang']. '">' .date ( 'd.m.Y' ). '</date>'. PHP_EOL .
+'<version>' .$options['version']. '</version>'. PHP_EOL .
+'</document-info>'. PHP_EOL .
+'<publish-info>'. PHP_EOL .
+'<publisher>' .$options['publisher']. '</publisher>'. PHP_EOL . 
+'</publish-info>'. PHP_EOL .
+'</description>';
 
 		return $content;
 	}
@@ -104,10 +123,8 @@ $this->images ($content, $options).
 		$content = $text.substr($content, $start);
 
 		// Обрамляем тегом <section>
-		$content = '<section>'.$content;
+		$content = '<section><title></title>'.$content;
 		for ($n=0; $n < $num_sections; $n++) $content .= '</section>';
-		// Удаляем лишнее
-		$content = preg_replace('/<section>\s*<\/section>/is', '',  $content);
 
 		// Обрабатываем заголовки секций
 		$content = preg_replace_callback('/(<title>)(.*?)(<\/title>)/is', 
@@ -124,6 +141,9 @@ $this->images ($content, $options).
 					$content = $fb2->section ($matches[2]);
 					return $matches[1].$content.$matches[3];
 				}, $content);
+		// Удаляем лишнее
+		$content = preg_replace('/<title>\s*<\/title>/is', '',  $content);
+		$content = preg_replace('/<section>\s*<\/section>/is', '',  $content);
 		
 		return $content;
 	}
@@ -198,6 +218,8 @@ $this->images ($content, $options).
 		$content = str_replace('<empty-line/>', '</p><empty-line/><p>',  $content);
 		$content = preg_replace('/<cite([^>]*?)>/is', '</p><cite\1><p>',  $content);
 		$content = str_replace('</cite>', '</p></cite><p>',  $content);
+		$content = preg_replace('/<table([^>]*?)>/is', '</p><table\1><p>',  $content);
+		$content = str_replace('</table>', '</p></table><p>',  $content);
 		$content = '<p>'.$content.'</p>';
 
 		// Убираем лишние <p> и </p>
