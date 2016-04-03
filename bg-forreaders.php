@@ -137,13 +137,13 @@ function bg_forreaders_proc($content) {
 		foreach($ex_cats as $cat) {
 			if (get_option('bg_forreaders_cats') == 'excluded') {
 				foreach((get_the_category()) as $category) { 
-					if (trim($cat) == $category->category_nicename) return;
+					if (trim($cat) == $category->category_nicename) return $content;
 				}
 			} else {
 				foreach((get_the_category()) as $category) { 
 					if (trim($cat) == $category->category_nicename) break 2;
 				}
-				return;
+				return $content;
 			}
 		}
 	break;
@@ -207,7 +207,7 @@ function bg_forreaders_save( $id ) {
 		break;
 		case 'page' :
 			$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
-			if (!$for_readers_field) return $content;
+			if (!$for_readers_field) return;
 		break;
 		default:
 			return;
@@ -474,7 +474,7 @@ class BgForReaders {
 // FistonBook (fb2)
 	function tofb2 ($html, $options) {
 
-		require_once "lib/phpFB2/sFB2.php";
+		require_once "lib/phpFB2/bgFB2.php";
 		$filefb2 = $options["filename"] . '.fb2';
 									
 		$opt = array(
@@ -489,7 +489,7 @@ class BgForReaders {
 			"entities" => BG_FORREADERS_FB2_ENTITIES
 		);
 
-		$fb2 = new sFB2();
+		$fb2 = new bgFB2();
 		$html = $fb2->prepare($html, $opt);
 		$put = $fb2->save($filefb2, $html);
 		return $put;

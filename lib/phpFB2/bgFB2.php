@@ -1,9 +1,9 @@
 <?php
 /*****************************************************************************************
-	sFB2 - простой PHP класс, преобразует HTML в формат FistonBook (fb2)
-	Автор алгоритма: неизвестен
+	bgFB2 - простой PHP класс, преобразует HTML в формат FistonBook (fb2)
+
 ******************************************************************************************/
-class sFB2 {
+class bgFB2 {
 	public function prepare ($content, $options) {
 		
 		/* Оставляем только разрешенные теги и атрибуты */
@@ -112,7 +112,7 @@ $this->images ($content, $options).
 		// Обрабатываем заголовки секций
 		$content = preg_replace_callback('/(<title>)(.*?)(<\/title>)/is', 
 				function ($matches) {
-					$fb2 = new sFB2();
+					$fb2 = new bgFB2();
 					$content = $fb2->section ($matches[2]);
 					return $matches[1].$content.$matches[3];
 				}, $content);
@@ -120,7 +120,7 @@ $this->images ($content, $options).
 		// Обрабатываем внутри секций
 		$content = preg_replace_callback('/(<\/title>)(.*?)(<\/?section>)/is', 
 				function ($matches) {
-					$fb2 = new sFB2();
+					$fb2 = new bgFB2();
 					$content = $fb2->section ($matches[2]);
 					return $matches[1].$content.$matches[3];
 				}, $content);
