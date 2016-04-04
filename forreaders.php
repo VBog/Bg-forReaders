@@ -18,6 +18,7 @@
  *
  */
 header("Content-type: text/html; charset: UTF-8");
+header("X-Accel-Buffering: no");
 if(!defined('PATH')):
 	$value_const =  dirname(dirname(dirname(__DIR__)));
 	define("PATH", $value_const);
@@ -54,7 +55,7 @@ if (isset($_GET['id'])) {
 	error_log(" List of posts (".$cnt."): ".$_GET['id']. PHP_EOL, 3, $debug_file);
 	if ($echo_on) echo " List of posts (".$cnt."): ".$_GET['id']. PHP_EOL;
 
-	$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => 0, 'orderby' => 'ID');
+//	$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => 0, 'orderby' => 'ID');
 	for ($i = 0; $i < $cnt; $i++){
 		$post = get_post($id_list[$i]);
 		
@@ -64,12 +65,16 @@ if (isset($_GET['id'])) {
 			$the_time =  microtime(true);
 			$bg_forreaders->generate ($post->ID);
 			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
-			if ($echo_on) echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
+			if ($echo_on) {
+				echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
+				ob_flush();
+				flush();
+			}
 		}
 	}
 // Иначе если указан параметр all, то обрабатываем все посты
 } elseif (isset($_GET['all'])) {
-	$cnt = wp_count_posts()->publish;
+	$cnt = wp_count_posts('post')->publish + wp_count_posts('page')->publish;
 	error_log(" All posts (".$cnt.")". PHP_EOL, 3, $debug_file);
 	if ($echo_on) echo " All posts (".$cnt.")". PHP_EOL;
 
@@ -77,14 +82,15 @@ if (isset($_GET['id'])) {
 		$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => $i, 'orderby' => 'ID');
 		$posts_array = get_posts($args);
 		$post = $posts_array[0];
+		error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. "  (".$post->post_type. ") ", 3, $debug_file);
+		if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. " (".$post->post_type. ") ";
 
 		if (!check_exceptions ($post,  $debug_file, $echo_on)) {
 		
-			error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
-			if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
 			$the_time =  microtime(true);
 			$bg_forreaders->generate ($post->ID);
 			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+			if ($echo_on) echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
 		}
 	}
 }
@@ -95,7 +101,7 @@ if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Finish the batch 
 exit;
 
 function check_exceptions ($post,  $debug_file, $echo_on) {
-	if ($post->post_type == 'post') :
+	if ($post->post_type == 'post') {
 		// Исключения - категории
 		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		
 		foreach($ex_cats as $cat) {
@@ -109,18 +115,21 @@ function check_exceptions ($post,  $debug_file, $echo_on) {
 				}
 			} else {												// если разрешены некоторые категории
 				foreach((get_the_category()) as $category) { 
-					if (trim($cat) == $category->category_nicename) {
-						error_log(" - category (".$category->category_nicename .") not allowed.". PHP_EOL, 3, $debug_file);
-						if ($echo_on) echo " - category (".$category->category_nicename .") not allowed.". PHP_EOL;
-						return false;
+					if (trim($cat) == $category->category_nicename) return false;
 				}
+				error_log(" - categories not allowed.". PHP_EOL, 3, $debug_file);
+				if ($echo_on) echo " - categories not allowed.". PHP_EOL;
 				return true;
 			}
 		}
-	elseif ($post->post_type == 'page') :
+	} elseif ($post->post_type == 'page') {
 		// Исключение - произвольное поле not_for_readers
 		$for_readers = get_post_meta($post->ID, 'for_readers', true);
-		if (!$for_readers) return true;
-	endif;
+		if (!$for_readers) {
+			error_log(" - field 'for_readers' not checked.". PHP_EOL, 3, $debug_file);
+			if ($echo_on) echo " - field 'for_readers' not checked.". PHP_EOL;
+			return true;
+		}
+	}
 	return false;
 }

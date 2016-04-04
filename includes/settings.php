@@ -21,6 +21,7 @@ function bg_forreaders_options_page() {
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=options" class="nav-tab <?php echo $active_tab == 'options' ? 'nav-tab-active' : ''; ?>"><?php _e('Options', 'bg-forreaders') ?></a>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=css" class="nav-tab <?php echo $active_tab == 'css' ? 'nav-tab-active' : ''; ?>"><?php _e('CSS', 'bg-forreaders') ?></a> 
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('HTML', 'bg-forreaders') ?></a> 
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=batch" class="nav-tab <?php echo $active_tab == 'batch' ? 'nav-tab-active' : ''; ?>"><?php _e('Batch mode', 'bg-forreaders') ?></a> 
 		</h2>
 
 		<form id="bg_forreaders_options" method="post" action="options.php">
@@ -106,13 +107,6 @@ function bg_forreaders_options_page() {
 				<th scope="row"><?php _e('Time limit', 'bg-forreaders') ?></th>
 				<td>
 				<input type="number" name="bg_forreaders_time_limit" value="<?php echo get_option('bg_forreaders_time_limit'); ?>" min="0" /> <?php _e('sec.', 'bg-forreaders') ?>
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Batch mode', 'bg-forreaders') ?></th>
-				<td>
-				<?php printf (__('You can use script %s<br>to generate files for readers in batch mode. ', 'bg-forreaders'), '<span style="background: gray; color: white">'.plugins_url( 'forreaders.php', dirname(__FILE__) ).'</span>') ?>
 				</td>
 				</tr>
 
@@ -207,6 +201,31 @@ function bg_forreaders_options_page() {
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
+
+				<!-- Пакетный режим -->
+			<?php } elseif ($active_tab == 'batch') { ?>
+				<table class="form-table">
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Batch mode', 'bg-forreaders') ?></th>
+				<td>
+				<?php printf (__('You can use script %s<br>to generate files for readers in batch mode.', 'bg-forreaders'),' <span style="background: gray; color: white">'. plugin_dir_path( dirname(__FILE__) ). 'forreaders.php'.'</span>') ?><br><br>
+				<?php _e('Options:', 'bg-forreaders'); ?><br>
+				<?php _e('<b>id = [post id list separated by commas]</b> - process all the posts in the list;', 'bg-forreaders'); ?><br>
+				<?php _e('<i>or</i>', 'bg-forreaders'); ?><br>
+				<?php _e('<b>all</b> - process all the posts on the site ignoring exceptions, see General tab.', 'bg-forreaders'); ?><br><br>
+				<?php _e('* Second parameter', 'bg-forreaders'); ?><br>
+				<?php _e('<b>echo</b> - output progress info to the screen.', 'bg-forreaders'); ?>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Log file', 'bg-forreaders') ?></th>
+				<td>
+				<?php printf ('<a href="%s" target="_blank">forreaders.log</a>', plugins_url('forreaders.log', dirname(__FILE__) )) ?>
+				</td>
+				</tr>
+				</table>
 
 			<?php } ?>
 			
