@@ -4,12 +4,21 @@
  * Генерирует файлы для чтения в форматах: PDF, ePub, mobi, fb2,
  * если эти файлы отсутствуют в заданном каталоге.
  *
- * использует плагин Bg forReaders и должен распологаться в каталоге плагина
+ * Использует плагин Bg forReaders и должен распологаться в каталоге плагина
+ 
+	Параметры:
+	* первый параметр
+	id=[список id постов через запятую] - обрабатываются все указанные в списке посты
+	или
+	all - обрабатываются все посты сайта, кроме указанных в исключениях см. настройки плагина
+		(для типа 'post' - могут быть указаны исключенные или, наоборот, разрешенные категории
+		 для типа 'page' - произвольное поле for_readers='on' разрешает создание файлов)
+	* второй параметр
+	echo - выводить информацию о выполнении скрипта на экран
  *
  */
 header("Content-type: text/html; charset: UTF-8");
 if(!defined('PATH')):
-//	$value_const = str_replace('wp-content/plugins', '', dirname(__DIR__));
 	$value_const =  dirname(dirname(dirname(__DIR__)));
 	define("PATH", $value_const);
 else: 
@@ -25,7 +34,7 @@ if (isset($argv[1])) {
     else    
         $_GET[$e[0]]=0;
 }
-// else exit; // Запрет запуска не из консоли
+// else exit; // Запрет запуска не из консоли (без параметров)
 
 $e=explode("=",$argv[2]);
 $echo_on = ("echo" == $e[0]);
@@ -69,39 +78,14 @@ if (isset($_GET['id'])) {
 		$posts_array = get_posts($args);
 		$post = $posts_array[0];
 
-		if ($post->post_type == 'post') :
-		// Исключения - категории
-		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		// если запрещены некоторые категории
-		foreach($ex_cats as $cat) {
-			if (get_option('bg_forreaders_cats') == 'excluded') {
-				foreach((get_the_category()) as $category) { 
-					if (trim($cat) == $category->category_nicename) {
-						error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
-						if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
-						continue 3;
-					}
-				}
-			} else {
-				foreach((get_the_category()) as $category) { 
-					if (trim($cat) == $category->category_nicename) {
-						error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
-						if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
-						break 2;
-				}
-				continue 3;
-			}
-		}
-		elseif ($post->post_type == 'page') :
-		// Исключение - произвольное поле not_for_readers
-		$for_readers = get_post_meta($post->ID, 'for_readers', true);
-		if (!$for_readers) continue;
-		endif;
+		if (!check_exceptions ($post,  $debug_file, $echo_on)) {
 		
-		error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
-		if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
-		$the_time =  microtime(true);
-		$bg_forreaders->generate ($post->ID);
-		error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+			error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
+			if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
+			$the_time =  microtime(true);
+			$bg_forreaders->generate ($post->ID);
+			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+		}
 	}
 }
 error_log("TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL, 3, $debug_file);
@@ -109,3 +93,34 @@ error_log(date ("j-m-Y H:i"). " ===================== Finish the batch mode ====
 if ($echo_on) echo "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL;
 if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL;
 exit;
+
+function check_exceptions ($post,  $debug_file, $echo_on) {
+	if ($post->post_type == 'post') :
+		// Исключения - категории
+		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		
+		foreach($ex_cats as $cat) {
+			if (get_option('bg_forreaders_cats') == 'excluded') {	// если запрещены некоторые категории
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) {
+						error_log(" - category (".$category->category_nicename .") banned.". PHP_EOL, 3, $debug_file);
+						if ($echo_on) echo " - category (".$category->category_nicename .") banned.". PHP_EOL;
+						return true;
+					}
+				}
+			} else {												// если разрешены некоторые категории
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) {
+						error_log(" - category (".$category->category_nicename .") not allowed.". PHP_EOL, 3, $debug_file);
+						if ($echo_on) echo " - category (".$category->category_nicename .") not allowed.". PHP_EOL;
+						return false;
+				}
+				return true;
+			}
+		}
+	elseif ($post->post_type == 'page') :
+		// Исключение - произвольное поле not_for_readers
+		$for_readers = get_post_meta($post->ID, 'for_readers', true);
+		if (!$for_readers) return true;
+	endif;
+	return false;
+}
