@@ -7,12 +7,19 @@
  * Использует плагин Bg forReaders и должен распологаться в каталоге плагина
  
 	Параметры:
+	
 	* первый параметр
-	id=[список id постов через запятую] - обрабатываются все указанные в списке посты
+	id=[список id постов через запятую] - обрабатываются все указанные в списке ID посты
 	или
-	all - обрабатываются все посты сайта, кроме указанных в исключениях см. настройки плагина
+	all=[from],[to] - обрабатываются все посты сайта из указанного диапазона,
+		кроме указанных в исключениях см. настройки плагина
 		(для типа 'post' - могут быть указаны исключенные или, наоборот, разрешенные категории
 		 для типа 'page' - произвольное поле for_readers='on' разрешает создание файлов)
+	Например,
+	all - все опубликованные посты и страницы
+	all=[from] - все посты, начиная с порядкового номера [from] и до конца
+	all=[from],[to] - все посты, начиная с порядкового номера [from] и до номера [to]
+	
 	* второй параметр
 	echo - выводить информацию о выполнении скрипта на экран
  *
@@ -40,7 +47,6 @@ if (isset($argv[1])) {
 $e=explode("=",$argv[2]);
 $echo_on = ("echo" == $e[0]);
 
-
 $debug_file = dirname(__FILE__ )."/forreaders.log";
 if (file_exists ($debug_file) ) unlink ($debug_file);
 error_log(date ("j-m-Y H:i"). " ===================== Start the batch mode =====================". PHP_EOL, 3, $debug_file);
@@ -60,30 +66,41 @@ if (isset($_GET['id'])) {
 		$post = get_post($id_list[$i]);
 		
 		if ($post) {
-			error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
-			if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
+			error_log(($i+1).". ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
+			if ($echo_on) echo ($i+1).". ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
 			$the_time =  microtime(true);
 			$bg_forreaders->generate ($post->ID);
 			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
 			if ($echo_on) {
 				echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
-				ob_flush();
 				flush();
+				ob_flush();
 			}
 		}
 	}
 // Иначе если указан параметр all, то обрабатываем все посты
 } elseif (isset($_GET['all'])) {
 	$cnt = wp_count_posts('post')->publish + wp_count_posts('page')->publish;
-	error_log(" All posts (".$cnt.")". PHP_EOL, 3, $debug_file);
-	if ($echo_on) echo " All posts (".$cnt.")". PHP_EOL;
+	$id_list = explode ( ',' , $_GET['all'] );
+	if (isset($id_list[0])) {
+		$start = intval ($id_list[0]);
+		if (isset($id_list[1])) $finish = intval ($id_list[1]);
+		else $finish = $cnt;
+	} else {
+		$start = 0;
+		$finish = $cnt;
+	}
+	error_log(" All posts (".$cnt."): Start=".$start.", Finish=".$finish. PHP_EOL, 3, $debug_file);
+	if ($echo_on) echo " All posts (".$cnt."): Start=".$start.", Finish=".$finish. PHP_EOL;
 
 	for ($i = 0; $i < $cnt; $i++){
+		if ($i < $start-1) continue;
+		if ($i > $finish-1) break;
 		$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => $i, 'orderby' => 'ID');
 		$posts_array = get_posts($args);
 		$post = $posts_array[0];
-		error_log(date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. "  (".$post->post_type. ") ", 3, $debug_file);
-		if ($echo_on) echo date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. " (".$post->post_type. ") ";
+		error_log(($i+1).". ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. "  (".$post->post_type. ") ", 3, $debug_file);
+		if ($echo_on) echo ($i+1).". ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. " (".$post->post_type. ") ";
 
 		if (!check_exceptions ($post,  $debug_file, $echo_on)) {
 		
@@ -91,6 +108,8 @@ if (isset($_GET['id'])) {
 			$bg_forreaders->generate ($post->ID);
 			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
 			if ($echo_on) echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
+			flush();
+			ob_flush();
 		}
 	}
 }
