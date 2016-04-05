@@ -209,11 +209,11 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Batch mode', 'bg-forreaders') ?></th>
 				<td>
-				<?php printf (__('You can use script %s<br>to generate files for readers in batch mode.', 'bg-forreaders'),' <span style="background: gray; color: white">'. plugin_dir_path( dirname(__FILE__) ). 'forreaders.php'.'</span>') ?><br><br>
+				<?php printf (__('You can use script %s<br>to generate files for readers in batch mode (using <b>cli</b> or <b>cron</b>).', 'bg-forreaders'),' <span style="background: gray; color: white">'. plugin_dir_path( dirname(__FILE__) ). 'forreaders.php'.'</span>') ?><br><br>
 				<?php _e('Options:', 'bg-forreaders'); ?><br>
 				<?php _e('<b>id = [post id list separated by commas]</b> - process all the posts in the list;', 'bg-forreaders'); ?><br>
 				<?php _e('<i>or</i>', 'bg-forreaders'); ?><br>
-				<?php _e('<b>all</b> - process all the posts on the site ignoring exceptions, see General tab.', 'bg-forreaders'); ?><br><br>
+				<?php _e('<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) on the site ignoring exceptions,<br>see General tab.', 'bg-forreaders'); ?><br><br>
 				<?php _e('* Second parameter', 'bg-forreaders'); ?><br>
 				<?php _e('<b>echo</b> - output progress info to the screen.', 'bg-forreaders'); ?>
 				</td>

@@ -288,6 +288,7 @@ $this->images ($content, $options).
 		return $text;
 	}
 	function create_binary ($path) {
+		if (!file_exists($path)) return "";
 		$filename = basename($path);
 		$ext = substr(strrchr($filename, '.'), 1);
 		switch ($ext) {

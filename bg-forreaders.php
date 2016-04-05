@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.7.3
+Version: 0.7.4
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.7.3' );
+define( 'BG_FORREADERS_VERSION', '0.7.4' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -60,8 +60,8 @@ $formats = array(
 	'fb2' => 'fb2'
 );
 
-// Задаем начальные значения параметров
-bg_forreaders_add_options ();
+// Активируем параметры плагина, если они не сохранились
+bg_forreaders_activate();
 
 // Загрузка интернационализации
 add_action( 'plugins_loaded', 'bg_forreaders_load_textdomain' );
@@ -153,7 +153,7 @@ function bg_forreaders_proc($content) {
 	$zoom = get_option('bg_forreaders_zoom');
 	$forreaders = "";
 	foreach ($formats as $type => $document_type) {
-		$filename = $post->post_name.".".$type;
+		$filename = $post->post_name."_".$post->ID.".".$type;
 		if (get_option('bg_forreaders_'.$type) == 'on' && file_exists(BG_FORREADERS_STORAGE."/".$filename)) {
 			$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), $post->post_title, $document_type);
 			$link_type = get_option('bg_forreaders_links');
@@ -207,7 +207,7 @@ function bg_forreaders_save( $id ) {
 		if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
 	
 	// 	Удаление старых версий файлов для чтения
-		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
+		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
 		foreach ($formats as $type => $document_type) {
 			if (file_exists ($filename.".".$type)) unlink ($filename.".".$type);
 		}
@@ -306,7 +306,7 @@ class BgForReaders {
 		$content = balanceTags( $content, true );	
 
 
-		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name;
+		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
 		if (get_option('bg_forreaders_author_field') == 'post') {
 			// Автор - автор поста
 			$author_id = get_user_by( 'ID', $post->post_author ); 	// Get user object
@@ -327,7 +327,7 @@ class BgForReaders {
 		// Миниатюра поста
 		$upload_dir = wp_upload_dir();
 		$attachment_data = wp_get_attachment_metadata(get_post_thumbnail_id($post->ID, 'full'));
-		if ($attachment_data['file']) $image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
+		if ($attachment_data && $attachment_data['file']) $image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
 		else $image_path = '';
 
 		
@@ -382,6 +382,7 @@ class BgForReaders {
 		$pdf->AddPage('','','','','on');
 		$pdf->WriteHTML($html);
 		$pdf->Output($filepdf, 'F');
+		unset($pdf);
 		return;
 	}
 // Electronic Publication (ePub)
@@ -420,8 +421,9 @@ class BgForReaders {
 		if ($options["thumb"]) $epub->setCoverImage($options["thumb"]);
 		$epub->addChapter("Book", "Book.html", $html, false, EPub::EXTERNAL_REF_ADD, '');
 		$epub->finalize();
-		$put = file_put_contents($fileepub, $epub->getBook());
-		return $put;
+		file_put_contents($fileepub, $epub->getBook());
+		unset($epub);
+		return;
 	}
 // Mobile (mobi)
 	function tomobi ($html, $options) {
@@ -460,6 +462,7 @@ class BgForReaders {
 		$mobi->setContentProvider($mobi_content);
 		$mobi->setData($html);
 		$mobi->save($filemobi);		
+		unset($mobi);
 		return;
 	}
 // FistonBook (fb2)
@@ -483,8 +486,9 @@ class BgForReaders {
 
 		$fb2 = new bgFB2();
 		$html = $fb2->prepare($html, $opt);
-		$put = $fb2->save($filefb2, $html);
-		return $put;
+		$fb2->save($filefb2, $html);
+		unset($fb2);
+		return;
 	}
 	
 // Упрощенный html (html)
