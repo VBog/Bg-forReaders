@@ -349,8 +349,9 @@ class BgForReaders {
 		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($content, $options);
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($content, $options);
 		if (!file_exists ($filename.".fb2") && get_option('bg_forreaders_fb2') == 'on') $this->tofb2($content, $options);
-//		if (!file_exists ($filename.".html")) $this->tohtml($content, $options);
 
+		unset($сhtml);
+		$сhtml=NULL;
 		return;
 	}
 
@@ -383,6 +384,7 @@ class BgForReaders {
 		$pdf->WriteHTML($html);
 		$pdf->Output($filepdf, 'F');
 		unset($pdf);
+		$pdf=NULL;
 		return;
 	}
 // Electronic Publication (ePub)
@@ -423,6 +425,7 @@ class BgForReaders {
 		$epub->finalize();
 		file_put_contents($fileepub, $epub->getBook());
 		unset($epub);
+		$epub=NULL;
 		return;
 	}
 // Mobile (mobi)
@@ -463,6 +466,7 @@ class BgForReaders {
 		$mobi->setData($html);
 		$mobi->save($filemobi);		
 		unset($mobi);
+		$mobi=NULL;
 		return;
 	}
 // FistonBook (fb2)
@@ -488,31 +492,8 @@ class BgForReaders {
 		$html = $fb2->prepare($html, $opt);
 		$fb2->save($filefb2, $html);
 		unset($fb2);
+		$fb2=NULL;
 		return;
-	}
-	
-// Упрощенный html (html)
-	function tohtml ($html, $options) {
-
-		$filehtml = $options["filename"] . '.html';
-									
-		$html = $сhtml->addEOL ($html);
-
-		$html = 
-		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-		. "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n"
-		. "    \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n"
-		. "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-		. "<head>\n"
-		. "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
-		. "<title>" . $options["title"] . "</title>\n"
-		. "</head>\n"
-		. "<body>\n"
-		. $html
-		."</body></html>";
-
-		$put = file_put_contents($filehtml, $html);
-		return $put;
 	}
 	
 	function idtoname($html) {

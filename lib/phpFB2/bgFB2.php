@@ -51,6 +51,8 @@ $this->images ($content, $options).
 		}
 		$content = str_replace('<empty-line/>', '<empty-line/>'. PHP_EOL,  $content);
 		
+		unset($сhtml);
+		$сhtml=NULL;
 		return $content;
 	}
 

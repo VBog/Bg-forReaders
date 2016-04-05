@@ -91,8 +91,11 @@ if (isset($_GET['id'])) {
 		$finish = $cnt;
 	}
 	error_log(" All posts (".$cnt."): Start=".$start.", Finish=".$finish. PHP_EOL, 3, $debug_file);
-	if ($echo_on) echo " All posts (".$cnt."): Start=".$start.", Finish=".$finish. PHP_EOL;
-
+	if ($echo_on) {
+		echo " All posts (".$cnt."): Start=".$start.", Finish=".$finish. PHP_EOL;
+		flush();
+		ob_flush();
+	}
 	for ($i = 0; $i < $cnt; $i++){
 		if ($i < $start-1) continue;
 		if ($i > $finish-1) break;
