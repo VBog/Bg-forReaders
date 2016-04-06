@@ -281,6 +281,10 @@ class BgForReaders {
 // Создание файлов для чтения
 	public function generate ($id) {
 		
+		ini_set("pcre.backtrack_limit","3000000");
+		ini_set("memory_limit", "1G");
+		set_time_limit ( intval(get_option('bg_forreaders_time_limit')) );
+		
 		require_once "lib/BgClearHTML.php";
 		
 		$post = get_post($id);
@@ -344,7 +348,6 @@ class BgForReaders {
 						implode(' ,',array_map("get_cat_name", wp_get_post_categories($post->ID))) :
 						__("Unknown subject")			
 		);
-		set_time_limit ( intval(get_option('bg_forreaders_time_limit')) );
 		if (!file_exists ($filename.".pdf") && get_option('bg_forreaders_pdf') == 'on') $this->topdf($content, $options);
 		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($content, $options);
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($content, $options);
@@ -358,8 +361,6 @@ class BgForReaders {
 // Portable Document Format (PDF)
 	function topdf ($html, $options) {
 
-		ini_set("pcre.backtrack_limit","3000000");
-		ini_set("memory_limit", "256M");
 		require_once "lib/mpdf60/mpdf.php";
 		$filepdf = $options["filename"] . '.pdf';
 		
