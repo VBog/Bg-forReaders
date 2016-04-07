@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.7.4
+Version: 0.7.6
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.7.4' );
+define( 'BG_FORREADERS_VERSION', '0.7.6' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -282,8 +282,17 @@ class BgForReaders {
 	public function generate ($id) {
 		
 		ini_set("pcre.backtrack_limit","3000000");
-		ini_set("memory_limit", "1G");
-		set_time_limit ( intval(get_option('bg_forreaders_time_limit')) );
+
+		$the_memory_limit = (int) ini_get('memory_limit');
+		$memory_limit = trim(get_option('bg_forreaders_memory_limit'));
+		if (empty($memory_limit)) ini_set("memory_limit", $memory_limit."M");
+//		ini_set("memory_limit", "1G");
+
+		$the_time_limit = (int) ini_get('max_execution_time') ;
+		$the_time_limit = empty($the_time_limit) ? 30 : $the_time_limit;
+		$time_limit = trim(get_option('bg_forreaders_time_limit'));		
+		if (empty($time_limit)) set_time_limit ( intval($time_limit) );
+//		set_time_limit ( get_option('bg_forreaders_time_limit') );
 		
 		require_once "lib/BgClearHTML.php";
 		
@@ -341,6 +350,7 @@ class BgForReaders {
 			"guid"=>$post->guid,
 			"url"=>$post->guid,
 			"thumb"=>$image_path,
+			"cover"=>get_option('bg_forreaders_cover_image'),
 			"filename"=>$filename,
 			"lang"=>$lang,
 			"genre"=>$genre,
@@ -348,13 +358,21 @@ class BgForReaders {
 						implode(' ,',array_map("get_cat_name", wp_get_post_categories($post->ID))) :
 						__("Unknown subject")			
 		);
+		if (get_option('bg_forreaders_add_title')) {
+			$content = '<h1>'.$post->post_title.'</h1>'.$content;
+		}
 		if (!file_exists ($filename.".pdf") && get_option('bg_forreaders_pdf') == 'on') $this->topdf($content, $options);
 		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($content, $options);
 		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($content, $options);
 		if (!file_exists ($filename.".fb2") && get_option('bg_forreaders_fb2') == 'on') $this->tofb2($content, $options);
 
+		// Восстанавливаем настройки системных параметров
+		if (!empty($memory_limit) && !empty($the_memory_limit)) ini_set("memory_limit", $the_memory_limit."M");
+		if (!empty($time_limit) && !empty($the_time_limit)) set_time_limit ( $the_time_limit );
+
 		unset($сhtml);
 		$сhtml=NULL;
+		
 		return;
 	}
 
@@ -379,6 +397,49 @@ class BgForReaders {
 				'<div style="position: relative; left:0; right: 0; top: 0; bottom: 0;">
 					<img src="'.$options["thumb"].'" style="width: 210mm; height: 297mm; margin: 1mm;" />
 				</div>');
+		} else {
+			$pdf->AddPage('','','','','on');
+			$cover_cssData = "
+	.cover_page {
+		position: absolute; 
+		left:0; 
+		right: 0; 
+		top: 0; 
+		bottom: 0;
+		width: 210mm; 
+		height: 297mm; 
+	}
+	.cover_page img {
+		width: 210mm; 
+		height: 297mm; 
+		margin: 1mm;
+	}
+	.cover_author {
+		position: absolute; 
+		left:0; 
+		right: 0; 
+		top: 50mm; 
+		bottom: 0;
+		margin: 0; 
+		padding: 0;
+	}
+	.cover_title {
+		position: absolute; 
+		left:0; 
+		right: 0; 
+		top: 125mm; 
+		bottom: 0;
+		margin: 0; 
+		padding: 0;
+	}
+";
+			$pdf->WriteHTML($cover_cssData,1);
+			$pdf->WriteHTML(
+				'<div class="cover_page">'.
+					(($options["cover"])?('<img src="'.$options["cover"].'"  />'):'').
+				'</div>
+				<div class="cover_author"><p align="center">'.$options["author"].'</p></div>
+				<div class="cover_title"><p align="center">'.$options["title"].'</p></div>');
 		}
 		//$pdf->showImageErrors = true;
 		$pdf->AddPage('','','','','on');
@@ -588,32 +649,16 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_excat', '');
 	add_option('bg_forreaders_author_field', 'post');
 	add_option('bg_forreaders_genre', 'genre');
+	add_option('bg_forreaders_cover_image', '');
+	add_option('bg_forreaders_add_title', 'on');
 	add_option('bg_forreaders_while_displayed', '');
 	add_option('bg_forreaders_while_saved', 'on');
+	add_option('bg_forreaders_memory_limit', '1024');
 	add_option('bg_forreaders_time_limit', '60');
 
 	add_option('bg_forreaders_css', BG_FORREADERS_CSS);
 	add_option('bg_forreaders_tags', BG_FORREADERS_TAGS);
 	add_option('bg_forreaders_extlinks', 'on');
-// Ниже - удалить
-	delete_option('bg_forreaders_allowed_tags');
-
-	delete_option('bg_forreaders_pdf_css');
-	delete_option('bg_forreaders_pdf_tags');
-	delete_option('bg_forreaders_pdf_extlinks');
-
-	delete_option('bg_forreaders_epub_css');
-	delete_option('bg_forreaders_epub_tags');
-	delete_option('bg_forreaders_epub_extlinks');
-
-	delete_option('bg_forreaders_mobi_css');
-	delete_option('bg_forreaders_mobi_tags');
-	delete_option('bg_forreaders_mobi_extlinks');
-
-	delete_option('bg_forreaders_fb2_css');
-	delete_option('bg_forreaders_fb2_tags');
-	delete_option('bg_forreaders_fb2_entities');
-	delete_option('bg_forreaders_fb2_extlinks');
 }
 function bg_forreaders_delete_options (){
 
@@ -632,8 +677,11 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_excat');
 	delete_option('bg_forreaders_author_field');
 	delete_option('bg_forreaders_genre');
+	delete_option('bg_forreaders_cover_image');
+	delete_option('bg_forreaders_add_title');
 	delete_option('bg_forreaders_while_displayed');
 	delete_option('bg_forreaders_while_saved');
+	delete_option('bg_forreaders_memory_limit');
 	delete_option('bg_forreaders_time_limit');
 
 	delete_option('bg_forreaders_css');

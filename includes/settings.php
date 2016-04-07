@@ -18,6 +18,7 @@ function bg_forreaders_options_page() {
 
 		<h2 class="nav-tab-wrapper">
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=general" class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>"><?php _e('General', 'bg-forreaders') ?></a>
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=system" class="nav-tab <?php echo $active_tab == 'system' ? 'nav-tab-active' : ''; ?>"><?php _e('System settings', 'bg-forreaders') ?></a>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=options" class="nav-tab <?php echo $active_tab == 'options' ? 'nav-tab-active' : ''; ?>"><?php _e('Options', 'bg-forreaders') ?></a>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=css" class="nav-tab <?php echo $active_tab == 'css' ? 'nav-tab-active' : ''; ?>"><?php _e('CSS', 'bg-forreaders') ?></a> 
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('HTML', 'bg-forreaders') ?></a> 
@@ -61,14 +62,16 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Prompt to download', 'bg-forreaders') ?></th>
 				<td>
-				<input type="text" name="bg_forreaders_prompt" value="<?php echo get_option('bg_forreaders_prompt'); ?>" size="60" /> <?php _e('you can use html-tags in the text', 'bg-forreaders') ?>
+				<input type="text" name="bg_forreaders_prompt" value="<?php echo get_option('bg_forreaders_prompt'); ?>" size="60" /><br>
+				<?php _e('(you can use html-tags in the text)', 'bg-forreaders') ?>
 				</td>
 				</tr>
 
 				<tr valign="top">
 				<th scope="row"><?php _e('Separator', 'bg-forreaders') ?></th>
 				<td>
-				<input type="text" name="bg_forreaders_separator" value="<?php echo get_option('bg_forreaders_separator'); ?>" size="60" /> <?php _e('you can use html-tags in the text', 'bg-forreaders') ?>
+				<input type="text" name="bg_forreaders_separator" value="<?php echo get_option('bg_forreaders_separator'); ?>" size="60" /><br>
+				<?php _e('(you can use html-tags in the text)', 'bg-forreaders') ?>
 				</td>
 				</tr>
 
@@ -103,9 +106,44 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 				
+				</table>
+
+				<input type="hidden" name="action" value="update" />
+				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
+							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_separator,
+							bg_forreaders_zoom, bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
+							bg_forreaders_while_displayed, bg_forreaders_while_saved" />
+
+				<p class="submit">
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				</p>
+
+			<!-- Системные настройки -->
+			<?php } elseif ($active_tab == 'system') { ?>
+			
+				<table class="form-table">
+				
+				<tr valign="top">
+				<th scope="row"><?php _e('PHP version', 'bg-forreaders') ?></th>
+				<td>
+				<span><?php echo PHP_VERSION; ?>&nbsp;/&nbsp;<?php echo (PHP_INT_SIZE * 8) . __('Bit OS'); ?></span>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Memory limit', 'bg-forreaders') ?></th>
+				<td>
+				<?php bg_forreaders_memory_usage (); ?>
+				<?php _e('Set memory limit:', 'bg-forreaders') ?><br>
+				<input type="number" name="bg_forreaders_memory_limit" value="<?php echo get_option('bg_forreaders_memory_limit'); ?>" min="0" /> <?php _e('MB', 'bg-forreaders') ?>
+				</td>
+				</tr>
+
 				<tr valign="top">
 				<th scope="row"><?php _e('Time limit', 'bg-forreaders') ?></th>
 				<td>
+				<?php bg_forreaders_time_limit (); ?>
+				<?php _e('Set time limit:', 'bg-forreaders') ?><br>
 				<input type="number" name="bg_forreaders_time_limit" value="<?php echo get_option('bg_forreaders_time_limit'); ?>" min="0" /> <?php _e('sec.', 'bg-forreaders') ?>
 				</td>
 				</tr>
@@ -113,10 +151,7 @@ function bg_forreaders_options_page() {
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
-							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_separator,
-							bg_forreaders_zoom, bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
-							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_time_limit" />
+				<input type="hidden" name="page_options" value="bg_forreaders_memory_limit, bg_forreaders_time_limit" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -142,10 +177,25 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
+				<tr valign="top">
+				<th scope="row"><?php _e('Cover image', 'bg-forreaders') ?></th>
+				<td>
+				<input type="text" name="bg_forreaders_cover_image" value="<?php echo get_option('bg_forreaders_cover_image'); ?>" size="60" />
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Add book title into the text', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_add_title" <?php if(get_option('bg_forreaders_add_title')) echo "checked" ?> value="on" /> 
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_genre" />
+				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_genre, bg_forreaders_cover_image, 
+							bg_forreaders_add_title" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -156,10 +206,13 @@ function bg_forreaders_options_page() {
 				<table class="form-table">
 
 				<tr valign="top">
-				<th scope="row"><?php _e('CSS styles table for PDF', 'bg-forreaders') ?></th>
+				<th scope="row"><?php _e('CSS styles table', 'bg-forreaders') ?></th>
 				<td>
 				<textarea name="bg_forreaders_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_css'); ?></textarea><br>
-				<i><?php _e('Enter the css styling table for display text in readers.', 'bg-forreaders') ?></i>
+				<i><?php _e('Enter the css styling table for display text in readers.', 'bg-forreaders') ?></i><hr>
+				<?php _e('<b>.cover_page</b> - class for background of cover page;', 'bg-forreaders') ?><br>
+				<?php _e('<b>.cover_author</b> - class for author name on cover page;', 'bg-forreaders') ?><br>
+				<?php _e('<b>.cover_title</b> - class for book title on cover page;', 'bg-forreaders') ?><br>
 				</td>
 				</tr>
 				
@@ -232,4 +285,31 @@ function bg_forreaders_options_page() {
 		</form>
 	</div>
 	<?php 
+}
+
+function bg_forreaders_memory_usage () {
+	$memory = array();
+	
+	$memory['limit'] = (int) ini_get('memory_limit') ;
+	$memory['usage'] = function_exists('memory_get_usage') ? round(memory_get_usage() / 1024 / 1024, 2) : 0;
+	$memory['limit'] = empty($memory['limit']) ? __('N/A') : $memory['limit'] . __(' MB');
+	$memory['usage'] = empty($memory['usage']) ? __('N/A') : $memory['usage'] . __(' MB');
+	
+	?>
+		<ul>	
+			<li><strong><?php _e('Memory limit', 'bg-forreaders'); ?></strong> : <span><?php echo $memory['limit']; ?></span></li>
+			<li><strong><?php _e('Memory usage', 'bg-forreaders'); ?></strong> : <span><?php echo $memory['usage']; ?></span></li>
+		</ul>
+	<?php
+}
+function bg_forreaders_time_limit () {
+
+	$time_limit = (int) ini_get('max_execution_time') ;
+	$time_limit = (empty($time_limit) ? 30 : $time_limit) . __(' sec.');
+	
+	?>
+		<ul>	
+			<li><strong><?php _e('Max. execution time', 'bg-forreaders'); ?></strong> : <span><?php echo $time_limit; ?></span></li>
+		</ul>
+	<?php
 }
