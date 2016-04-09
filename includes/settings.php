@@ -180,7 +180,22 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Cover image', 'bg-forreaders') ?></th>
 				<td>
-				<input type="text" name="bg_forreaders_cover_image" value="<?php echo get_option('bg_forreaders_cover_image'); ?>" size="60" />
+				<input type="text" name="bg_forreaders_cover_image" value="<?php echo get_option('bg_forreaders_cover_image'); ?>" size="60" /><br>
+				<i><?php _e('(png, gif or jpg file. Size: 840x1188px)', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Text color', 'bg-forreaders') ?></th>
+				<td>
+				<input type="color" name="bg_forreaders_text_color" value="<?php echo get_option('bg_forreaders_text_color'); ?>" />
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Background color', 'bg-forreaders') ?></th>
+				<td>
+				<input type="color" name="bg_forreaders_bg_color" value="<?php echo get_option('bg_forreaders_bg_color'); ?>" />
 				</td>
 				</tr>
 
@@ -202,7 +217,7 @@ function bg_forreaders_options_page() {
 
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_genre, bg_forreaders_cover_image, 
-							bg_forreaders_add_title, bg_forreaders_add_author" />
+							bg_forreaders_text_color, bg_forreaders_bg_color, bg_forreaders_add_title, bg_forreaders_add_author" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -216,10 +231,7 @@ function bg_forreaders_options_page() {
 				<th scope="row"><?php _e('CSS styles table', 'bg-forreaders') ?></th>
 				<td>
 				<textarea name="bg_forreaders_css" rows="10" cols="60"><?php echo get_option('bg_forreaders_css'); ?></textarea><br>
-				<i><?php _e('Enter the css styling table for display text in readers.', 'bg-forreaders') ?></i><hr>
-				<?php _e('<b>.cover_page</b> - class for background of cover page;', 'bg-forreaders') ?><br>
-				<?php _e('<b>.cover_author</b> - class for author name on cover page;', 'bg-forreaders') ?><br>
-				<?php _e('<b>.cover_title</b> - class for book title on cover page;', 'bg-forreaders') ?><br>
+				<i><?php _e('Enter the css styling table for display text in readers.', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
 				

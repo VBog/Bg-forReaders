@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.7.7
+Version: 0.8.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.7.7' );
+define( 'BG_FORREADERS_VERSION', '0.8.0' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -279,13 +279,13 @@ class BgForReaders {
 
 		$the_memory_limit = (int) ini_get('memory_limit');
 		$memory_limit = trim(get_option('bg_forreaders_memory_limit'));
-		if (empty($memory_limit)) ini_set("memory_limit", $memory_limit."M");
+		if (!empty($memory_limit)) ini_set("memory_limit", $memory_limit."M");
 //		ini_set("memory_limit", "1G");
 
 		$the_time_limit = (int) ini_get('max_execution_time') ;
 		$the_time_limit = empty($the_time_limit) ? 30 : $the_time_limit;
 		$time_limit = trim(get_option('bg_forreaders_time_limit'));		
-		if (empty($time_limit)) set_time_limit ( intval($time_limit) );
+		if (!empty($time_limit)) set_time_limit ( intval($time_limit) );
 //		set_time_limit ( get_option('bg_forreaders_time_limit') );
 		
 		require_once "lib/BgClearHTML.php";
@@ -335,8 +335,49 @@ class BgForReaders {
 		$upload_dir = wp_upload_dir();
 		$attachment_data = wp_get_attachment_metadata(get_post_thumbnail_id($post->ID, 'full'));
 		if ($attachment_data && $attachment_data['file']) $image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
-		else $image_path = '';
+		else {
+			// Загружаем рисунок фона с диска
+			$template = get_option('bg_forreaders_cover_image');
+			$ext = substr(strrchr($template, '.'), 1);
+			switch ($ext) {
+				case 'jpg':
+				case 'jpeg':
+					 $im = @imageCreateFromJpeg($template);
+					 break;
+				case 'gif':
+					 $im = @imageCreateFromGif($template);
+					 break;
+				case 'png':
+					 $im = @imageCreateFromPng($template);
+					 break;
+				default:
+					return $im = false;
+			}
+			
+			if (!$im) {
+				// Создаем пустое изображение
+				$im  = imagecreatetruecolor(840, 1188);
+				// Создаем в палитре цвет фона
+				list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_bg_color') );
+				$bkcolor = imageColorAllocate($im, $r, $g, $b);
+				imagefilledrectangle($im, 0, 0, 840, 1188, $bkcolor);
+			}
 
+			// Создаем в палитре цвет текста
+			list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_text_color') );
+			$color = imageColorAllocate($im, $r, $g, $b);
+			// Подгружаем шрифт
+			$font = dirname(__file__)."/fonts/BOOKOSB.TTF";
+			// Выводим строки названия книги
+			$this->multiline ($post->post_title, $im, 'middle', $font, 48, $color);
+			// Выводим строки названия книги
+			$this->multiline ($author, $im, 220, $font, 24, $color);
+			// Создаем воременный файл изображения обложки
+			imagepng ($im, 'tmp_cover.png', 9); 
+			// В конце освобождаем память, занятую картинкой.
+			imageDestroy($im);
+			$image_path = 'tmp_cover.png';
+		}
 		
 		$options = array(
 			"title"=> $post->post_title,
@@ -344,7 +385,7 @@ class BgForReaders {
 			"guid"=>$post->guid,
 			"url"=>$post->guid,
 			"thumb"=>$image_path,
-			"cover"=>get_option('bg_forreaders_cover_image'),
+//			"cover"=>get_option('bg_forreaders_cover_image'),
 			"filename"=>$filename,
 			"lang"=>$lang,
 			"genre"=>$genre,
@@ -366,6 +407,7 @@ class BgForReaders {
 
 		unset($сhtml);
 		$сhtml=NULL;
+		if (file_exists('tmp_cover.png')) unlink ('tmp_cover.png');	// Удаляем временный файл
 		
 		return;
 	}
@@ -378,7 +420,67 @@ class BgForReaders {
 		}
 		return true;
 	}
-	
+
+	// Функция добавляет на изображение многострочный текст
+	function multiline ($text, $im, $h, $font, $font_size, $color) {
+		$width = imageSX($im);
+		// Разбиваем наш текст на массив слов
+		$arr = explode(' ', $text);
+		$ret = "";
+		// Перебираем наш массив слов
+		foreach($arr as $word)	{
+			// Временная строка, добавляем в нее слово
+			$tmp_string = $ret.' '.$word;
+
+			// Получение параметров рамки обрамляющей текст, т.е. размер временной строки 
+			$textbox = imagettfbbox($font_size, 0, $font, $tmp_string);
+			
+			// Если временная строка не укладывается в нужные нам границы, то делаем перенос строки, иначе добавляем еще одно слово
+			if($textbox[2]-$textbox[0] > $width)
+				$ret.=($ret==""?"":"\n").$word;
+			else
+				$ret.=($ret==""?"":" ").$word;
+		}
+		$ret=str_replace("\n", "|", $ret);
+		$lines = explode('|', $ret);
+		$cnt = count ($lines);
+
+		// Получение параметров рамки обрамляющей текст, т.е. размер временной строки 
+		$textbox = imagettfbbox($font_size, 0, $font, $ret);
+		$height = abs($textbox[5] - $textbox[1]);
+		if ($h == 'middle')
+			$y = (imageSY($im)+$cnt*$height)/2;
+		else
+			$y = $h+$cnt*$height;
+
+		// Накладываем возращенный многострочный текст на изображение
+		for ($i=0; $i<$cnt; $i++) {
+			$textbox = imagettfbbox($font_size, 0, $font, $lines[$i]);
+			$width = abs($textbox[4] - $textbox[0]);
+			$px = (imageSX($im)-$width)/2;
+			$py = $y - $height*($cnt-$i);
+			imagettftext($im, $font_size ,0, $px, $py, $color, $font, $lines[$i]);
+		}
+		return;
+	}
+	// Convert Hex Color to RGB
+	function hex2rgb( $colour ) {
+        if ( $colour[0] == '#' ) {
+                $colour = substr( $colour, 1 );
+        }
+        if ( strlen( $colour ) == 6 ) {
+                list( $r, $g, $b ) = array( $colour[0] . $colour[1], $colour[2] . $colour[3], $colour[4] . $colour[5] );
+        } elseif ( strlen( $colour ) == 3 ) {
+                list( $r, $g, $b ) = array( $colour[0] . $colour[0], $colour[1] . $colour[1], $colour[2] . $colour[2] );
+        } else {
+                return false;
+        }
+        $r = hexdec( $r );
+        $g = hexdec( $g );
+        $b = hexdec( $b );
+        return array( $r, $g, $b );
+}
+
 // Portable Document Format (PDF)
 	function topdf ($html, $options) {
 
@@ -391,49 +493,13 @@ class BgForReaders {
 		$pdf->SetSubject($options["subject"]);
 		$pdf->h2bookmarks = array('H1'=>0, 'H2'=>1, 'H3'=>2);
 		$cssData = get_option('bg_forreaders_css');
+		$pdf->AddPage('','','','','on');
 		if ($cssData != "") {
 			$pdf->WriteHTML($cssData,1);	// The parameter 1 tells that this is css/style only and no body/html/text
 		}
-		$pdf->AddPage('','','','','on');
-		$cover_cssData = "
-	.cover_page {
-		position: absolute; 
-		left:0; 
-		right: 0; 
-		top: 0; 
-		bottom: 0;
-		width: 210mm; 
-		height: 297mm; 
-	}
-	.cover_author {
-		position: absolute; 
-		left:0; 
-		right: 0; 
-		top: 50mm; 
-		bottom: 0;
-		margin: 0; 
-		padding: 0;
-	}
-	.cover_title {
-		position: absolute; 
-		left:0; 
-		right: 0; 
-		top: 125mm; 
-		bottom: 0;
-		margin: 0; 
-		padding: 0;
-	}
-";
-		$pdf->WriteHTML($cover_cssData,1);
 		if ($options["thumb"]) {
-			$pdf->WriteHTML(
-				'<div class="cover_page" style="background: url('.$options["thumb"].') no-repeat center;"></div>');
-		} else {
-			$pdf->WriteHTML(
-				'<div class="cover_page" '.
-				(($options["cover"])?('style="background: url('.$options["cover"].') no-repeat center;"'):'').'></div>
-				<div class="cover_author"><p align="center">'.$options["author"].'</p></div>
-				<div class="cover_title"><p align="center">'.$options["title"].'</p></div>');
+			$pdf->WriteHTML('<div style="position: absolute; left:0; right: 0; top: 0; bottom: 0; width: 210mm; height: 297mm; '.
+			'background: url('.$options["thumb"].') no-repeat center; background-size: contain;"></div>');
 		}
 		//$pdf->showImageErrors = true;
 		$pdf->AddPage('','','','','on');
@@ -645,6 +711,8 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_author_field', 'post');
 	add_option('bg_forreaders_genre', 'genre');
 	add_option('bg_forreaders_cover_image', '');
+	add_option('bg_forreaders_text_color', '#000000');
+	add_option('bg_forreaders_bg_color', '#ffffff');
 	add_option('bg_forreaders_add_title', 'on');
 	add_option('bg_forreaders_add_author', 'on');
 	add_option('bg_forreaders_while_displayed', '');
@@ -674,6 +742,8 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_author_field');
 	delete_option('bg_forreaders_genre');
 	delete_option('bg_forreaders_cover_image');
+	delete_option('bg_forreaders_text_color');
+	delete_option('bg_forreaders_bg_color');
 	delete_option('bg_forreaders_add_title');
 	delete_option('bg_forreaders_add_author');
 	delete_option('bg_forreaders_while_displayed');
