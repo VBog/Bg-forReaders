@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.7.6
+Version: 0.7.7
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.7.6' );
+define( 'BG_FORREADERS_VERSION', '0.7.7' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -206,17 +206,11 @@ function bg_forreaders_save( $id ) {
 		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 			// пропустим если это автосохранение
 		if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
 	
-	// 	Удаление старых версий файлов для чтения
-		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
-		foreach ($formats as $type => $document_type) {
-			if (file_exists ($filename.".".$type)) unlink ($filename.".".$type);
-		}
-		if (file_exists ($filename.".html")) unlink ($filename.".html");
 	// 	Генерация файлов для чтения
 		if (get_option('bg_forreaders_while_saved')) {
 			$bg_forreaders = new BgForReaders();
 			$bg_forreaders->generate ($id);
-		}
+		} 
 	}
 }
 add_action( 'save_post', 'bg_forreaders_save', 10 );
@@ -358,13 +352,13 @@ class BgForReaders {
 						implode(' ,',array_map("get_cat_name", wp_get_post_categories($post->ID))) :
 						__("Unknown subject")			
 		);
-		if (get_option('bg_forreaders_add_title')) {
-			$content = '<h1>'.$post->post_title.'</h1>'.$content;
-		}
-		if (!file_exists ($filename.".pdf") && get_option('bg_forreaders_pdf') == 'on') $this->topdf($content, $options);
-		if (!file_exists ($filename.".epub") && get_option('bg_forreaders_epub') == 'on') $this->toepub($content, $options);
-		if (!file_exists ($filename.".mobi") && get_option('bg_forreaders_mobi') == 'on') $this->tomobi($content, $options);
-		if (!file_exists ($filename.".fb2") && get_option('bg_forreaders_fb2') == 'on') $this->tofb2($content, $options);
+		if (get_option('bg_forreaders_add_author')) $content = '<p><em>'.$author.'</em></p>'.$content;
+		if (get_option('bg_forreaders_add_title')) $content = '<h1>'.$post->post_title.'</h1>'.$content;
+
+		if (!$this->file_updated ($filename, "pdf", $post->post_modified_gmt)) $this->topdf($content, $options);
+		if (!$this->file_updated ($filename, "epub", $post->post_modified_gmt)) $this->toepub($content, $options);
+		if (!$this->file_updated ($filename, "mobi", $post->post_modified_gmt)) $this->tomobi($content, $options);
+		if (!$this->file_updated ($filename, "fb2", $post->post_modified_gmt)) $this->tofb2($content, $options);
 
 		// Восстанавливаем настройки системных параметров
 		if (!empty($memory_limit) && !empty($the_memory_limit)) ini_set("memory_limit", $the_memory_limit."M");
@@ -376,6 +370,15 @@ class BgForReaders {
 		return;
 	}
 
+// Проверяем необходимость обновления файла
+	function file_updated ($filename, $type, $check_time) {
+		if (get_option('bg_forreaders_'.$type) == 'on') {
+			if (!file_exists ($filename.".".$type) ||
+				($check_time > date('Y-m-d H:i:s', filemtime($filename.".".$type)))) return false;
+		}
+		return true;
+	}
+	
 // Portable Document Format (PDF)
 	function topdf ($html, $options) {
 
@@ -391,15 +394,8 @@ class BgForReaders {
 		if ($cssData != "") {
 			$pdf->WriteHTML($cssData,1);	// The parameter 1 tells that this is css/style only and no body/html/text
 		}
-		if ($options["thumb"]) {
-			$pdf->AddPage('','','','','on');
-			$pdf->WriteHTML(
-				'<div style="position: relative; left:0; right: 0; top: 0; bottom: 0;">
-					<img src="'.$options["thumb"].'" style="width: 210mm; height: 297mm; margin: 1mm;" />
-				</div>');
-		} else {
-			$pdf->AddPage('','','','','on');
-			$cover_cssData = "
+		$pdf->AddPage('','','','','on');
+		$cover_cssData = "
 	.cover_page {
 		position: absolute; 
 		left:0; 
@@ -408,11 +404,6 @@ class BgForReaders {
 		bottom: 0;
 		width: 210mm; 
 		height: 297mm; 
-	}
-	.cover_page img {
-		width: 210mm; 
-		height: 297mm; 
-		margin: 1mm;
 	}
 	.cover_author {
 		position: absolute; 
@@ -433,11 +424,14 @@ class BgForReaders {
 		padding: 0;
 	}
 ";
-			$pdf->WriteHTML($cover_cssData,1);
+		$pdf->WriteHTML($cover_cssData,1);
+		if ($options["thumb"]) {
 			$pdf->WriteHTML(
-				'<div class="cover_page">'.
-					(($options["cover"])?('<img src="'.$options["cover"].'"  />'):'').
-				'</div>
+				'<div class="cover_page" style="background: url('.$options["thumb"].') no-repeat center;"></div>');
+		} else {
+			$pdf->WriteHTML(
+				'<div class="cover_page" '.
+				(($options["cover"])?('style="background: url('.$options["cover"].') no-repeat center;"'):'').'></div>
 				<div class="cover_author"><p align="center">'.$options["author"].'</p></div>
 				<div class="cover_title"><p align="center">'.$options["title"].'</p></div>');
 		}
@@ -467,6 +461,8 @@ class BgForReaders {
 		$epub->setPublisher(get_bloginfo( 'name' ), get_bloginfo( 'url' ));
 		$epub->setSourceURL($options["url"]);
 		
+		if ($options["thumb"]) $epub->setCoverImage($options["thumb"]);
+		
 		$epub->addCSSFile("styles.css", "css1", $cssData);			
 		$html =
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -482,7 +478,6 @@ class BgForReaders {
 		. $html
 		."\n</body>\n</html>\n";
 		
-		if ($options["thumb"]) $epub->setCoverImage($options["thumb"]);
 		$epub->addChapter("Book", "Book.html", $html, false, EPub::EXTERNAL_REF_ADD, '');
 		$epub->finalize();
 		file_put_contents($fileepub, $epub->getBook());
@@ -651,6 +646,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_genre', 'genre');
 	add_option('bg_forreaders_cover_image', '');
 	add_option('bg_forreaders_add_title', 'on');
+	add_option('bg_forreaders_add_author', 'on');
 	add_option('bg_forreaders_while_displayed', '');
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_memory_limit', '1024');
@@ -679,6 +675,7 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_genre');
 	delete_option('bg_forreaders_cover_image');
 	delete_option('bg_forreaders_add_title');
+	delete_option('bg_forreaders_add_author');
 	delete_option('bg_forreaders_while_displayed');
 	delete_option('bg_forreaders_while_saved');
 	delete_option('bg_forreaders_memory_limit');

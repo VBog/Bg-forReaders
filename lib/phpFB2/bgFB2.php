@@ -287,10 +287,10 @@ $this->images ($content, $options).
 			preg_match($template, $matches[0][$i][0], $mt);
 			$text .= $this->create_binary($mt[3]);
 		}
+
 		return $text;
 	}
 	function create_binary ($path) {
-		if (!file_exists($path)) return "";
 		$filename = basename($path);
 		$ext = substr(strrchr($filename, '.'), 1);
 		switch ($ext) {
@@ -310,6 +310,7 @@ $this->images ($content, $options).
 			$image = $this->giftopng ($path);
 		}
 		else $image = file_get_contents($path);
+		if (!$image) return "";
 		$text = '<binary id="'.$filename.'" content-type="image/'.$type.'">'.base64_encode ($image).'</binary>'.PHP_EOL;
 
 		return $text;		

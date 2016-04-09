@@ -120,9 +120,8 @@ class BgClearHTML {
 	
 	public function replaceSpaces ($content) {
 		
-		// Заменяем символы конца строки на пробел	
-		$content = preg_replace("#\r\n\&nbsp;#s", " ", $content);
-		$content = preg_replace("#\r\n#s", " ", $content);
+		// Заменяем двойной перенос строки на HTML конструкцию <p>...</p>, а одинарный на <br>.
+		$content = wpautop( $content, true);
 		// Заменяем &nbsp; на пробел 	
 		$content = str_replace('&nbsp;', ' ', $content);
 		// Удаляем двойные пробелы	
@@ -130,7 +129,6 @@ class BgClearHTML {
 		$content = str_replace('  ', ' ', $content);
 		// Удаляем пробелы из начала и конца строки
 		$content = trim($content);
-		
 		
 		return $content;
 	}

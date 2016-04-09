@@ -191,11 +191,18 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
+				<tr valign="top">
+				<th scope="row"><?php _e('Add book author into the text', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_add_author" <?php if(get_option('bg_forreaders_add_author')) echo "checked" ?> value="on" /> 
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_genre, bg_forreaders_cover_image, 
-							bg_forreaders_add_title" />
+							bg_forreaders_add_title, bg_forreaders_add_author" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
