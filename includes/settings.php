@@ -28,7 +28,7 @@ function bg_forreaders_options_page() {
 		<form id="bg_forreaders_options" method="post" action="options.php">
 			<?php wp_nonce_field('update-options'); ?>
 
-			<!-- Общие Настройки -->
+	<!-- Общие Настройки -->
 			<?php if ($active_tab == 'general') { ?>
 
 				<table class="form-table">
@@ -118,7 +118,7 @@ function bg_forreaders_options_page() {
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 
-			<!-- Системные настройки -->
+	<!-- Системные настройки -->
 			<?php } elseif ($active_tab == 'system') { ?>
 			
 				<table class="form-table">
@@ -157,6 +157,7 @@ function bg_forreaders_options_page() {
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 
+	<!-- Прочие настройки -->
 			<?php } elseif ($active_tab == 'options') { ?>
 
 				<table class="form-table">
@@ -170,6 +171,14 @@ function bg_forreaders_options_page() {
 				</tr>
 
 				<tr valign="top">
+				<th scope="row"><?php _e('Custom field for publishing year', 'bg-forreaders') ?></th>
+				<td>
+				<input type="text" name="bg_forreaders_publishing_year" value="<?php echo get_option('bg_forreaders_publishing_year'); ?>" size="60" /><br>
+				<i><?php _e('(if you specify as "post", publishing year is publishing year of the post)', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
+				<tr valign="top">
 				<th scope="row"><?php _e('Genre', 'bg-forreaders') ?></th>
 				<td>
 				<input type="text" name="bg_forreaders_genre" value="<?php echo get_option('bg_forreaders_genre'); ?>" size="60" /><br>
@@ -178,7 +187,23 @@ function bg_forreaders_options_page() {
 				</tr>
 
 				<tr valign="top">
-				<th scope="row"><?php _e('Cover image', 'bg-forreaders') ?></th>
+				<th scope="row"><?php _e('Book header in  the text', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_add_title" <?php if(get_option('bg_forreaders_add_title')) echo "checked" ?> value="on" />&nbsp;<?php _e('add book title', 'bg-forreaders') ?>&nbsp;&nbsp;
+				<input type="checkbox" name="bg_forreaders_add_author" <?php if(get_option('bg_forreaders_add_author')) echo "checked" ?> value="on" />&nbsp;<?php _e('add book author', 'bg-forreaders') ?>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Use post thumbnail as cover', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_cover_thumb" <?php if(get_option('bg_forreaders_cover_thumb')) echo "checked" ?> value="on" />&nbsp;
+				<i><?php _e('(If there is post thumbnail, it will be used as cover)', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Cover image template', 'bg-forreaders') ?></th>
 				<td>
 				<input type="text" name="bg_forreaders_cover_image" value="<?php echo get_option('bg_forreaders_cover_image'); ?>" size="60" /><br>
 				<i><?php _e('(png, gif or jpg file. Size: 840x1188px)', 'bg-forreaders') ?></i>
@@ -186,44 +211,46 @@ function bg_forreaders_options_page() {
 				</tr>
 
 				<tr valign="top">
-				<th scope="row"><?php _e('Text color', 'bg-forreaders') ?></th>
+				<th scope="row"><?php _e('Сolors', 'bg-forreaders') ?></th>
 				<td>
-				<input type="color" name="bg_forreaders_text_color" value="<?php echo get_option('bg_forreaders_text_color'); ?>" />
+				<?php _e('text:', 'bg-forreaders') ?>&nbsp;<input type="color" name="bg_forreaders_text_color" value="<?php echo get_option('bg_forreaders_text_color'); ?>" />&nbsp;&nbsp;
+				<?php _e('background:', 'bg-forreaders') ?>&nbsp;<input type="color" name="bg_forreaders_bg_color" value="<?php echo get_option('bg_forreaders_bg_color'); ?>" />
 				</td>
 				</tr>
 
 				<tr valign="top">
-				<th scope="row"><?php _e('Background color', 'bg-forreaders') ?></th>
+				<th scope="row"><?php _e('Offset of the text field on the cover', 'bg-forreaders') ?></th>
 				<td>
-				<input type="color" name="bg_forreaders_bg_color" value="<?php echo get_option('bg_forreaders_bg_color'); ?>" />
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Add book title into the text', 'bg-forreaders') ?></th>
-				<td>
-				<input type="checkbox" name="bg_forreaders_add_title" <?php if(get_option('bg_forreaders_add_title')) echo "checked" ?> value="on" /> 
-				</td>
-				</tr>
-
-				<tr valign="top">
-				<th scope="row"><?php _e('Add book author into the text', 'bg-forreaders') ?></th>
-				<td>
-				<input type="checkbox" name="bg_forreaders_add_author" <?php if(get_option('bg_forreaders_add_author')) echo "checked" ?> value="on" /> 
+				<table>
+					<tr>
+					<td><?php _e('left:', 'bg-forreaders') ?></td>
+					<td><input type="number" name="bg_forreaders_left_offset" value="<?php echo get_option('bg_forreaders_left_offset'); ?>" style="width: 80px;" /> px</td>
+					<td><?php _e('right:', 'bg-forreaders') ?></td>
+					<td><input type="number" name="bg_forreaders_right_offset" value="<?php echo get_option('bg_forreaders_right_offset'); ?>" style="width: 80px;" /> px</td>
+					</tr>
+					<tr>
+					<td><?php _e('top:', 'bg-forreaders') ?></td>
+					<td><input type="number" name="bg_forreaders_top_offset" value="<?php echo get_option('bg_forreaders_top_offset'); ?>" style="width: 80px;" /> px</td>
+					<td><?php _e('bottom:', 'bg-forreaders') ?></td>
+					<td><input type="number" name="bg_forreaders_bottom_offset" value="<?php echo get_option('bg_forreaders_bottom_offset'); ?>" style="width: 80px;" /> px</td>
+					</tr>
+				</table>
 				</td>
 				</tr>
 
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_genre, bg_forreaders_cover_image, 
-							bg_forreaders_text_color, bg_forreaders_bg_color, bg_forreaders_add_title, bg_forreaders_add_author" />
+				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_publishing_year, bg_forreaders_genre, 
+							bg_forreaders_add_title, bg_forreaders_add_author, 
+							bg_forreaders_cover_thumb, bg_forreaders_cover_image, bg_forreaders_text_color, bg_forreaders_bg_color, 
+							bg_forreaders_left_offset, bg_forreaders_right_offset, bg_forreaders_top_offset, bg_forreaders_bottom_offset" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 
-				<!-- Настройка таблицы стилей -->
+	<!-- Настройка таблицы стилей -->
 			<?php } elseif ($active_tab == 'css') { ?>
 				<table class="form-table">
 
@@ -244,7 +271,7 @@ function bg_forreaders_options_page() {
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 					
-				<!-- Ограничение использования HTML-тегов и их атрибутов -->
+	<!-- Ограничение использования HTML-тегов и их атрибутов -->
 			<?php } elseif ($active_tab == 'html') { ?>
 				<table class="form-table">
 
@@ -274,7 +301,7 @@ function bg_forreaders_options_page() {
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
 
-				<!-- Пакетный режим -->
+	<!-- Пакетный режим -->
 			<?php } elseif ($active_tab == 'batch') { ?>
 				<table class="form-table">
 

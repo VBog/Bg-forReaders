@@ -62,7 +62,9 @@ $this->images ($content, $options).
 	}
 	
 	function discription ($content, $options) {
-		$authorName = explode(" ", $options['author']);
+		$authorName = preg_replace('/\.\,\;\:/is', '', $options['author']);
+		$authorName = trim(preg_replace('/\s/is', ' ', $authorName));
+		$authorName = explode(" ", $authorName);
 		$firstName = (isset($authorName[1]))?$authorName[1]:"";
 		$lastName = (isset($authorName[0]))?$authorName[0]:"";
 		$content ='<description>'. PHP_EOL .
@@ -74,7 +76,7 @@ $this->images ($content, $options).
 '</author>'.
 '<book-title>' .$options['title']. '</book-title>'. PHP_EOL .
 '<lang>' .$options['lang']. '</lang>'. PHP_EOL .
-(($options['cover'])?('<coverpage><image l:href="#' .basename($options['cover']). '"/></coverpage>'. PHP_EOL):'').
+(($options['cover'])?('<coverpage><image l:href="#' .str_replace('gif', 'png', basename($options['cover'])). '"/></coverpage>'. PHP_EOL):'').
 '<date value="' .date ( 'Y-m-d' ). '">' .date ( 'd.m.Y' ). '</date>'. PHP_EOL .
 '</title-info>'. PHP_EOL .
 '<document-info>'. PHP_EOL .
