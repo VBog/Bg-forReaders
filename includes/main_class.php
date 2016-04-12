@@ -1,11 +1,11 @@
 <?php
 /*****************************************************************************************
-	Класс плагина
+	РљР»Р°СЃСЃ РїР»Р°РіРёРЅР°
 	
 ******************************************************************************************/
 class BgForReaders {
 	
-// Создание файлов для чтения
+// РЎРѕР·РґР°РЅРёРµ С„Р°Р№Р»РѕРІ РґР»СЏ С‡С‚РµРЅРёСЏ
 	public function generate ($id) {
 		
 		ini_set("pcre.backtrack_limit","3000000");
@@ -21,101 +21,105 @@ class BgForReaders {
 		$post = get_post($id);
 		$plink = get_permalink($id);
 		$content = $post->post_content;
-		// Выполнить все шорт-коды
+		// Р’С‹РїРѕР»РЅРёС‚СЊ РІСЃРµ С€РѕСЂС‚-РєРѕРґС‹
 		$content = do_shortcode ( $content );
-		// Удаляем указания на текущую страницу в ссылках с якорями
+		// РЈРґР°Р»СЏРµРј СѓРєР°Р·Р°РЅРёСЏ РЅР° С‚РµРєСѓС‰СѓСЋ СЃС‚СЂР°РЅРёС†Сѓ РІ СЃСЃС‹Р»РєР°С… СЃ СЏРєРѕСЂСЏРјРё
 		$content = preg_replace("/". preg_quote( $plink, '/' ).'.*?#/is', '#', $content);
-		// Исправляем неправильно-введенные XHTML (HTML) теги
+		// РСЃРїСЂР°РІР»СЏРµРј РЅРµРїСЂР°РІРёР»СЊРЅРѕ-РІРІРµРґРµРЅРЅС‹Рµ XHTML (HTML) С‚РµРіРё
 		$content = balanceTags( $content, true );	
 
-//		Очищаем текст от лишних тегов разметки
-		$сhtml = new BgClearHTML();
-		// Массив разрешенных тегов и атрибутов
-		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_tags'));
-		// Оставляем в тексте только разрешенные теги и атрибуты
-		$content = $сhtml->prepare ($content, $allow_attributes);
+//		РћС‡РёС‰Р°РµРј С‚РµРєСЃС‚ РѕС‚ Р»РёС€РЅРёС… С‚РµРіРѕРІ СЂР°Р·РјРµС‚РєРё
+		$СЃhtml = new BgClearHTML();
+		// РњР°СЃСЃРёРІ СЂР°Р·СЂРµС€РµРЅРЅС‹С… С‚РµРіРѕРІ Рё Р°С‚СЂРёР±СѓС‚РѕРІ
+		$allow_attributes = $СЃhtml->strtoarray (get_option('bg_forreaders_tags'));
+		// РћСЃС‚Р°РІР»СЏРµРј РІ С‚РµРєСЃС‚Рµ С‚РѕР»СЊРєРѕ СЂР°Р·СЂРµС€РµРЅРЅС‹Рµ С‚РµРіРё Рё Р°С‚СЂРёР±СѓС‚С‹
+		$content = $СЃhtml->prepare ($content, $allow_attributes);
 		$content = $this->idtoname($content);
 		$content = $this->clearanchor($content);
 		if (!get_option('bg_forreaders_extlinks')) $content = $this->removehref($content);
-		// Исправляем неправильно-введенные XHTML (HTML) теги
+		// РСЃРїСЂР°РІР»СЏРµРј РЅРµ UTF-8 СЃРёРјРІРѕР»С‹
+		$content = iconv("UTF-8","UTF-8//IGNORE",$content);
+		// РСЃРїСЂР°РІР»СЏРµРј РЅРµРїСЂР°РІРёР»СЊРЅРѕ-РІРІРµРґРµРЅРЅС‹Рµ XHTML (HTML) С‚РµРіРё
 		$content = balanceTags( $content, true );	
 
 		if (get_option('bg_forreaders_author_field') == 'post') {
-			// Автор - автор поста
+			// РђРІС‚РѕСЂ - Р°РІС‚РѕСЂ РїРѕСЃС‚Р°
 			$author_id = get_user_by( 'ID', $post->post_author ); 	// Get user object
 			$author = $author_id->display_name;						// Get user display name
 		} else {
-			// Автор указан в произвольном поле
+			// РђРІС‚РѕСЂ СѓРєР°Р·Р°РЅ РІ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРј РїРѕР»Рµ
 			$author = get_post_meta($post->ID, get_option('bg_forreaders_author_field'), true);
 		}
 		if (get_option('bg_forreaders_genre') == 'genre') {
-			// Жанр указан в произвольном поле
+			// Р–Р°РЅСЂ СѓРєР°Р·Р°РЅ РІ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРј РїРѕР»Рµ
 			$genre = get_post_meta($post->ID, 'genre', true);
 		} else $genre = get_option('bg_forreaders_genre');
 		
-		// Определяем язык блога
+		// РћРїСЂРµРґРµР»СЏРµРј СЏР·С‹Рє Р±Р»РѕРіР°
 		$lang = get_bloginfo('language');	
 		$lang = substr($lang,0, 2);
 		
 		// bg_forreaders_publishing_year
 		if (get_option('bg_forreaders_publishing_year') == 'post') {
-			// Год издания  - год модификации поста
+			// Р“РѕРґ РёР·РґР°РЅРёСЏ  - РіРѕРґ РјРѕРґРёС„РёРєР°С†РёРё РїРѕСЃС‚Р°
 			$publishing_year = substr( $post->post_modified, 0, 4); 
 		} else {
-			// Год издания указан в произвольном поле
+			// Р“РѕРґ РёР·РґР°РЅРёСЏ СѓРєР°Р·Р°РЅ РІ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРј РїРѕР»Рµ
 			$publishing_year = get_post_meta($post->ID, get_option('bg_forreaders_publishing_year'), true);
 		}
 		$publisher = get_bloginfo( 'name' )." ".$publishing_year;
-		// Миниатюра поста
+		// РњРёРЅРёР°С‚СЋСЂР° РїРѕСЃС‚Р°
 		$upload_dir = wp_upload_dir();
 		$attachment_data = wp_get_attachment_metadata(get_post_thumbnail_id($post->ID, 'full'));
 		if ((get_option('bg_forreaders_cover_thumb')=='on') && $attachment_data && $attachment_data['file']) 
 			$image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
 		else {
-			// Загружаем рисунок фона с диска
+			// Р—Р°РіСЂСѓР¶Р°РµРј СЂРёСЃСѓРЅРѕРє С„РѕРЅР° СЃ РґРёСЃРєР°
 			$template = get_option('bg_forreaders_cover_image');
-			$ext = substr(strrchr($template, '.'), 1);
-			switch ($ext) {
-				case 'jpg':
-				case 'jpeg':
-					 $im = @imageCreateFromJpeg($template);
-					 break;
-				case 'gif':
-					 $im = @imageCreateFromGif($template);
-					 break;
-				case 'png':
-					 $im = @imageCreateFromPng($template);
-					 break;
-				default:
-					return $im = false;
-			}
+			if ($template) {
+				$ext = substr(strrchr($template, '.'), 1);
+				switch ($ext) {
+					case 'jpg':
+					case 'jpeg':
+						 $im = @imageCreateFromJpeg($template);
+						 break;
+					case 'gif':
+						 $im = @imageCreateFromGif($template);
+						 break;
+					case 'png':
+						 $im = @imageCreateFromPng($template);
+						 break;
+					default:
+						return $im = false;
+				}
+			} else $im = false;
 			
 			if (!$im) {
-				// Создаем пустое изображение
+				// РЎРѕР·РґР°РµРј РїСѓСЃС‚РѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ
 				$im  = imagecreatetruecolor(840, 1188);
-				// Создаем в палитре цвет фона
+				// РЎРѕР·РґР°РµРј РІ РїР°Р»РёС‚СЂРµ С†РІРµС‚ С„РѕРЅР°
 				list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_bg_color') );
 				$bkcolor = imageColorAllocate($im, $r, $g, $b);
 				imagefilledrectangle($im, 0, 0, 840, 1188, $bkcolor);
 			}
 
-			// Создаем в палитре цвет текста
+			// РЎРѕР·РґР°РµРј РІ РїР°Р»РёС‚СЂРµ С†РІРµС‚ С‚РµРєСЃС‚Р°
 			list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_text_color') );
 			$color = imageColorAllocate($im, $r, $g, $b);
-			// Подгружаем шрифт
+			// РџРѕРґРіСЂСѓР¶Р°РµРј С€СЂРёС„С‚
 			$font = dirname(__file__)."/fonts/BOOKOSB.TTF";
 
 			$dx1 = get_option('bg_forreaders_left_offset');
 			$dx2 = get_option('bg_forreaders_right_offset');
-			// Выводим строки названия книги
+			// Р’С‹РІРѕРґРёРј СЃС‚СЂРѕРєРё РЅР°Р·РІР°РЅРёСЏ РєРЅРёРіРё
 			$this->multiline ($post->post_title, $im, 'middle', $dx1, $dx2, $font, 24, $color);
-			// Выводим имя автора
+			// Р’С‹РІРѕРґРёРј РёРјСЏ Р°РІС‚РѕСЂР°
 			$this->multiline ($author, $im, get_option('bg_forreaders_top_offset'), $dx1, $dx2, $font, 16, $color);
-			// Выводим название сайта
+			// Р’С‹РІРѕРґРёРј РЅР°Р·РІР°РЅРёРµ СЃР°Р№С‚Р°
 			$this->multiline ($publisher, $im, -get_option('bg_forreaders_bottom_offset'), $dx1, $dx2, $font, 12, $color);
-			// Создаем воременный файл изображения обложки
+			// РЎРѕР·РґР°РµРј РІРѕСЂРµРјРµРЅРЅС‹Р№ С„Р°Р№Р» РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РѕР±Р»РѕР¶РєРё
 			imagepng ($im, 'tmp_cover.png', 9); 
-			// В конце освобождаем память, занятую картинкой.
+			// Р’ РєРѕРЅС†Рµ РѕСЃРІРѕР±РѕР¶РґР°РµРј РїР°РјСЏС‚СЊ, Р·Р°РЅСЏС‚СѓСЋ РєР°СЂС‚РёРЅРєРѕР№.
 			imageDestroy($im);
 			$image_path = 'tmp_cover.png';
 		}
@@ -143,41 +147,41 @@ class BgForReaders {
 		if (!$this->file_updated ($filename, "fb2", $post->post_modified_gmt)) $this->tofb2($content, $options);
 
 
-		unset($сhtml);
-		$сhtml=NULL;
-		if (file_exists('tmp_cover.png')) unlink ('tmp_cover.png');	// Удаляем временный файл
+		unset($СЃhtml);
+		$СЃhtml=NULL;
+		if (file_exists('tmp_cover.png')) unlink ('tmp_cover.png');	// РЈРґР°Р»СЏРµРј РІСЂРµРјРµРЅРЅС‹Р№ С„Р°Р№Р»
 		
 		return;
 	}
 
-// Проверяем необходимость обновления файла
+// РџСЂРѕРІРµСЂСЏРµРј РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ С„Р°Р№Р»Р°
 	function file_updated ($filename, $type, $check_time) {
-		// Если разрешет данный тип файла
+		// Р•СЃР»Рё СЂР°Р·СЂРµС€РµС‚ РґР°РЅРЅС‹Р№ С‚РёРї С„Р°Р№Р»Р°
 		if (get_option('bg_forreaders_'.$type) == 'on') {
-			// Проверяем нет ли защищенного от обновления файла?
+			// РџСЂРѕРІРµСЂСЏРµРј РЅРµС‚ Р»Рё Р·Р°С‰РёС‰РµРЅРЅРѕРіРѕ РѕС‚ РѕР±РЅРѕРІР»РµРЅРёСЏ С„Р°Р№Р»Р°?
 			if (file_exists ($filename."p.".$type)) return true;
-			// Проверяем есть ли обычный файл и неустарел ли он?
+			// РџСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё РѕР±С‹С‡РЅС‹Р№ С„Р°Р№Р» Рё РЅРµСѓСЃС‚Р°СЂРµР» Р»Рё РѕРЅ?
 			if (!file_exists ($filename.".".$type) ||
 				($check_time > date('Y-m-d H:i:s', filemtime($filename.".".$type)))) return false;
 		}
 		return true;
 	}
 
-	// Функция добавляет на изображение многострочный текст
+	// Р¤СѓРЅРєС†РёСЏ РґРѕР±Р°РІР»СЏРµС‚ РЅР° РёР·РѕР±СЂР°Р¶РµРЅРёРµ РјРЅРѕРіРѕСЃС‚СЂРѕС‡РЅС‹Р№ С‚РµРєСЃС‚
 	function multiline ($text, $im, $dy, $dx1, $dx2, $font, $font_size, $color) {
 		$width = imageSX($im)-$dx1-$dx2;
-		// Разбиваем наш текст на массив слов
+		// Р Р°Р·Р±РёРІР°РµРј РЅР°С€ С‚РµРєСЃС‚ РЅР° РјР°СЃСЃРёРІ СЃР»РѕРІ
 		$arr = explode(' ', $text);
 		$ret = "";
-		// Перебираем наш массив слов
+		// РџРµСЂРµР±РёСЂР°РµРј РЅР°С€ РјР°СЃСЃРёРІ СЃР»РѕРІ
 		foreach($arr as $word)	{
-			// Временная строка, добавляем в нее слово
+			// Р’СЂРµРјРµРЅРЅР°СЏ СЃС‚СЂРѕРєР°, РґРѕР±Р°РІР»СЏРµРј РІ РЅРµРµ СЃР»РѕРІРѕ
 			$tmp_string = $ret.' '.$word;
 
-			// Получение параметров рамки обрамляющей текст, т.е. размер временной строки 
+			// РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°РјРєРё РѕР±СЂР°РјР»СЏСЋС‰РµР№ С‚РµРєСЃС‚, С‚.Рµ. СЂР°Р·РјРµСЂ РІСЂРµРјРµРЅРЅРѕР№ СЃС‚СЂРѕРєРё 
 			$textbox = imagettfbbox($font_size, 0, $font, $tmp_string);
 			
-			// Если временная строка не укладывается в нужные нам границы, то делаем перенос строки, иначе добавляем еще одно слово
+			// Р•СЃР»Рё РІСЂРµРјРµРЅРЅР°СЏ СЃС‚СЂРѕРєР° РЅРµ СѓРєР»Р°РґС‹РІР°РµС‚СЃСЏ РІ РЅСѓР¶РЅС‹Рµ РЅР°Рј РіСЂР°РЅРёС†С‹, С‚Рѕ РґРµР»Р°РµРј РїРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё, РёРЅР°С‡Рµ РґРѕР±Р°РІР»СЏРµРј РµС‰Рµ РѕРґРЅРѕ СЃР»РѕРІРѕ
 			if($textbox[2]-$textbox[0] > $width)
 				$ret.=($ret==""?"":"\n").$word;
 			else
@@ -187,18 +191,18 @@ class BgForReaders {
 		$lines = explode('|', $ret);
 		$cnt = count ($lines);
 
-		// Получение параметров рамки обрамляющей текст, т.е. размер временной строки 
+		// РџРѕР»СѓС‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ СЂР°РјРєРё РѕР±СЂР°РјР»СЏСЋС‰РµР№ С‚РµРєСЃС‚, С‚.Рµ. СЂР°Р·РјРµСЂ РІСЂРµРјРµРЅРЅРѕР№ СЃС‚СЂРѕРєРё 
 		$textbox = imagettfbbox($font_size, 0, $font, $ret);
 		$height = abs($textbox[5] - $textbox[1]);
-		if ($dy == 'middle') {	// Заголовок - по центру
+		if ($dy == 'middle') {	// Р—Р°РіРѕР»РѕРІРѕРє - РїРѕ С†РµРЅС‚СЂСѓ
 			$y = (imageSY($im)+$cnt*$height)/2;
-		} elseif ($dy >= 0)  {	// Авторы - сверху
+		} elseif ($dy >= 0)  {	// РђРІС‚РѕСЂС‹ - СЃРІРµСЂС…Сѓ
 			$y = $dy+$cnt*$height;
-		} else {				// Название сайта - снизу
+		} else {				// РќР°Р·РІР°РЅРёРµ СЃР°Р№С‚Р° - СЃРЅРёР·Сѓ
 			$y = imageSY($im)+$dy;
 		}
 
-		// Накладываем возращенный многострочный текст на изображение
+		// РќР°РєР»Р°РґС‹РІР°РµРј РІРѕР·СЂР°С‰РµРЅРЅС‹Р№ РјРЅРѕРіРѕСЃС‚СЂРѕС‡РЅС‹Р№ С‚РµРєСЃС‚ РЅР° РёР·РѕР±СЂР°Р¶РµРЅРёРµ
 		for ($i=0; $i<$cnt; $i++) {
 			$textbox = imagettfbbox($font_size, 0, $font, $lines[$i]);
 			$wt = abs($textbox[4] - $textbox[0]);
@@ -233,6 +237,7 @@ class BgForReaders {
 		$filepdf = $options["filename"] . '.pdf';
 		
 		$pdf = new mPDF();
+		$pdf->ignore_invalid_utf8 = true;
 		$pdf->SetTitle($options["title"]);
 		$pdf->SetAuthor($options["author"]);
 		$pdf->SetSubject($options["subject"]);
@@ -368,12 +373,12 @@ class BgForReaders {
 			return preg_replace('/<a(.*?)id\s*=/is','<a\1name=',$html);
 	}
 
-	// Функция очищает внутренние ссылки и атрибуты id и name от не буквенно-цифровых символов
+	// Р¤СѓРЅРєС†РёСЏ РѕС‡РёС‰Р°РµС‚ РІРЅСѓС‚СЂРµРЅРЅРёРµ СЃСЃС‹Р»РєРё Рё Р°С‚СЂРёР±СѓС‚С‹ id Рё name РѕС‚ РЅРµ Р±СѓРєРІРµРЅРЅРѕ-С†РёС„СЂРѕРІС‹С… СЃРёРјРІРѕР»РѕРІ
 	//	$html = $this->clearanchor($html);
 	function clearanchor($html) {
 		$html = preg_replace_callback('/href\s*=\s*([\"\'])(.*?)(\1)/is',
 		function ($match) {
-			if($match[2][0] == '#') {	// Внутренняя ссылка
+			if($match[2][0] == '#') {	// Р’РЅСѓС‚СЂРµРЅРЅСЏСЏ СЃСЃС‹Р»РєР°
 				$anhor = mb_substr($match[2],1);
 				$anhor = bg_forreaders_clearurl($anhor);
 				return 'href="#'.$anhor.'"';
@@ -387,15 +392,15 @@ class BgForReaders {
 		
 		return $html;
 	}
-	// Функция удаляет все внешние ссылки
+	// Р¤СѓРЅРєС†РёСЏ СѓРґР°Р»СЏРµС‚ РІСЃРµ РІРЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё
 	function removehref($html) {
 		$html = preg_replace_callback('/href\s*=\s*([\"\'])(.*?)(\1)/is',
 		function ($match) {
-			if($match[2][0] == '#') {	// Внутренняя ссылка
+			if($match[2][0] == '#') {	// Р’РЅСѓС‚СЂРµРЅРЅСЏСЏ СЃСЃС‹Р»РєР°
 				return 'href="'.$match[2].'"';
-			} else return '';			// Удаляем внешнюю ссылку
+			} else return '';			// РЈРґР°Р»СЏРµРј РІРЅРµС€РЅСЋСЋ СЃСЃС‹Р»РєСѓ
 		} ,$html);
-		// Удаляем пустые теги <a>
+		// РЈРґР°Р»СЏРµРј РїСѓСЃС‚С‹Рµ С‚РµРіРё <a>
 		$html = preg_replace('/<a\s*>(.*?)<\/a>/is','\1',$html);
 		
 		return $html;
@@ -420,8 +425,8 @@ class BgForReaders {
 	}
 		
 }
-// Функция оставляет в строке только буквенно-цифровые символы, 
-// заменяя пробелы, знак + и другие символы на _ 
+// Р¤СѓРЅРєС†РёСЏ РѕСЃС‚Р°РІР»СЏРµС‚ РІ СЃС‚СЂРѕРєРµ С‚РѕР»СЊРєРѕ Р±СѓРєРІРµРЅРЅРѕ-С†РёС„СЂРѕРІС‹Рµ СЃРёРјРІРѕР»С‹, 
+// Р·Р°РјРµРЅСЏСЏ РїСЂРѕР±РµР»С‹, Р·РЅР°Рє + Рё РґСЂСѓРіРёРµ СЃРёРјРІРѕР»С‹ РЅР° _ 
 function bg_forreaders_clearurl ($str) {
 	$str = urldecode($str);
 	$str = preg_replace ('/&[a-z0-9]+;/is', '_', $str);
