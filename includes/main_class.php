@@ -29,11 +29,11 @@ class BgForReaders {
 		$content = balanceTags( $content, true );	
 
 //		Очищаем текст от лишних тегов разметки
-		$сhtml = new BgClearHTML();
+		$chtml = new BgClearHTML();
 		// Массив разрешенных тегов и атрибутов
-		$allow_attributes = $сhtml->strtoarray (get_option('bg_forreaders_tags'));
+		$allow_attributes = $chtml->strtoarray (get_option('bg_forreaders_tags'));
 		// Оставляем в тексте только разрешенные теги и атрибуты
-		$content = $сhtml->prepare ($content, $allow_attributes);
+		$content = $chtml->prepare ($content, $allow_attributes);
 		$content = $this->idtoname($content);
 		$content = $this->clearanchor($content);
 		if (!get_option('bg_forreaders_extlinks')) $content = $this->removehref($content);
@@ -67,63 +67,69 @@ class BgForReaders {
 			// Год издания указан в произвольном поле
 			$publishing_year = get_post_meta($post->ID, get_option('bg_forreaders_publishing_year'), true);
 		}
-		$publisher = get_bloginfo( 'name' )." ".$publishing_year;
-		// Миниатюра поста
-		$upload_dir = wp_upload_dir();
-		$attachment_data = wp_get_attachment_metadata(get_post_thumbnail_id($post->ID, 'full'));
-		if ((get_option('bg_forreaders_cover_thumb')=='on') && $attachment_data && $attachment_data['file']) 
-			$image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
-		else {
-			// Загружаем рисунок фона с диска
-			$template = get_option('bg_forreaders_cover_image');
-			if ($template) {
-				$ext = substr(strrchr($template, '.'), 1);
-				switch ($ext) {
-					case 'jpg':
-					case 'jpeg':
-						 $im = @imageCreateFromJpeg($template);
-						 break;
-					case 'gif':
-						 $im = @imageCreateFromGif($template);
-						 break;
-					case 'png':
-						 $im = @imageCreateFromPng($template);
-						 break;
-					default:
-						return $im = false;
+		if (get_option('bg_forreaders_cover_title')=='on') {
+			// Миниатюра поста
+			$upload_dir = wp_upload_dir();
+			$attachment_data = wp_get_attachment_metadata(get_post_thumbnail_id($post->ID, 'full'));
+			if ((get_option('bg_forreaders_cover_thumb')=='on') && $attachment_data && $attachment_data['file']) 
+				$image_path = $upload_dir['basedir'] . '/' . $attachment_data['file'];
+			else {
+
+				// Загружаем рисунок фона с диска
+				$template = get_option('bg_forreaders_cover_image');
+				if ($template) {
+					$ext = substr(strrchr($template, '.'), 1);
+					switch ($ext) {
+						case 'jpg':
+						case 'jpeg':
+							 $im = @imageCreateFromJpeg($template);
+							 break;
+						case 'gif':
+							 $im = @imageCreateFromGif($template);
+							 break;
+						case 'png':
+							 $im = @imageCreateFromPng($template);
+							 break;
+						default:
+							return $im = false;
+					}
+				} else $im = false;
+				
+				if (!$im) {
+					// Создаем пустое изображение
+					$im  = imagecreatetruecolor(840, 1188);
+					// Создаем в палитре цвет фона
+					list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_bg_color') );
+					$bkcolor = imageColorAllocate($im, $r, $g, $b);
+					imagefilledrectangle($im, 0, 0, 840, 1188, $bkcolor);
 				}
-			} else $im = false;
-			
-			if (!$im) {
-				// Создаем пустое изображение
-				$im  = imagecreatetruecolor(840, 1188);
-				// Создаем в палитре цвет фона
-				list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_bg_color') );
-				$bkcolor = imageColorAllocate($im, $r, $g, $b);
-				imagefilledrectangle($im, 0, 0, 840, 1188, $bkcolor);
+
+				// Создаем в палитре цвет текста
+				list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_text_color') );
+				$color = imageColorAllocate($im, $r, $g, $b);
+				// Подгружаем шрифт
+				$font = dirname(__file__)."/fonts/BOOKOSB.TTF";
+
+				$dx1 = get_option('bg_forreaders_left_offset');
+				$dx2 = get_option('bg_forreaders_right_offset');
+				// Выводим строки названия книги
+				if (get_option('bg_forreaders_cover_title')=='on')
+					$this->multiline ($post->post_title, $im, 'middle', $dx1, $dx2, $font, 24, $color);
+				// Выводим имя автора
+				if (get_option('bg_forreaders_cover_author')=='on')
+					$this->multiline ($author, $im, get_option('bg_forreaders_top_offset'), $dx1, $dx2, $font, 16, $color);
+				// Выводим название сайта и год
+				if (get_option('bg_forreaders_cover_site')=='on' || get_option('bg_forreaders_cover_year')=='on') {
+					$publisher = ((get_option('bg_forreaders_cover_site')=='on')?get_bloginfo( 'name' ):"")." ".((get_option('bg_forreaders_cover_year')=='on')?$publishing_year:"");
+					$this->multiline ($publisher, $im, -get_option('bg_forreaders_bottom_offset'), $dx1, $dx2, $font, 12, $color);
+				}
+				// Создаем воременный файл изображения обложки
+				imagepng ($im, 'tmp_cover.png', 9); 
+				// В конце освобождаем память, занятую картинкой.
+				imageDestroy($im);
+				$image_path = 'tmp_cover.png';
 			}
-
-			// Создаем в палитре цвет текста
-			list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_text_color') );
-			$color = imageColorAllocate($im, $r, $g, $b);
-			// Подгружаем шрифт
-			$font = dirname(__file__)."/fonts/BOOKOSB.TTF";
-
-			$dx1 = get_option('bg_forreaders_left_offset');
-			$dx2 = get_option('bg_forreaders_right_offset');
-			// Выводим строки названия книги
-			$this->multiline ($post->post_title, $im, 'middle', $dx1, $dx2, $font, 24, $color);
-			// Выводим имя автора
-			$this->multiline ($author, $im, get_option('bg_forreaders_top_offset'), $dx1, $dx2, $font, 16, $color);
-			// Выводим название сайта
-			$this->multiline ($publisher, $im, -get_option('bg_forreaders_bottom_offset'), $dx1, $dx2, $font, 12, $color);
-			// Создаем воременный файл изображения обложки
-			imagepng ($im, 'tmp_cover.png', 9); 
-			// В конце освобождаем память, занятую картинкой.
-			imageDestroy($im);
-			$image_path = 'tmp_cover.png';
 		}
-		
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
 		$options = array(
 			"title"=> $post->post_title,
@@ -147,8 +153,8 @@ class BgForReaders {
 		if (!$this->file_updated ($filename, "fb2", $post->post_modified_gmt)) $this->tofb2($content, $options);
 
 
-		unset($сhtml);
-		$сhtml=NULL;
+		unset($chtml);
+		$chtml=NULL;
 		if (file_exists('tmp_cover.png')) unlink ('tmp_cover.png');	// Удаляем временный файл
 		
 		return;
@@ -250,9 +256,9 @@ class BgForReaders {
 		if ($options["thumb"]) {
 			$pdf->WriteHTML('<div style="position: absolute; left:0; right: 0; top: 0; bottom: 0; width: 210mm; height: 297mm; '.
 			'background: url('.$options["thumb"].') no-repeat center; background-size: contain;"></div>');
+			$pdf->AddPage('','','','','on');
 		}
 		//$pdf->showImageErrors = true;
-		$pdf->AddPage('','','','','on');
 		$pdf->WriteHTML($html);
 		$pdf->Output($filepdf, 'F');
 		unset($pdf);

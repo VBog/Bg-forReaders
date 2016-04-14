@@ -195,6 +195,18 @@ function bg_forreaders_options_page() {
 				</tr>
 
 				<tr valign="top">
+				<th scope="row"><?php _e('Cover content', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_cover_title" <?php if(get_option('bg_forreaders_cover_title')) echo "checked" ?> value="on" id="bg_forreaders_cover" onchange="bg_forreaders_trigger_show_cover ();" />&nbsp;<?php _e('title', 'bg-forreaders') ?>&nbsp;&nbsp;
+				<span  class="bg_forreaders_cover">
+				<input type="checkbox" name="bg_forreaders_cover_author" <?php if(get_option('bg_forreaders_cover_author')) echo "checked" ?> value="on" />&nbsp;<?php _e('author', 'bg-forreaders') ?>&nbsp;&nbsp;
+				<input type="checkbox" name="bg_forreaders_cover_site" <?php if(get_option('bg_forreaders_cover_site')) echo "checked" ?> value="on" />&nbsp;<?php _e('site name', 'bg-forreaders') ?>&nbsp;&nbsp;
+				<input type="checkbox" name="bg_forreaders_cover_year" <?php if(get_option('bg_forreaders_cover_year')) echo "checked" ?> value="on" />&nbsp;<?php _e('year', 'bg-forreaders') ?>
+				</span>
+				</td>
+				</tr>
+
+				<tr valign="top"  class="bg_forreaders_cover">
 				<th scope="row"><?php _e('Use post thumbnail as cover', 'bg-forreaders') ?></th>
 				<td>
 				<input type="checkbox" name="bg_forreaders_cover_thumb" <?php if(get_option('bg_forreaders_cover_thumb')) echo "checked" ?> value="on" />&nbsp;
@@ -202,7 +214,7 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
-				<tr valign="top">
+				<tr valign="top"  class="bg_forreaders_cover">
 				<th scope="row"><?php _e('Cover image template', 'bg-forreaders') ?></th>
 				<td>
 				<input type="text" name="bg_forreaders_cover_image" value="<?php echo get_option('bg_forreaders_cover_image'); ?>" size="60" /><br>
@@ -210,7 +222,7 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
-				<tr valign="top">
+				<tr valign="top"  class="bg_forreaders_cover">
 				<th scope="row"><?php _e('Сolors', 'bg-forreaders') ?></th>
 				<td>
 				<?php _e('text:', 'bg-forreaders') ?>&nbsp;<input type="color" name="bg_forreaders_text_color" value="<?php echo get_option('bg_forreaders_text_color'); ?>" />&nbsp;&nbsp;
@@ -218,7 +230,7 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
-				<tr valign="top">
+				<tr valign="top"  class="bg_forreaders_cover">
 				<th scope="row"><?php _e('Offset of the text field on the cover', 'bg-forreaders') ?></th>
 				<td>
 				<table>
@@ -243,13 +255,20 @@ function bg_forreaders_options_page() {
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_author_field, bg_forreaders_publishing_year, bg_forreaders_genre, 
 							bg_forreaders_add_title, bg_forreaders_add_author, 
+							bg_forreaders_cover_author, bg_forreaders_cover_title, bg_forreaders_cover_site, bg_forreaders_cover_year,
 							bg_forreaders_cover_thumb, bg_forreaders_cover_image, bg_forreaders_text_color, bg_forreaders_bg_color, 
 							bg_forreaders_left_offset, bg_forreaders_right_offset, bg_forreaders_top_offset, bg_forreaders_bottom_offset" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 				</p>
-
+				<script>
+					function bg_forreaders_trigger_show_cover () {
+						if (document.getElementById('bg_forreaders_cover').checked) jQuery('.bg_forreaders_cover').show();
+						else jQuery('.bg_forreaders_cover').hide();
+					}
+					bg_forreaders_trigger_show_cover ();
+				</script>
 	<!-- Настройка таблицы стилей -->
 			<?php } elseif ($active_tab == 'css') { ?>
 				<table class="form-table">

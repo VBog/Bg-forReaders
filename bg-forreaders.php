@@ -2,8 +2,8 @@
 /*
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
-Description: Конвертирует контент страницы в популярные форматы для чтения и выводит на экран форму для скачивания.
-Version: 0.9.1
+Description: Convert post content to most popular formats for readers and displays a form for download.
+Version: 0.9.2
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.9.1' );
+define( 'BG_FORREADERS_VERSION', '0.9.2' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -60,6 +60,19 @@ $formats = array(
 	'fb2' => 'fb2'
 );
 
+// Функция, исполняемая при активации плагина
+function bg_forreaders_activate() {
+	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
+	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/index.php')) @copy( "../".BG_FORREADERS_PATH.'/download.php', "../".BG_FORREADERS_STORAGE_PATH.'/index.php' );
+	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/style.php')) @copy( "../".BG_FORREADERS_PATH.'/css/style.php', "../".BG_FORREADERS_STORAGE_PATH.'/style.php' );
+	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-pdf.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-pdf.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-pdf.png' );
+	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-epub.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-epub.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-epub.png' );
+	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-mobi.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png' );
+	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-fb2.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-fb2.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-fb2.png' );
+	bg_forreaders_add_options ();
+}
+register_activation_hook( __FILE__, 'bg_forreaders_activate' );
+
 // Активируем параметры плагина, если они не сохранились
 bg_forreaders_activate();
 
@@ -74,14 +87,6 @@ function bg_forreaders_frontend_styles () {
 	wp_enqueue_style( "bg_forreaders_styles", plugins_url( '/css/style.php', plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
 }
 add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
-
-// Функция, исполняемая при активации плагина
-function bg_forreaders_activate() {
-	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/index.php')) @copy( "../".BG_FORREADERS_PATH.'/download.php', "../".BG_FORREADERS_STORAGE_PATH.'/index.php' );
-	bg_forreaders_add_options ();
-}
-register_activation_hook( __FILE__, 'bg_forreaders_activate' );
 
 // Функция, исполняемая при удалении плагина
 function bg_forreaders_uninstall() {
@@ -116,35 +121,46 @@ if ( defined('ABSPATH') && defined('WPINC') ) {
 // Функция вставки блока загрузки файлов для чтения
 function bg_forreaders_proc($content) {
 	global $post, $formats;
+	
+	$forreaders = bg_forreaders ($post);
+	
+	if ($forreaders) 
+		$content = (get_option('bg_forreaders_before') ? $forreaders : '') .$content. (get_option('bg_forreaders_after') ? $forreaders : '');
+	
+	return $content;
+}
+// Функция формирования блока загрузки файлов для чтения
+function bg_forreaders ($post) {
+	global $formats;
 
 	$bg_forreaders = new BgForReaders();
 	
 	// Исключения 
-	if (!is_object($post)) return $content;		// если не пост
+	if (!is_object($post)) return "";		// если не пост
 	
 	switch ($post->post_type) :
 	case 'post' :
-		if (get_option('bg_forreaders_single') && !is_single() ) return $content;	// если не одиночная статья (опция)
-		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );				// если запрещены некоторые категории
+		if (get_option('bg_forreaders_single') && !is_single() ) return "";		// если не одиночная статья (опция)
+		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );			// если запрещены некоторые категории
 		foreach($ex_cats as $cat) {
 			if (get_option('bg_forreaders_cats') == 'excluded') {
 				foreach((get_the_category()) as $category) { 
-					if (trim($cat) == $category->category_nicename) return $content;
+					if (trim($cat) == $category->category_nicename) return "";
 				}
 			} else {
 				foreach((get_the_category()) as $category) { 
 					if (trim($cat) == $category->category_nicename) break 2;
 				}
-				return $content;
+				return "";
 			}
 		}
 	break;
 	case 'page' :
 		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
-		if (!$for_readers_field) return $content;
+		if (!$for_readers_field) return "";
 	break;
 	default:
-		return $content;
+		return "";
 	endswitch;
 	// Генерация файлов для чтения при открытии страницы, если они отсутствуют
 	if (get_option('bg_forreaders_while_displayed')) {
@@ -168,16 +184,15 @@ function bg_forreaders_proc($content) {
 				if ($zoom) {
 					$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s"%s></a></div>', $type, $href, $title, $download);
 				} else {
-					$forreaders .= sprintf ('<span><a href="%s" title="%s"%s>%s</a></span><br>', $href, $title, $download, sprintf(__('Download as %s','bg-forreaders'), $document_type));
+				$forreaders .= sprintf ('<span><a href="%s" title="%s"%s>%s</a></span><br>', $href, $title, $download, sprintf(__('Download as %s','bg-forreaders'), $document_type));
 				}
 			}
 		}
 	}
-	if ($forreaders) {
+	if ($forreaders) 
 		$forreaders = get_option('bg_forreaders_prompt').'<div class="bg_forreaders">'.$forreaders.'</div>'.get_option('bg_forreaders_separator');
-		$content = (get_option('bg_forreaders_before') ? $forreaders : '') .$content. (get_option('bg_forreaders_after') ? $forreaders : '');
-	}
-	return $content;
+	
+	return $forreaders;
 }
 
 // Функция генерации файлов для чтения при сохранении поста
@@ -297,6 +312,10 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_genre', 'genre');
 	add_option('bg_forreaders_add_title', 'on');
 	add_option('bg_forreaders_add_author', 'on');
+	add_option('bg_forreaders_cover_title', 'on');
+	add_option('bg_forreaders_cover_author', 'on');
+	add_option('bg_forreaders_cover_site', 'on');
+	add_option('bg_forreaders_cover_year', 'on');
 	add_option('bg_forreaders_cover_thumb', 'on');
 	add_option('bg_forreaders_cover_image', '');
 	add_option('bg_forreaders_text_color', '#000000');
@@ -308,7 +327,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_while_displayed', '');
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_memory_limit', '1024');
-	add_option('bg_forreaders_time_limit', '60');
+	add_option('bg_forreaders_time_limit', '900');
 
 	add_option('bg_forreaders_css', BG_FORREADERS_CSS);
 	add_option('bg_forreaders_tags', BG_FORREADERS_TAGS);
@@ -334,6 +353,10 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_genre');
 	delete_option('bg_forreaders_add_title');
 	delete_option('bg_forreaders_add_author');
+	delete_option('bg_forreaders_cover_title');
+	delete_option('bg_forreaders_cover_author');
+	delete_option('bg_forreaders_cover_site');
+	delete_option('bg_forreaders_cover_year');
 	delete_option('bg_forreaders_cover_thumb');
 	delete_option('bg_forreaders_cover_image');
 	delete_option('bg_forreaders_text_color');

@@ -2,6 +2,8 @@
 header("Content-type: text/css; charset: UTF-8");
 $absolute_path = explode('wp-content', $_SERVER['SCRIPT_FILENAME']);
 $wp_load = $absolute_path[0] . 'wp-load.php';
+$absolute_url  = @( $_SERVER["HTTPS"] != 'on' ) ? 'http://'.$_SERVER["SERVER_NAME"] :  'https://'.$_SERVER["SERVER_NAME"];
+$bg_forreaders = $absolute_url . '/bg_forreaders/';
 require_once($wp_load);
 if (function_exists ( 'get_option' )){
 	$zoom = get_option('bg_forreaders_zoom');
@@ -43,21 +45,21 @@ div.bg_forreaders {
 }
 
 .bg_forreaders .pdf {
-	background: url(document-pdf.png) no-repeat 50% 50%;
+	background: url(<?php echo $bg_forreaders?>document-pdf.png) no-repeat 50% 50%;
 	background-size: contain;
 }
 
 .bg_forreaders .epub {
-	background: url(document-epub.png) no-repeat 50% 50%;
+	background: url(<?php echo $bg_forreaders?>document-epub.png) no-repeat 50% 50%;
 	background-size: contain;
 }
 
 .bg_forreaders .mobi{
-	background: url(document-mobi.png) no-repeat 50% 50%;
+	background: url(<?php echo $bg_forreaders?>document-mobi.png) no-repeat 50% 50%;
 	background-size: contain;
 }
 
 .bg_forreaders .fb2 {
-	background: url(document-fb2.png) no-repeat 50% 50%;
+	background: url(<?php echo $bg_forreaders?>document-fb2.png) no-repeat 50% 50%;
 	background-size: contain;
 }
