@@ -28,12 +28,14 @@
  */
 header("Content-type: text/html; charset: UTF-8");
 header("X-Accel-Buffering: no");
+
 if(!defined('PATH')):
 	$value_const =  dirname(dirname(dirname(__DIR__)));
 	define("PATH", $value_const);
 else: 
 	exit();
 endif; 
+
 require_once(PATH.'/wp-load.php');
 
 if (isset($argv[1])) {
@@ -45,6 +47,10 @@ if (isset($argv[1])) {
         $_GET[$e[0]]=0;
 }
 else exit; // Запрет запуска не из консоли (без параметров)
+
+if (file_exists('lock')) exit;
+$fp = fopen($lock_file, 'w'); 	// Создаем блокировочный файл
+//flock($fp, LOCK_EX); 			// Блокаруем его на всякий случай
 
 $e=explode("=",$argv[2]);
 $echo_on = ("echo" == $e[0]);
@@ -148,6 +154,11 @@ error_log("TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL
 error_log(date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL, 3, $debug_file);
 if ($echo_on) echo "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL;
 if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL;
+
+//flock($fp, LOCK_UN); 	// отпираем файл
+fclose($fp);			// закрываем его
+unlink ('lock');		// и удаляем
+
 exit;
 
 function check_exceptions ($post,  $debug_file, $echo_on) {
