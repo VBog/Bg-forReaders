@@ -102,7 +102,15 @@ function bg_forreaders_options_page() {
 				<th scope="row"><?php _e('When will created files for readers?', 'bg-forreaders') ?></th>
 				<td>
 				<input type="checkbox" name="bg_forreaders_while_displayed" <?php if(get_option('bg_forreaders_while_displayed')) echo "checked" ?> value="on" /> <?php _e('while current post is displayed', 'bg-forreaders') ?><br /> 
-				<input type="checkbox" name="bg_forreaders_while_saved" <?php if(get_option('bg_forreaders_while_saved')) echo "checked" ?> value="on" /> <?php _e('while current post is saved', 'bg-forreaders') ?>
+				<input type="checkbox" name="bg_forreaders_while_saved" <?php if(get_option('bg_forreaders_while_saved')) echo "checked" ?> value="on" /> <?php _e('while current post is saved', 'bg-forreaders') ?><br />
+				<input type="checkbox" name="bg_forreaders_offline_query" <?php if(get_option('bg_forreaders_offline_query')) echo "checked" ?> value="on" /> <?php _e('in offline query from stack', 'bg-forreaders') ?>&nbsp;
+				<?php 
+					$stack = get_option ('bg_forreaders_stack');
+					if (isset($stack)){
+						$cnt = count($stack); 
+						echo sprintf( _n( '(1 element now)', '(%s elements now)', $cnt, 'your_textdomain' ), $cnt );
+					}
+				?>
 				</td>
 				</tr>
 				
@@ -112,7 +120,7 @@ function bg_forreaders_options_page() {
 				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
 							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_separator,
 							bg_forreaders_zoom, bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
-							bg_forreaders_while_displayed, bg_forreaders_while_saved" />
+							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_offline_query" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -328,11 +336,14 @@ function bg_forreaders_options_page() {
 				<th scope="row"><?php _e('Batch mode', 'bg-forreaders') ?></th>
 				<td>
 				<?php printf (__('You can use script %s<br>to generate files for readers in batch mode (using <b>cli</b> or <b>cron</b>).', 'bg-forreaders'),' <span style="background: gray; color: white">'. plugin_dir_path( dirname(__FILE__) ). 'forreaders.php'.'</span>') ?><br><br>
-				<?php _e('Options:', 'bg-forreaders'); ?><br>
+				<?php _e('<h3>Options:</h3>', 'bg-forreaders'); ?>
+				<?php _e('<u>First parameter</u>', 'bg-forreaders'); ?><br>
 				<?php _e('<b>id = [post id list separated by commas]</b> - process all the posts in the list;', 'bg-forreaders'); ?><br>
 				<?php _e('<i>or</i>', 'bg-forreaders'); ?><br>
-				<?php _e('<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) on the site ignoring exceptions,<br>see General tab.', 'bg-forreaders'); ?><br><br>
-				<?php _e('* Second parameter', 'bg-forreaders'); ?><br>
+				<?php _e('<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) on the site ignoring exceptions,<br>see General tab.', 'bg-forreaders'); ?><br>
+				<?php _e('<i>or</i>', 'bg-forreaders'); ?><br>
+				<?php _e('<b>stack</b> - process first element (post-id) from stack.', 'bg-forreaders'); ?><br><br>
+				<?php _e('<u>Second parameter</u>', 'bg-forreaders'); ?><br>
 				<?php _e('<b>echo</b> - output progress info to the screen.', 'bg-forreaders'); ?>
 				</td>
 				</tr>

@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular formats for readers and displays a form for download.
-Version: 0.9.2
+Version: 0.10.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.9.2' );
+define( 'BG_FORREADERS_VERSION', '0.10.0' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -228,10 +228,15 @@ function bg_forreaders_save( $id ) {
 		if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
 	
 	// 	Генерация файлов для чтения
-		if (get_option('bg_forreaders_while_saved')) {
+		if (get_option('bg_forreaders_while_saved')) {				// Сразу
 			$bg_forreaders = new BgForReaders();
 			$bg_forreaders->generate ($id);
-		} 
+		} elseif (get_option('bg_forreaders_offline_query')) {		// Ставим в очередь
+			$stack = get_option ('bg_forreaders_stack');
+			$stack[] = $id;
+			$stack = array_unique ($stack);
+			update_option('bg_forreaders_stack', $stack);
+		}
 	}
 }
 add_action( 'save_post', 'bg_forreaders_save', 10 );
@@ -326,12 +331,16 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_bottom_offset', '80');
 	add_option('bg_forreaders_while_displayed', '');
 	add_option('bg_forreaders_while_saved', 'on');
+	add_option('bg_forreaders_offline_query', '');
 	add_option('bg_forreaders_memory_limit', '1024');
 	add_option('bg_forreaders_time_limit', '900');
 
 	add_option('bg_forreaders_css', BG_FORREADERS_CSS);
 	add_option('bg_forreaders_tags', BG_FORREADERS_TAGS);
 	add_option('bg_forreaders_extlinks', 'on');
+	
+	add_option('bg_forreaders_stack', array());
+
 }
 function bg_forreaders_delete_options (){
 
@@ -367,10 +376,13 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_bottom_offset');
 	delete_option('bg_forreaders_while_displayed');
 	delete_option('bg_forreaders_while_saved');
+	delete_option('bg_forreaders_offline_query');
 	delete_option('bg_forreaders_memory_limit');
 	delete_option('bg_forreaders_time_limit');
 
 	delete_option('bg_forreaders_css');
 	delete_option('bg_forreaders_tags');
 	delete_option('bg_forreaders_extlinks');
+	
+	delete_option('bg_forreaders_stack');
 }

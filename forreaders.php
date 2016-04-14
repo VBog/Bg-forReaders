@@ -9,19 +9,21 @@
 	Параметры:
 	
 	* первый параметр
-	id=[список id постов через запятую] - обрабатываются все указанные в списке ID посты
+		id=[список id постов через запятую] - обрабатываются все указанные в списке ID посты
 	или
-	all=[from],[to] - обрабатываются все посты сайта из указанного диапазона,
-		кроме указанных в исключениях см. настройки плагина
-		(для типа 'post' - могут быть указаны исключенные или, наоборот, разрешенные категории
-		 для типа 'page' - произвольное поле for_readers='on' разрешает создание файлов)
-	Например,
-	all - все опубликованные посты и страницы
-	all=[from] - все посты, начиная с порядкового номера [from] и до конца
-	all=[from],[to] - все посты, начиная с порядкового номера [from] и до номера [to]
+		all=[from],[to] - обрабатываются все посты сайта из указанного диапазона,
+			кроме указанных в исключениях см. настройки плагина
+			(для типа 'post' - могут быть указаны исключенные или, наоборот, разрешенные категории
+			 для типа 'page' - произвольное поле for_readers='on' разрешает создание файлов)
+		Например,
+		all - все опубликованные посты и страницы
+		all=[from] - все посты, начиная с порядкового номера [from] и до конца
+		all=[from],[to] - все посты, начиная с порядкового номера [from] и до номера [to]
+	или 
+		stack - вынимает из стека первый элемент - id поста и обрабатывает его
 	
 	* второй параметр
-	echo - выводить информацию о выполнении скрипта на экран
+		echo - выводить информацию о выполнении скрипта на экран
  *
  */
 header("Content-type: text/html; charset: UTF-8");
@@ -115,6 +117,32 @@ if (isset($_GET['id'])) {
 			ob_flush();
 		}
 	}
+// Иначе если указан параметр stack, то вынимаем первый элемент из стека id постов
+} elseif (isset($_GET['stack'])) {
+	$stack = get_option ('bg_forreaders_stack');
+	if (isset($stack) && count($stack)){
+		$post_id = array_shift($stack);
+		update_option('bg_forreaders_stack', $stack);
+		$post = get_post($post_id);
+		
+		if ($post) {
+			error_log("stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
+			if ($echo_on) echo "stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
+			$the_time =  microtime(true);
+			$bg_forreaders->generate ($post->ID);
+			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+			if ($echo_on) {
+				echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
+				flush();
+				ob_flush();
+			}
+		}
+	} else {
+		error_log("stack empty". PHP_EOL, 3, $debug_file);
+		if ($echo_on) echo "stack empty". PHP_EOL;
+		
+	}
+	
 }
 error_log("TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL, 3, $debug_file);
 error_log(date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL, 3, $debug_file);
