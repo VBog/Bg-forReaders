@@ -48,8 +48,8 @@ if (isset($argv[1])) {
 }
 else exit; // Запрет запуска не из консоли (без параметров)
 
-if (file_exists('lock')) exit;
-$fp = fopen($lock_file, 'w'); 	// Создаем блокировочный файл
+//if (file_exists('lock')) exit;
+//$fp = fopen($lock_file, 'w'); 	// Создаем блокировочный файл
 //flock($fp, LOCK_EX); 			// Блокаруем его на всякий случай
 
 $e=explode("=",$argv[2]);
@@ -132,15 +132,20 @@ if (isset($_GET['id'])) {
 		$post = get_post($post_id);
 		
 		if ($post) {
-			error_log("stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
-			if ($echo_on) echo "stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
-			$the_time =  microtime(true);
-			$bg_forreaders->generate ($post->ID);
-			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
-			if ($echo_on) {
-				echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
-				flush();
-				ob_flush();
+			if (!check_exceptions ($post,  $debug_file, $echo_on)) {
+				error_log("stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, $debug_file);
+				if ($echo_on) echo "stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name;
+				$the_time =  microtime(true);
+				$bg_forreaders->generate ($post->ID);
+				error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL, 3, $debug_file);
+				if ($echo_on) {
+					echo " - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.". PHP_EOL;
+					flush();
+					ob_flush();
+				}
+			} else {
+				error_log("stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name." - already converted", 3, $debug_file);
+				if ($echo_on) echo "stack(left ".count($stack)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name." - already converted";
 			}
 		}
 	} else {
@@ -156,8 +161,8 @@ if ($echo_on) echo "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec."
 if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL;
 
 //flock($fp, LOCK_UN); 	// отпираем файл
-fclose($fp);			// закрываем его
-unlink ('lock');		// и удаляем
+//fclose($fp);			// закрываем его
+//unlink ('lock');		// и удаляем
 
 exit;
 
