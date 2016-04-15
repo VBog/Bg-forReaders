@@ -5,6 +5,8 @@
  * если эти файлы отсутствуют в заданном каталоге.
  *
  * Использует плагин Bg forReaders и должен распологаться в каталоге плагина
+ *
+ * Лог обновляется в 00:01 по Гринвичу (03:01 МСК), старый лог сохраняется с расширением .old
  
 	Параметры:
 	
@@ -48,15 +50,20 @@ if (isset($argv[1])) {
 }
 else exit; // Запрет запуска не из консоли (без параметров)
 
-//if (file_exists('lock')) exit;
-//$fp = fopen($lock_file, 'w'); 	// Создаем блокировочный файл
-//flock($fp, LOCK_EX); 			// Блокаруем его на всякий случай
-
 $e=explode("=",$argv[2]);
 $echo_on = ("echo" == $e[0]);
 
 $debug_file = dirname(__FILE__ )."/forreaders.log";
-if (file_exists ($debug_file) ) unlink ($debug_file);
+$debug_file_old = dirname(__FILE__ )."/forreaders.old";
+if (file_exists ($debug_file) ) {
+	$checktime = date('j-m-Y 00:01');				// Контрольное время по Гринвичу
+	// Если лог изменялся раньше контрольного времени, то удалить его
+	if ( filemtime($debug_file) < strtotime($checktime) ) {
+		unlink ($debug_file_old);					// Удаляем старый лог
+		rename ( $debug_file, $debug_file_old );	// Переименовываем текущий лог в старый
+	}
+}
+
 error_log(date ("j-m-Y H:i"). " ===================== Start the batch mode =====================". PHP_EOL, 3, $debug_file);
 if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Start the batch mode =====================". PHP_EOL;
 $bg_forreaders = new BgForReaders();
@@ -159,10 +166,6 @@ error_log("TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL
 error_log(date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL, 3, $debug_file);
 if ($echo_on) echo "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.". PHP_EOL;
 if ($echo_on) echo date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================". PHP_EOL;
-
-//flock($fp, LOCK_UN); 	// отпираем файл
-//fclose($fp);			// закрываем его
-//unlink ('lock');		// и удаляем
 
 exit;
 
