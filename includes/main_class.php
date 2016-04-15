@@ -108,7 +108,7 @@ class BgForReaders {
 				list($r, $g, $b) = $this->hex2rgb( get_option('bg_forreaders_text_color') );
 				$color = imageColorAllocate($im, $r, $g, $b);
 				// Подгружаем шрифт
-				$font = dirname(__file__)."/fonts/BOOKOSB.TTF";
+				$font = dirname(__file__)."/fonts/arialbd.ttf";
 
 				$dx1 = get_option('bg_forreaders_left_offset');
 				$dx2 = get_option('bg_forreaders_right_offset');
