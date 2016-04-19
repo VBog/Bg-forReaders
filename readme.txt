@@ -47,10 +47,14 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.0.1 =
+
+Fixed some errors.
+
 = 1.0 =
 
 Startup version.
 
 == Upgrade Notice ==
 
-Startup version.
+Fixed some errors.

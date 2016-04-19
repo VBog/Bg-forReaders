@@ -22,7 +22,9 @@ function bg_forreaders_options_page() {
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=options" class="nav-tab <?php echo $active_tab == 'options' ? 'nav-tab-active' : ''; ?>"><?php _e('Options', 'bg-forreaders') ?></a>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=css" class="nav-tab <?php echo $active_tab == 'css' ? 'nav-tab-active' : ''; ?>"><?php _e('CSS', 'bg-forreaders') ?></a> 
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('HTML', 'bg-forreaders') ?></a> 
+		<?php if (file_exists(BG_FORREADERS_URI.'/forreaders.php')) : ?>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=batch" class="nav-tab <?php echo $active_tab == 'batch' ? 'nav-tab-active' : ''; ?>"><?php _e('Batch mode', 'bg-forreaders') ?></a> 
+		<?php endif; ?>
 		</h2>
 
 		<form id="bg_forreaders_options" method="post" action="options.php">
@@ -103,6 +105,7 @@ function bg_forreaders_options_page() {
 				<td>
 				<input type="checkbox" name="bg_forreaders_while_displayed" <?php if(get_option('bg_forreaders_while_displayed')) echo "checked" ?> value="on" /> <?php _e('while current post is displayed', 'bg-forreaders') ?><br /> 
 				<input type="checkbox" name="bg_forreaders_while_saved" <?php if(get_option('bg_forreaders_while_saved')) echo "checked" ?> value="on" /> <?php _e('while current post is saved', 'bg-forreaders') ?><br />
+			<?php if (file_exists(BG_FORREADERS_URI.'/forreaders.php')) : ?>
 				<input type="checkbox" name="bg_forreaders_offline_query" <?php if(get_option('bg_forreaders_offline_query')) echo "checked" ?> value="on" /> <?php _e('in offline query from stack', 'bg-forreaders') ?>&nbsp;
 				<?php 
 					$stack = get_option ('bg_forreaders_stack');
@@ -111,6 +114,7 @@ function bg_forreaders_options_page() {
 						echo sprintf( _n( '(1 element now)', '(%s elements now)', $cnt, 'your_textdomain' ), $cnt );
 					}
 				?>
+			<?php endif; ?>
 				</td>
 				</tr>
 				

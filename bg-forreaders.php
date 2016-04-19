@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular formats for readers and displays a form for download.
-Version: 0.10.0
+Version: 1.0.1
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -35,7 +35,7 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '0.10.0' );
+define( 'BG_FORREADERS_VERSION', '1.0.1' );
 define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
 define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
@@ -63,12 +63,12 @@ $formats = array(
 // Функция, исполняемая при активации плагина
 function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/index.php')) @copy( "../".BG_FORREADERS_PATH.'/download.php', "../".BG_FORREADERS_STORAGE_PATH.'/index.php' );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/style.php')) @copy( "../".BG_FORREADERS_PATH.'/css/style.php', "../".BG_FORREADERS_STORAGE_PATH.'/style.php' );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-pdf.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-pdf.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-pdf.png' );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-epub.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-epub.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-epub.png' );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-mobi.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png' );
-	if (!file_exists("../".BG_FORREADERS_STORAGE_PATH.'/document-fb2.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-fb2.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-fb2.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/index.php')) @copy( "../".BG_FORREADERS_PATH.'/css/download', "../".BG_FORREADERS_STORAGE_PATH.'/index.php' );
+	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/style.php')) @copy( "../".BG_FORREADERS_PATH.'/css/style.php', "../".BG_FORREADERS_STORAGE_PATH.'/style.php' );
+	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-pdf.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-pdf.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-pdf.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-epub.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-epub.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-epub.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-mobi.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-mobi.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-fb2.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-fb2.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-fb2.png' );
 	bg_forreaders_add_options ();
 }
 register_activation_hook( __FILE__, 'bg_forreaders_activate' );
@@ -84,7 +84,7 @@ function bg_forreaders_load_textdomain() {
 
 // Динамическая таблица стилей для плагина
 function bg_forreaders_frontend_styles () {
-	wp_enqueue_style( "bg_forreaders_styles", plugins_url( '/css/style.php', plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
+	wp_enqueue_style( "bg_forreaders_styles", plugins_url( '/css/style.php?zoom='.get_option('bg_forreaders_zoom'), plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
 }
 add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
 

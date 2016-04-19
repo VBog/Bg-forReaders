@@ -1,17 +1,9 @@
 <?php
 header("Content-type: text/css; charset: UTF-8");
-$absolute_path = explode('wp-content', $_SERVER['SCRIPT_FILENAME']);
-$wp_load = $absolute_path[0] . 'wp-load.php';
 $absolute_url  = @( $_SERVER["HTTPS"] != 'on' ) ? 'http://'.$_SERVER["SERVER_NAME"] :  'https://'.$_SERVER["SERVER_NAME"];
 $bg_forreaders = $absolute_url . '/bg_forreaders/';
-require_once($wp_load);
-if (function_exists ( 'get_option' )){
-	$zoom = get_option('bg_forreaders_zoom');
-	echo $zoom."<br>";
-}
+$zoom=(float) $_GET['zoom'];
 ?>
-.bg_forreaders {
-}
 div.bg_forreaders {
 	<?php if($zoom) echo 'height: '. (88*$zoom) .'px;' ?>
 	padding: 0px;

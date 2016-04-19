@@ -25,20 +25,22 @@ class BgForReaders {
 		$content = do_shortcode ( $content );
 		// Удаляем указания на текущую страницу в ссылках с якорями
 		$content = preg_replace("/". preg_quote( $plink, '/' ).'.*?#/is', '#', $content);
-		// Исправляем неправильно-введенные XHTML (HTML) теги
-		$content = balanceTags( $content, true );	
 
-//		Очищаем текст от лишних тегов разметки
+		// Очищаем текст от лишних тегов разметки
 		$chtml = new BgClearHTML();
 		// Массив разрешенных тегов и атрибутов
 		$allow_attributes = $chtml->strtoarray (get_option('bg_forreaders_tags'));
 		// Оставляем в тексте только разрешенные теги и атрибуты
 		$content = $chtml->prepare ($content, $allow_attributes);
+		// Преобразуем атрибуты id в name во внутренних ссылках
 		$content = $this->idtoname($content);
+		// Очищаем внутренние ссылки и атрибуты id и name от не буквенно-цифровых символов
 		$content = $this->clearanchor($content);
 		if (!get_option('bg_forreaders_extlinks')) $content = $this->removehref($content);
 		// Исправляем не UTF-8 символы
 		$content = iconv("UTF-8","UTF-8//IGNORE",$content);
+		// Заменяем двойной перенос строки на HTML конструкцию <p>...</p>, а одинарный на <br>.
+		$content = wpautop( $content, true);
 		// Исправляем неправильно-введенные XHTML (HTML) теги
 		$content = balanceTags( $content, true );	
 
