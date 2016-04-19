@@ -1,7 +1,6 @@
 <?php
 header("Content-type: text/css; charset: UTF-8");
-$absolute_url  = @( $_SERVER["HTTPS"] != 'on' ) ? 'http://'.$_SERVER["SERVER_NAME"] :  'https://'.$_SERVER["SERVER_NAME"];
-$bg_forreaders = $absolute_url . '/bg_forreaders/';
+$bg_forreaders = urldecode ($_GET['storage']);
 $zoom=(float) $_GET['zoom'];
 ?>
 div.bg_forreaders {

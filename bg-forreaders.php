@@ -36,11 +36,13 @@ if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
 define( 'BG_FORREADERS_VERSION', '1.0.1' );
-define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
-define( 'BG_FORREADERS_STORAGE_URI', trailingslashit( ABSPATH ) . 'bg_forreaders' );
+$upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
-define( 'BG_FORREADERS_STORAGE_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_STORAGE_URI  ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
+define( 'BG_FORREADERS_STORAGE', 'bg_forreaders' );
+define( 'BG_FORREADERS_STORAGE_URL', $upload_dir['baseurl'] ."/". BG_FORREADERS_STORAGE );
+define( 'BG_FORREADERS_STORAGE_URI', $upload_dir['basedir'] ."/". BG_FORREADERS_STORAGE );
+define( 'BG_FORREADERS_STORAGE_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_STORAGE_URI  ) );
 
 // Для всех форматов
 define( 'BG_FORREADERS_CSS', "");
@@ -64,7 +66,6 @@ $formats = array(
 function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
 	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/index.php')) @copy( "../".BG_FORREADERS_PATH.'/css/download', "../".BG_FORREADERS_STORAGE_PATH.'/index.php' );
-	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/style.php')) @copy( "../".BG_FORREADERS_PATH.'/css/style.php', "../".BG_FORREADERS_STORAGE_PATH.'/style.php' );
 	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-pdf.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-pdf.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-pdf.png' );
 	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-epub.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-epub.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-epub.png' );
 	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-mobi.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-mobi.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png' );
@@ -84,7 +85,8 @@ function bg_forreaders_load_textdomain() {
 
 // Динамическая таблица стилей для плагина
 function bg_forreaders_frontend_styles () {
-	wp_enqueue_style( "bg_forreaders_styles", plugins_url( '/css/style.php?zoom='.get_option('bg_forreaders_zoom'), plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
+	$css_path = '/css/style.php?zoom='.get_option('bg_forreaders_zoom').'&storage='.urlencode (BG_FORREADERS_STORAGE_URL.'/');
+	wp_enqueue_style( "bg_forreaders_styles", plugins_url( $css_path, plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
 }
 add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
 
@@ -172,14 +174,14 @@ function bg_forreaders ($post) {
 	foreach ($formats as $type => $document_type) {
 		// Сначала проверяем наличие защищенного файла
 		$filename = $post->post_name."_".$post->ID."p.".$type;
-		if (!file_exists(BG_FORREADERS_STORAGE."/".$filename)) $filename = $post->post_name."_".$post->ID.".".$type;
+		if (!file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) $filename = $post->post_name."_".$post->ID.".".$type;
 		// Если такового нет, проверяем наличие обычного файла
-		if (file_exists(BG_FORREADERS_STORAGE."/".$filename)) {
+		if (file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) {
 			if (get_option('bg_forreaders_'.$type) == 'on') {
 				$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), $post->post_title, $document_type);
 				$link_type = get_option('bg_forreaders_links');
-				if ($link_type == 'php') $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."?file=".$filename;
-				else $href = trailingslashit( home_url() ).BG_FORREADERS_STORAGE."/".$filename;
+				if ($link_type == 'php') $href = BG_FORREADERS_STORAGE_URL."?file=".$filename;
+				else $href = BG_FORREADERS_STORAGE_URL."/".$filename;
 				$download = ($link_type == 'html5')? ' download':'';
 				if ($zoom) {
 					$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s"%s></a></div>', $type, $href, $title, $download);
