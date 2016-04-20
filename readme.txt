@@ -8,20 +8,17 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Convert post content to most popular formats for readers and displays a form for download.
+Convert post content to most popular e-book formats for readers and displays a form for download.
 
 == Description ==
-The plugin convert content of your blog posts and pages to most popular formats for readers - pdf, ePub, mobi and fb2, using php-librasries:
+The plugin convert content of your blog posts and pages to most popular e-book formats for readers - pdf, ePub, mobi and fb2, using php-librasries:
 
 * [mPDF](https://github.com/mpdf/mpdf);
-
 * [PHPePub](https://github.com/Grandt/PHPePub);
-
 * [MOBIClass](https://github.com/rksonindia/MOBIClass);
-
 * [bgFB2](https://github.com/VBog/bgFB2).
 
-Plugin displays a icons form for download converted files beforeand/or after content on your blog pages. 
+Plugin displays a icons form for download converted files before and/or after content on your blog pages. 
 
 == Installation ==
 1. Upload the plugin files to the `/wp-content/plugins/bg-forreaders` directory, or install the plugin through the WordPress plugins screen directly.
@@ -42,8 +39,8 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 **A.:** Just replace image files `document_pdf.png, document_pdf.png, document_epub.png,  document_mobi.png, document_fb2.png`, in folder `http://yoursite.com/bg_forreaders`. 
 
 == Screenshots ==
-1. Icons form
-2. Plugin settings
+1. Plugin settings
+2. Icons form
 
 == Changelog ==
 
