@@ -2,12 +2,12 @@
 /*
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
-Description: Convert post content to most popular formats for readers and displays a form for download.
-Version: 1.0.1
+Description: Convert post content to most popular e-book formats for readers and displays a form for download.
+Version: 1.1.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
-Text Domain: bg_forreaders
+Text Domain: bg-forreaders
 Domain Path: /languages
 */
 /*  Copyright 2016  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
@@ -35,7 +35,21 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-define( 'BG_FORREADERS_VERSION', '1.0.1' );
+if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+    add_action( 'admin_notices', 'bg_forreaders_no_activate_notice' );
+    add_action( 'admin_init', 'bg_forreaders_deactivate_self' );
+    return;
+}
+
+function bg_forreaders_no_activate_notice() {
+	echo '<div class="error"><p>'.__('Bg forReaders requires PHP 5.3 to function properly. Please upgrade PHP. The Plugin has been auto-deactivated.', 'bg-forreaders') .'</p></div>'; 
+	if ( isset( $_GET['activate'] ) ) unset( $_GET['activate'] );
+}
+function bg_forreaders_deactivate_self() {
+	deactivate_plugins( plugin_basename( __FILE__ ) );
+}
+
+define( 'BG_FORREADERS_VERSION', '1.1.0' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -53,8 +67,10 @@ hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
 table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
 b,strong,i,em,u,sub,sup,strike,code");
 
+define( 'BG_FORREADERS_DEBUG_FILE', dirname(__FILE__ )."/forreaders.log");
+define( 'BG_FORREADERS_DEBUG_OLD', dirname(__FILE__ )."/forreaders.old");
+
 $bg_forreaders_start_time = microtime(true);
-$bg_forreaders_debug_file = dirname(__FILE__ )."/forreaders.log";
 $formats = array(
 	'pdf'  => 'PDF',
 	'epub' => 'ePub',
@@ -71,6 +87,8 @@ function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-mobi.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-mobi.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-mobi.png' );
 	if (!file_exists(BG_FORREADERS_STORAGE_PATH.'/document-fb2.png')) @copy( "../".BG_FORREADERS_PATH.'/css/document-fb2.png', "../".BG_FORREADERS_STORAGE_PATH.'/document-fb2.png' );
 	bg_forreaders_add_options ();
+	update_option ('bg_forreaders_checktime', date('j-m-Y 00:00'));		// Время (по Гринвичу) очистки журнала
+
 }
 register_activation_hook( __FILE__, 'bg_forreaders_activate' );
 
@@ -94,6 +112,12 @@ add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
 function bg_forreaders_uninstall() {
 	removeDirectory(BG_FORREADERS_STORAGE_URI);
 	bg_forreaders_delete_options();
+	if( false !== ( $time = wp_next_scheduled( 'bg_forreaders_stack_cron_action' ) ) ) { 
+		wp_unschedule_event( $time, 'bg_forreaders_stack_cron_action' ); 
+	}
+	if( false !== ( $time = wp_next_scheduled( 'bg_forreaders_log_cron_action' ) ) ) { 
+		wp_unschedule_event( $time, 'bg_forreaders_log_cron_action' ); 
+	}
 }
 function removeDirectory($dir) {
 	if ($objs = glob($dir."/*")) {
@@ -259,6 +283,7 @@ function bg_forreaders_version() {
 	$plugin_data = get_plugin_data( __FILE__  );
 	return $plugin_data['Version'];
 }
+
 /*****************************************************************************************
 	Добавляем блок в боковую колонку на страницах редактирования страниц
 	
@@ -293,6 +318,165 @@ function bg_forreaders_extra_fields_update( $post_id ){
 	update_post_meta($post_id, 'for_readers', $_POST['bg_forreaders_for_readers']);
 }
 
+/*****************************************************************************************
+	Запуск WP-CRON
+	
+******************************************************************************************/
+// Устанавливаем дополнительные интервалы (Стандарт: 'hourly', 'twicedaily', and 'daily').
+add_filter( 'cron_schedules', 'bg_forreaders_add_cron_schedule' );
+function bg_forreaders_add_cron_schedule( $schedules ) {
+	$schedules['minutely'] = array(
+		'interval' => 60, // каждую минуту
+		'display'  => __( 'Minutely', 'bg-forreaders' ),
+	);
+	$schedules['every5min'] = array(
+		'interval' => 300, // каждые 5 минут
+		'display'  => __( 'Every 5 minutes', 'bg-forreaders' ),
+	);
+	$schedules['every15min'] = array(
+		'interval' => 900, // каждые 15 минут
+		'display'  => __( 'Every 15 minutes', 'bg-forreaders' ),
+	);
+	$schedules['twicehourly'] = array(
+		'interval' => 1800, // каждые 30 минут
+		'display'  => __( 'Twice Hourly', 'bg-forreaders' ),
+	);
+	$schedules['every3hour'] = array(
+		'interval' => 10800, // каждые 3 часа 
+		'display'  => __( 'Every 3 hours', 'bg-forreaders' ),
+	);
+ 	$schedules['every6hour'] = array(
+		'interval' => 21600, // каждые 6 часов  
+		'display'  => __( 'Every 6 hours', 'bg-forreaders' ),
+	);
+ 	$schedules['weekly'] = array(
+		'interval' => 604800, // каждые 6 часов  
+		'display'  => __( 'Weekly', 'bg-forreaders' ),
+	);
+  
+	return $schedules;
+}
+
+// Если обновлены настройки WP Cron, сбросить все расписания
+if (get_option('bg_forreaders_cron_updated') == 'update') {
+	if( false !== ( $time = wp_next_scheduled( 'bg_forreaders_stack_cron_action' ) ) ) { 
+		wp_unschedule_event( $time, 'bg_forreaders_stack_cron_action' ); 
+	}
+	if( false !== ( $time = wp_next_scheduled( 'bg_forreaders_log_cron_action' ) ) ) { 
+		wp_unschedule_event( $time, 'bg_forreaders_log_cron_action' ); 
+	}
+	update_option('bg_forreaders_cron_updated', '');	// Все расписания сброшены
+}
+
+// Если включена обработка через стек
+if(get_option('bg_forreaders_offline_query')) {
+	// Обрабатываем содержимое стека каждый заданный интервал времени
+	if ( !wp_next_scheduled( 'bg_forreaders_stack_cron_action' ) ) {
+		wp_schedule_event( strtotime( get_option('bg_forreaders_checktime') ), get_option ('bg_forreaders_stack_interval'), 'bg_forreaders_stack_cron_action' );
+	}
+	add_action( 'bg_forreaders_stack_cron_action', 'bg_forreaders_create_from_stack' );
+} else {
+	if( false !== ( $time = wp_next_scheduled( 'bg_forreaders_stack_cron_action' ) ) ) { 
+		wp_unschedule_event( $time, 'bg_forreaders_stack_cron_action' ); 
+	}
+}
+
+// Обновляем журнал каждый заданный интервал времени
+if ( !wp_next_scheduled( 'bg_forreaders_log_cron_action' ) ) {
+	wp_schedule_event( strtotime( date('j-m-Y ').get_option('bg_forreaders_log_checktime') ), get_option ('bg_forreaders_log_interval'), 'bg_forreaders_log_cron_action' );
+}
+add_action( 'bg_forreaders_log_cron_action', 'bg_forreaders_update_debug_file' );
+
+
+/*****************************************************************************************
+	Функции пакетной обработки
+	
+******************************************************************************************/
+// Функция обрабатывает пост из стека
+function bg_forreaders_create_from_stack() {
+	$bg_forreaders = new BgForReaders();
+	
+	$stack = get_option ('bg_forreaders_stack');
+	if (isset($stack) && count($stack)){
+		$post_id = array_shift($stack);
+		update_option('bg_forreaders_stack', $stack);
+		$post = get_post($post_id);
+		if ($post) {
+			if (!bg_forreaders_check_exceptions ($post)) {
+				error_log( PHP_EOL . "Stack(".(count($stack)+1)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, BG_FORREADERS_DEBUG_FILE);
+				$the_time =  microtime(true);
+				$bg_forreaders->generate ($post->ID);
+				error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.", 3, BG_FORREADERS_DEBUG_FILE);
+			} else error_log( PHP_EOL . "Stack(".(count($stack)+1)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name." - already converted", 3, BG_FORREADERS_DEBUG_FILE);
+		}
+	}
+}
+
+// Функция обрабатывает все посты в пакетном режиме	
+function bg_forreaders_create_all($start=0, $finish=false) {
+	error_log( PHP_EOL . date ("j-m-Y H:i"). " ===================== Start the batch mode =====================", 3, BG_FORREADERS_DEBUG_FILE);
+	$bg_forreaders = new BgForReaders();
+	$starttime =  microtime(true);
+	
+	if(!$finish) $finish = wp_count_posts('post')->publish + wp_count_posts('page')->publish;
+	error_log( PHP_EOL . " All posts (".$cnt."): Start=".$start.", Finish=".$finish, 3, BG_FORREADERS_DEBUG_FILE);
+	for ($i = 0; $i < $cnt; $i++){
+		if ($i < $start-1) continue;
+		if ($i > $finish-1) break;
+		$args = array('post_type' => array( 'post', 'page'), 'post_status' => 'publish', 'numberposts' => 1, 'offset' => $i, 'orderby' => 'ID');
+		$posts_array = get_posts($args);
+		$post = $posts_array[0];
+		error_log( PHP_EOL . ($i+1).". ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. "  (".$post->post_type. ") ", 3, BG_FORREADERS_DEBUG_FILE);
+
+		if (!bg_forreaders_check_exceptions ($post)) {
+			$the_time =  microtime(true);
+			$bg_forreaders->generate ($post->ID);
+			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.", 3, BG_FORREADERS_DEBUG_FILE);
+		}
+	}
+	error_log( PHP_EOL . "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.", 3, BG_FORREADERS_DEBUG_FILE);
+	error_log( PHP_EOL . date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================", 3, BG_FORREADERS_DEBUG_FILE);
+} 
+
+// Функция проверяет исключения
+function bg_forreaders_check_exceptions ($post) {
+	if ($post->post_type == 'post') {
+		// Исключения - категории
+		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		
+		foreach($ex_cats as $cat) {
+			if (get_option('bg_forreaders_cats') == 'excluded') {	// если запрещены некоторые категории
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) {
+						error_log(" - category (".$category->category_nicename .") banned.", 3, BG_FORREADERS_DEBUG_FILE);
+						return true;
+					}
+				}
+			} else {												// если разрешены некоторые категории
+				foreach((get_the_category()) as $category) { 
+					if (trim($cat) == $category->category_nicename) return false;
+				}
+				error_log(" - categories not allowed.", 3, BG_FORREADERS_DEBUG_FILE);
+				return true;
+			}
+		}
+	} elseif ($post->post_type == 'page') {
+		// Исключение - произвольное поле not_for_readers
+		$for_readers = get_post_meta($post->ID, 'for_readers', true);
+		if (!$for_readers) {
+			error_log(" - field 'for_readers' not checked.", 3, BG_FORREADERS_DEBUG_FILE);
+			return true;
+		}
+	}
+	return false;
+}
+
+// Функция обновляет файл журнала
+function bg_forreaders_update_debug_file() {
+	if (file_exists (BG_FORREADERS_DEBUG_FILE) ) {
+		@unlink (BG_FORREADERS_DEBUG_OLD);								// Удаляем старый лог
+		@rename ( BG_FORREADERS_DEBUG_FILE, BG_FORREADERS_DEBUG_OLD );	// Переименовываем текущий лог в старый
+	}
+}
 
 /*****************************************************************************************
 	Параметры плагина
@@ -337,12 +521,16 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_memory_limit', '1024');
 	add_option('bg_forreaders_time_limit', '900');
 
+	add_option('bg_forreaders_cron_updated', '');	// Все расписания сброшены
+	add_option('bg_forreaders_stack_interval', 'every5min');
+	add_option('bg_forreaders_log_interval', 'daily');
+	add_option('bg_forreaders_log_checktime', date('j-m-Y 00:00'));
+	
 	add_option('bg_forreaders_css', BG_FORREADERS_CSS);
 	add_option('bg_forreaders_tags', BG_FORREADERS_TAGS);
 	add_option('bg_forreaders_extlinks', 'on');
 	
 	add_option('bg_forreaders_stack', array());
-
 }
 function bg_forreaders_delete_options (){
 
@@ -382,6 +570,12 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_memory_limit');
 	delete_option('bg_forreaders_time_limit');
 
+	delete_option('bg_forreaders_cron_updated');
+	delete_option('bg_forreaders_stack_interval');
+	delete_option('bg_forreaders_log_interval');
+	delete_option('bg_forreaders_log_checktime');
+	delete_option('bg_forreaders_checktime');
+	
 	delete_option('bg_forreaders_css');
 	delete_option('bg_forreaders_tags');
 	delete_option('bg_forreaders_extlinks');

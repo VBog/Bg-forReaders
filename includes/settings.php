@@ -22,6 +22,7 @@ function bg_forreaders_options_page() {
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=options" class="nav-tab <?php echo $active_tab == 'options' ? 'nav-tab-active' : ''; ?>"><?php _e('Options', 'bg-forreaders') ?></a>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=css" class="nav-tab <?php echo $active_tab == 'css' ? 'nav-tab-active' : ''; ?>"><?php _e('CSS', 'bg-forreaders') ?></a> 
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=html" class="nav-tab <?php echo $active_tab == 'html' ? 'nav-tab-active' : ''; ?>"><?php _e('HTML', 'bg-forreaders') ?></a> 
+			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=cron" class="nav-tab <?php echo $active_tab == 'cron' ? 'nav-tab-active' : ''; ?>"><?php _e('WP Cron', 'bg-forreaders') ?></a> 
 		<?php if (file_exists(BG_FORREADERS_URI.'/forreaders.php')) : ?>
 			<a href="?page=bg-forreaders%2Fbg-forreaders.php&tab=batch" class="nav-tab <?php echo $active_tab == 'batch' ? 'nav-tab-active' : ''; ?>"><?php _e('Batch mode', 'bg-forreaders') ?></a> 
 		<?php endif; ?>
@@ -47,7 +48,7 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('Type of download links', 'bg-forreaders') ?></th>
 				<td>
-				<input type="radio" name="bg_forreaders_links" <?php if(get_option('bg_forreaders_links') == "php") echo "checked" ?> value="php" /> <?php _e('using download php-script', 'bg-forreaders') ?><br /> 
+				<input type="radio" name="bg_forreaders_links" <?php if(get_option('bg_forreaders_links') == "php") echo "checked" ?> value="php" /> <?php _e('using php-script', 'bg-forreaders') ?><br /> 
 				<input type="radio" name="bg_forreaders_links" <?php if(get_option('bg_forreaders_links') == "html5") echo "checked" ?> value="html5" /> <?php _e('using html5 atribute "download"', 'bg-forreaders') ?><br /> 
 				<input type="radio" name="bg_forreaders_links" <?php if(get_option('bg_forreaders_links') == "html") echo "checked" ?> value="html" /> <?php _e('simple html link', 'bg-forreaders') ?>
 				</td>
@@ -105,16 +106,14 @@ function bg_forreaders_options_page() {
 				<td>
 				<input type="checkbox" name="bg_forreaders_while_displayed" <?php if(get_option('bg_forreaders_while_displayed')) echo "checked" ?> value="on" /> <?php _e('while current post is displayed', 'bg-forreaders') ?><br /> 
 				<input type="checkbox" name="bg_forreaders_while_saved" <?php if(get_option('bg_forreaders_while_saved')) echo "checked" ?> value="on" /> <?php _e('while current post is saved', 'bg-forreaders') ?><br />
-			<?php if (file_exists(BG_FORREADERS_URI.'/forreaders.php')) : ?>
 				<input type="checkbox" name="bg_forreaders_offline_query" <?php if(get_option('bg_forreaders_offline_query')) echo "checked" ?> value="on" /> <?php _e('in offline query from stack', 'bg-forreaders') ?>&nbsp;
 				<?php 
 					$stack = get_option ('bg_forreaders_stack');
 					if (isset($stack)){
 						$cnt = count($stack); 
-						echo sprintf( _n( '(1 element now)', '(%s elements now)', $cnt, 'your_textdomain' ), $cnt );
+						echo sprintf( _n( '(%s element in stack now)', '(%s elements in stack now)', $cnt, 'bg-forreaders' ), $cnt );
 					}
 				?>
-			<?php endif; ?>
 				</td>
 				</tr>
 				
@@ -319,7 +318,7 @@ function bg_forreaders_options_page() {
 				<tr valign="top">
 				<th scope="row"><?php _e('External links', 'bg-forreaders') ?></th>
 				<td>
-				<input type="checkbox" name="bg_forreaders_extlinks" <?php if(get_option('bg_forreaders_extlinks')) echo "checked" ?> value="on" />	<i><?php _e('(If not allowed, the attribute href="..." with external link will removed from tag <a>).', 'bg-forreaders') ?></i>
+				<input type="checkbox" name="bg_forreaders_extlinks" <?php if(get_option('bg_forreaders_extlinks')) echo "checked" ?> value="on" />	<i><?php _e('(If not allowed, the attribute href="..." with external link will removed from tag &lt;a&gt;).', 'bg-forreaders') ?></i>
 				</td>
 				</tr>
 
@@ -327,6 +326,65 @@ function bg_forreaders_options_page() {
 
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_tags, bg_forreaders_extlinks" />
+
+				<p class="submit">
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				</p>
+
+	<!-- WP Cron  -->
+			<?php } elseif ($active_tab == 'cron') { ?>
+			<?php 
+				$schedules = wp_get_schedules();
+				asort ($schedules);
+			?>
+				<table class="form-table">
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Generate files for posts from stack', 'bg-forreaders') ?></th>
+				<td>
+				<select id='bg_forreaders_stack_interval' name='bg_forreaders_stack_interval'>
+					<?php 
+					foreach ($schedules as $schedule => $val) {
+						if ($val['interval'] > 3600) continue;
+						if (get_option('bg_forreaders_stack_interval') == $schedule) $selected = ' selected';
+						else $selected = '';
+						echo '<option value="'.$schedule.'"'.$selected.'>'.$val['display'].'</option>';
+					}
+					?>
+				</select>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Update Log file', 'bg-forreaders') ?></th>
+				<td>
+				<select id='bg_forreaders_log_interval' name='bg_forreaders_log_interval'>
+					<?php 
+					foreach ($schedules as $schedule => $val) {
+						if ($val['interval'] < 3600) continue;
+						if (get_option('bg_forreaders_log_interval') == $schedule) $selected = ' selected';
+						else $selected = '';
+						echo '<option value="'.$schedule.'"'.$selected.'>'.$val['display'].'</option>';
+					}
+					?>
+				</select>&nbsp;
+				<?php _e('after', 'bg-forreaders') ?>&nbsp;
+				<input type='time' name="bg_forreaders_log_checktime" value="<?php echo get_option('bg_forreaders_log_checktime'); ?>" />&nbsp;<?php _e('GMT', 'bg-forreaders') ?>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Log file', 'bg-forreaders') ?></th>
+				<td>
+				<?php printf ('<a href="%s" target="_blank">forreaders.log</a>', plugins_url('forreaders.log', dirname(__FILE__) )) ?>
+				</td>
+				</tr>
+				</table>
+
+				<input type="hidden" name="bg_forreaders_cron_updated" value="update" />
+				<input type="hidden" name="action" value="update" />
+				<input type="hidden" name="page_options" value="bg_forreaders_cron_updated, bg_forreaders_stack_interval, 
+						bg_forreaders_log_interval, bg_forreaders_log_checktime" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
@@ -372,8 +430,8 @@ function bg_forreaders_memory_usage () {
 	
 	$memory['limit'] = (int) ini_get('memory_limit') ;
 	$memory['usage'] = function_exists('memory_get_usage') ? round(memory_get_usage() / 1024 / 1024, 2) : 0;
-	$memory['limit'] = empty($memory['limit']) ? __('N/A') : $memory['limit'] . __(' MB');
-	$memory['usage'] = empty($memory['usage']) ? __('N/A') : $memory['usage'] . __(' MB');
+	$memory['limit'] = empty($memory['limit']) ? __('N/A') : $memory['limit'] .' ' . __('MB');
+	$memory['usage'] = empty($memory['usage']) ? __('N/A') : $memory['usage'] .' ' . __('MB');
 	
 	?>
 		<ul>	
@@ -385,7 +443,7 @@ function bg_forreaders_memory_usage () {
 function bg_forreaders_time_limit () {
 
 	$time_limit = (int) ini_get('max_execution_time') ;
-	$time_limit = (empty($time_limit) ? 30 : $time_limit) . __(' sec.');
+	$time_limit = (empty($time_limit) ? 30 : $time_limit) .' '. __('sec.', 'bg-forreaders');
 	
 	?>
 		<ul>	
