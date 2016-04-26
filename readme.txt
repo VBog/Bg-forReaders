@@ -44,6 +44,10 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.1 =
+
+* Fixed errors.
+
 = 1.1.0 =
 
 * Added offline mode to prepare files for readers from stack.
@@ -60,6 +64,4 @@ Startup version.
 
 == Upgrade Notice ==
 
-* Added offline mode to prepare files for readers from stack.
-* Added Russian translation.
-* Fixed some errors.
+* Fixed errors.

@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.0
+Version: 1.1.1
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.0' );
+define( 'BG_FORREADERS_VERSION', '1.1.1' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -394,6 +394,11 @@ add_action( 'bg_forreaders_log_cron_action', 'bg_forreaders_update_debug_file' )
 ******************************************************************************************/
 // Функция обрабатывает пост из стека
 function bg_forreaders_create_from_stack() {
+	$errors = array (
+		'1' => 'category banned',
+		'2' => 'categories not allowed',
+		'3' => 'field \"for_readers\" not checked'
+	);
 	$bg_forreaders = new BgForReaders();
 	
 	$stack = get_option ('bg_forreaders_stack');
@@ -402,18 +407,23 @@ function bg_forreaders_create_from_stack() {
 		update_option('bg_forreaders_stack', $stack);
 		$post = get_post($post_id);
 		if ($post) {
-			if (!bg_forreaders_check_exceptions ($post)) {
+			if (false === ($err = bg_forreaders_check_exceptions ($post))) {
 				error_log( PHP_EOL . "Stack(".(count($stack)+1)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name, 3, BG_FORREADERS_DEBUG_FILE);
 				$the_time =  microtime(true);
 				$bg_forreaders->generate ($post->ID);
 				error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.", 3, BG_FORREADERS_DEBUG_FILE);
-			} else error_log( PHP_EOL . "Stack(".(count($stack)+1)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name." - already converted", 3, BG_FORREADERS_DEBUG_FILE);
+			} else error_log( PHP_EOL . "Stack(".(count($stack)+1)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name." - ". $errors[$err], 3, BG_FORREADERS_DEBUG_FILE);
 		}
 	}
 }
 
 // Функция обрабатывает все посты в пакетном режиме	
 function bg_forreaders_create_all($start=0, $finish=false) {
+	$errors = array (
+		'1' => 'category banned',
+		'2' => 'categories not allowed',
+		'3' => 'field \"for_readers\" not checked'
+	);
 	error_log( PHP_EOL . date ("j-m-Y H:i"). " ===================== Start the batch mode =====================", 3, BG_FORREADERS_DEBUG_FILE);
 	$bg_forreaders = new BgForReaders();
 	$starttime =  microtime(true);
@@ -428,44 +438,42 @@ function bg_forreaders_create_all($start=0, $finish=false) {
 		$post = $posts_array[0];
 		error_log( PHP_EOL . ($i+1).". ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name. "  (".$post->post_type. ") ", 3, BG_FORREADERS_DEBUG_FILE);
 
-		if (!bg_forreaders_check_exceptions ($post)) {
+		if (false === ($err = bg_forreaders_check_exceptions ($post))) {
 			$the_time =  microtime(true);
 			$bg_forreaders->generate ($post->ID);
 			error_log(" - files generated in ".round((microtime(true)-$the_time)*1000, 1)." msec.", 3, BG_FORREADERS_DEBUG_FILE);
-		}
+		} else error_log( PHP_EOL . "Stack(".(count($stack)+1)."): ".date ("j-m-Y H:i"). " ".$post->ID. " ".$post->post_name." - ". $errors[$err], 3, BG_FORREADERS_DEBUG_FILE);
 	}
 	error_log( PHP_EOL . "TOTAL TIME: ".round((microtime(true)-$starttime), 1)." sec.", 3, BG_FORREADERS_DEBUG_FILE);
 	error_log( PHP_EOL . date ("j-m-Y H:i"). " ===================== Finish the batch mode =====================", 3, BG_FORREADERS_DEBUG_FILE);
 } 
 
 // Функция проверяет исключения
+// Возвращает false - если нет исключения,
+// или код ошибки:
+//    1 - category banned
+//    2 - categories not allowed
+//    3 - field 'for_readers' not checked
 function bg_forreaders_check_exceptions ($post) {
 	if ($post->post_type == 'post') {
 		// Исключения - категории
 		$ex_cats = explode ( ',' , get_option('bg_forreaders_excat') );		
 		foreach($ex_cats as $cat) {
 			if (get_option('bg_forreaders_cats') == 'excluded') {	// если запрещены некоторые категории
-				foreach((get_the_category()) as $category) { 
-					if (trim($cat) == $category->category_nicename) {
-						error_log(" - category (".$category->category_nicename .") banned.", 3, BG_FORREADERS_DEBUG_FILE);
-						return true;
-					}
+				foreach((get_the_category($post->ID)) as $category) { 
+					if (trim($cat) == $category->category_nicename) return 1;
 				}
 			} else {												// если разрешены некоторые категории
-				foreach((get_the_category()) as $category) { 
+				foreach((get_the_category($post->ID)) as $category) { 
 					if (trim($cat) == $category->category_nicename) return false;
 				}
-				error_log(" - categories not allowed.", 3, BG_FORREADERS_DEBUG_FILE);
-				return true;
+				return 2;
 			}
 		}
 	} elseif ($post->post_type == 'page') {
 		// Исключение - произвольное поле not_for_readers
 		$for_readers = get_post_meta($post->ID, 'for_readers', true);
-		if (!$for_readers) {
-			error_log(" - field 'for_readers' not checked.", 3, BG_FORREADERS_DEBUG_FILE);
-			return true;
-		}
+		if (!$for_readers) return 3;
 	}
 	return false;
 }
@@ -524,7 +532,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_cron_updated', '');	// Все расписания сброшены
 	add_option('bg_forreaders_stack_interval', 'every5min');
 	add_option('bg_forreaders_log_interval', 'daily');
-	add_option('bg_forreaders_log_checktime', date('j-m-Y 00:00'));
+	add_option('bg_forreaders_log_checktime', '00:00');
 	
 	add_option('bg_forreaders_css', BG_FORREADERS_CSS);
 	add_option('bg_forreaders_tags', BG_FORREADERS_TAGS);
