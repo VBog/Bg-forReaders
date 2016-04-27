@@ -340,6 +340,13 @@ function bg_forreaders_options_page() {
 				<table class="form-table">
 
 				<tr valign="top">
+				<th scope="row"></th>
+				<td>
+				<i><?php _e('Now:', 'bg-forreaders');
+				echo " <b>". date ('j-m-Y H:i')."</b> ".__('GMT', 'bg-forreaders'); ?></i>
+				</td>
+				</tr>
+				<tr valign="top">
 				<th scope="row"><?php _e('Generate files for posts from stack', 'bg-forreaders') ?></th>
 				<td>
 				<select id='bg_forreaders_stack_interval' name='bg_forreaders_stack_interval'>
@@ -351,7 +358,31 @@ function bg_forreaders_options_page() {
 						echo '<option value="'.$schedule.'"'.$selected.'>'.$val['display'].'</option>';
 					}
 					?>
-				</select>
+				</select><br>
+				<i><?php _e('Next time:', 'bg-forreaders');
+				$next_time = wp_next_scheduled( 'bg_forreaders_stack_cron_action' );
+				echo " ". ($next_time ? "<b>".date ('j-m-Y H:i', $next_time)."</b> ".__('GMT', 'bg-forreaders') : "<b>".__('never', 'bg-forreaders'))."</b>"; ?></i>
+				</td>
+				</tr>
+
+				<tr valign="top">
+				<th scope="row"><?php _e('Generate files for all allowed posts', 'bg-forreaders') ?></th>
+				<td>
+				<select id='bg_forreaders_all_interval' name='bg_forreaders_all_interval'>
+					<?php 
+					foreach ($schedules as $schedule => $val) {
+						if ($val['interval'] != 0 && $val['interval'] < 3600) continue;
+						if (get_option('bg_forreaders_all_interval') == $schedule) $selected = ' selected';
+						else $selected = '';
+						echo '<option value="'.$schedule.'"'.$selected.'>'.$val['display'].'</option>';
+					}
+					?>
+				</select>&nbsp;
+				<?php _e('after', 'bg-forreaders') ?>&nbsp;
+				<input type='time' name="bg_forreaders_all_checktime" value="<?php echo get_option('bg_forreaders_all_checktime'); ?>" />&nbsp;<?php _e('GMT', 'bg-forreaders') ?><br>
+				<i><?php _e('Next time:', 'bg-forreaders');
+				$next_time = wp_next_scheduled( 'bg_forreaders_all_cron_action' );
+				echo " ". ($next_time ? "<b>".date ('j-m-Y H:i', $next_time)."</b> ".__('GMT', 'bg-forreaders') : "<b>".__('never', 'bg-forreaders'))."</b>"; ?></i>
 				</td>
 				</tr>
 
@@ -361,7 +392,7 @@ function bg_forreaders_options_page() {
 				<select id='bg_forreaders_log_interval' name='bg_forreaders_log_interval'>
 					<?php 
 					foreach ($schedules as $schedule => $val) {
-						if ($val['interval'] < 3600) continue;
+						if ($val['interval'] != 0 && $val['interval'] < 3600) continue;
 						if (get_option('bg_forreaders_log_interval') == $schedule) $selected = ' selected';
 						else $selected = '';
 						echo '<option value="'.$schedule.'"'.$selected.'>'.$val['display'].'</option>';
@@ -369,7 +400,10 @@ function bg_forreaders_options_page() {
 					?>
 				</select>&nbsp;
 				<?php _e('after', 'bg-forreaders') ?>&nbsp;
-				<input type='time' name="bg_forreaders_log_checktime" value="<?php echo get_option('bg_forreaders_log_checktime'); ?>" />&nbsp;<?php _e('GMT', 'bg-forreaders') ?>
+				<input type='time' name="bg_forreaders_log_checktime" value="<?php echo get_option('bg_forreaders_log_checktime'); ?>" />&nbsp;<?php _e('GMT', 'bg-forreaders') ?><br>
+				<i><?php _e('Next time:', 'bg-forreaders');
+				$next_time = wp_next_scheduled( 'bg_forreaders_log_cron_action' );
+				echo " ". ($next_time ? "<b>".date ('j-m-Y H:i', $next_time)."</b> ".__('GMT', 'bg-forreaders') : "<b>".__('never', 'bg-forreaders'))."</b>"; ?></i>
 				</td>
 				</tr>
 
@@ -384,6 +418,7 @@ function bg_forreaders_options_page() {
 				<input type="hidden" name="bg_forreaders_cron_updated" value="update" />
 				<input type="hidden" name="action" value="update" />
 				<input type="hidden" name="page_options" value="bg_forreaders_cron_updated, bg_forreaders_stack_interval, 
+						bg_forreaders_all_interval, bg_forreaders_all_checktime,
 						bg_forreaders_log_interval, bg_forreaders_log_checktime" />
 
 				<p class="submit">

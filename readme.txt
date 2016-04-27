@@ -44,6 +44,11 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.2 =
+
+* Added offline mode to prepare all allpwed files for readers.
+* Fixed some errors.
+
 = 1.1.1 =
 
 * Fixed errors.
@@ -64,4 +69,4 @@ Startup version.
 
 == Upgrade Notice ==
 
-* Fixed errors.
+Added offline mode to prepare all allpwed files for readers.
