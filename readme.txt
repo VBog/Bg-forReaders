@@ -46,7 +46,7 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 = 1.1.2 =
 
-* Added offline mode to prepare all allpwed files for readers.
+* Added offline mode to prepare all allowed files for readers.
 * Fixed some errors.
 
 = 1.1.1 =
