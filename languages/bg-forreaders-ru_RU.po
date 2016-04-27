@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bg forReaders\n"
-"POT-Creation-Date: 2016-04-25 18:48+0300\n"
-"PO-Revision-Date: 2016-04-25 18:56+0300\n"
+"POT-Creation-Date: 2016-04-27 13:32+0300\n"
+"PO-Revision-Date: 2016-04-27 13:34+0300\n"
 "Last-Translator: Vadim Bogaiskov <vadim.bogaiskov@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -29,53 +29,61 @@ msgstr ""
 "Чтобы нормально функционировать Bg forReaders требуется PHP 5.3. Пожалуйста, "
 "обновите PHP. Плагин был автоматически деактивирован."
 
-#: bg-forreaders.php:205
+#: bg-forreaders.php:201
 #, php-format
 msgid "Download &#171;%s&#187; as %s"
 msgstr "Скачать &#171;%s&#187; в формате %s"
 
-#: bg-forreaders.php:213
+#: bg-forreaders.php:209
 #, php-format
 msgid "Download as %s"
 msgstr "Скачать в формате %s"
 
-#: bg-forreaders.php:278 includes/settings.php:15
+#: bg-forreaders.php:274 includes/settings.php:15
 msgid "Plugin's &#171;For Readers&#187; settings"
 msgstr "Настройки плагина &#171;Для чтения&#187;"
 
-#: bg-forreaders.php:278 bg-forreaders.php:294
+#: bg-forreaders.php:274 bg-forreaders.php:290
 msgid "For Readers"
 msgstr "Для чтения"
 
-#: bg-forreaders.php:301
+#: bg-forreaders.php:297
 msgid "create files for readers"
 msgstr "создание файлов для чтения"
 
+#: bg-forreaders.php:326
+msgid "Never"
+msgstr "Никогда"
+
 #: bg-forreaders.php:330
+msgid "Once"
+msgstr "Однажды"
+
+#: bg-forreaders.php:334
 msgid "Minutely"
 msgstr "Ежеминутно"
 
-#: bg-forreaders.php:334
+#: bg-forreaders.php:338
 msgid "Every 5 minutes"
 msgstr "Каждые 5 минут"
 
-#: bg-forreaders.php:338
+#: bg-forreaders.php:342
 msgid "Every 15 minutes"
 msgstr "Каждые 15 минут"
 
-#: bg-forreaders.php:342
+#: bg-forreaders.php:346
 msgid "Twice Hourly"
 msgstr "Дважды в час"
 
-#: bg-forreaders.php:346
+#: bg-forreaders.php:350
 msgid "Every 3 hours"
 msgstr "Каждые 3 часа"
 
-#: bg-forreaders.php:350
+#: bg-forreaders.php:354
 msgid "Every 6 hours"
 msgstr "Каждые 6 часов"
 
-#: bg-forreaders.php:354
+#: bg-forreaders.php:358
 msgid "Weekly"
 msgstr "Еженедельно"
 
@@ -111,7 +119,7 @@ msgstr "HTML"
 msgid "WP Cron"
 msgstr "WP Cron"
 
-#: includes/settings.php:27 includes/settings.php:398
+#: includes/settings.php:27 includes/settings.php:433
 msgid "Batch mode"
 msgstr "Пакетный режим"
 
@@ -213,7 +221,7 @@ msgstr[2] "(сейчас в стеке %s элементов)"
 
 #: includes/settings.php:129 includes/settings.php:168
 #: includes/settings.php:274 includes/settings.php:301
-#: includes/settings.php:331 includes/settings.php:390
+#: includes/settings.php:331 includes/settings.php:425
 msgid "Save Changes"
 msgstr "Сохранить изменения"
 
@@ -225,7 +233,7 @@ msgstr "Версия PHP "
 msgid "Bit OS"
 msgstr "Bit OS"
 
-#: includes/settings.php:145 includes/settings.php:438
+#: includes/settings.php:145 includes/settings.php:473
 msgid "Memory limit"
 msgstr "Лимит памяти"
 
@@ -233,8 +241,8 @@ msgstr "Лимит памяти"
 msgid "Set memory limit:"
 msgstr "Установить лимит памяти:"
 
-#: includes/settings.php:149 includes/settings.php:433
-#: includes/settings.php:434
+#: includes/settings.php:149 includes/settings.php:468
+#: includes/settings.php:469
 msgid "MB"
 msgstr "МБ"
 
@@ -246,7 +254,7 @@ msgstr "Лимит времени"
 msgid "Set time limit:"
 msgstr "Установить лимит времени:"
 
-#: includes/settings.php:158 includes/settings.php:446
+#: includes/settings.php:158 includes/settings.php:481
 msgid "sec."
 msgstr "сек."
 
@@ -397,27 +405,47 @@ msgstr ""
 "(Если не разрешено, то атрибут href= \"...\" с внешней ссылкой будет удален "
 "из тега &lt;a&gt;)."
 
-#: includes/settings.php:343
-msgid "Generate files for posts from stack"
-msgstr "Создание файлов для постов из стека"
+#: includes/settings.php:345
+msgid "Now:"
+msgstr "Сейчас:"
 
-#: includes/settings.php:359
-msgid "Update Log file"
-msgstr "Обновление файла журнала"
-
-#: includes/settings.php:371
-msgid "after"
-msgstr "после"
-
-#: includes/settings.php:372
+#: includes/settings.php:346 includes/settings.php:364
+#: includes/settings.php:382 includes/settings.php:385
+#: includes/settings.php:403 includes/settings.php:406
 msgid "GMT"
 msgstr "(время по Гринвичу)"
 
-#: includes/settings.php:377 includes/settings.php:414
+#: includes/settings.php:350
+msgid "Generate files for posts from stack"
+msgstr "Создание файлов для постов из стека"
+
+#: includes/settings.php:362 includes/settings.php:383
+#: includes/settings.php:404
+msgid "Next time:"
+msgstr "Cледующий раз:"
+
+#: includes/settings.php:364 includes/settings.php:385
+#: includes/settings.php:406
+msgid "never"
+msgstr "никогда"
+
+#: includes/settings.php:369
+msgid "Generate files for all allowed posts"
+msgstr "Создание файлов для всех разрешенных сообщений"
+
+#: includes/settings.php:381 includes/settings.php:402
+msgid "after"
+msgstr "после"
+
+#: includes/settings.php:390
+msgid "Update Log file"
+msgstr "Обновление файла журнала"
+
+#: includes/settings.php:411 includes/settings.php:449
 msgid "Log file"
 msgstr "Файл журнала"
 
-#: includes/settings.php:400
+#: includes/settings.php:435
 #, php-format
 msgid ""
 "You can use script %s<br>to generate files for readers in batch mode (using "
@@ -427,15 +455,15 @@ msgstr ""
 "пакетном режиме ( с помощью <b>интерфейса командной строки</b> или <b>cron</"
 "b>)."
 
-#: includes/settings.php:401
+#: includes/settings.php:436
 msgid "<h3>Options:</h3>"
 msgstr "<h3>Параметры:</h3>"
 
-#: includes/settings.php:402
+#: includes/settings.php:437
 msgid "<u>First parameter</u>"
 msgstr "<u>Первый параметр</u>"
 
-#: includes/settings.php:403
+#: includes/settings.php:438
 msgid ""
 "<b>id = [post id list separated by commas]</b> - process all the posts in "
 "the list;"
@@ -443,11 +471,11 @@ msgstr ""
 "<b>id = [список id постов через запятую] </b> - обработать все сообщения из "
 "списка;"
 
-#: includes/settings.php:404 includes/settings.php:406
+#: includes/settings.php:439 includes/settings.php:441
 msgid "<i>or</i>"
 msgstr "<i>или</i>"
 
-#: includes/settings.php:405
+#: includes/settings.php:440
 msgid ""
 "<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) "
 "on the site ignoring exceptions,<br>see General tab."
@@ -455,27 +483,27 @@ msgstr ""
 "<b>all = [с], [по]</b> - обработка все посты этого диапазона ([с] - [по]) на "
 "сайте, игнорируя исключения,<br> см. вкладку Общие."
 
-#: includes/settings.php:407
+#: includes/settings.php:442
 msgid "<b>stack</b> - process first element (post-id) from stack."
 msgstr "<b>stack</b> - обработать первый элемент (post-id) из стека."
 
-#: includes/settings.php:408
+#: includes/settings.php:443
 msgid "<u>Second parameter</u>"
 msgstr "<u>Второй параметр</u>"
 
-#: includes/settings.php:409
+#: includes/settings.php:444
 msgid "<b>echo</b> - output progress info to the screen."
 msgstr "<b>echo</b> - вывод на экран информации о выполнении."
 
-#: includes/settings.php:433 includes/settings.php:434
+#: includes/settings.php:468 includes/settings.php:469
 msgid "N/A"
 msgstr "Недоступно"
 
-#: includes/settings.php:439
+#: includes/settings.php:474
 msgid "Memory usage"
 msgstr "Использовано памяти"
 
-#: includes/settings.php:450
+#: includes/settings.php:485
 msgid "Max. execution time"
 msgstr "Макс. время выполнения"
 
