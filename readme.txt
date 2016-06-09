@@ -44,6 +44,11 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.3 =
+
+* Changed the location of the cover image files.
+* Full version of mPDF library v.6.0.
+
 = 1.1.2 =
 
 * Added offline mode to prepare all allowed files for readers.
@@ -69,4 +74,4 @@ Startup version.
 
 == Upgrade Notice ==
 
-Added offline mode to prepare all allpwed files for readers.
+Changed the location of the cover image files.

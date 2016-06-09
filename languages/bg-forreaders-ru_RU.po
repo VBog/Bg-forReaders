@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Bg forReaders\n"
 "POT-Creation-Date: 2016-06-09 09:57+0300\n"
+"PO-Revision-Date: 2016-06-09 10:05+0300\n"
 "Last-Translator: Vadim Bogaiskov <vadim.bogaiskov@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -335,6 +336,7 @@ msgstr "(png, gif или  jpg файл. Размер: 840x1188px)"
 
 #: includes/settings.php:233
 msgid "The image file must be located in a folder"
+msgstr "Файл изображения должен быть расположен в папке"
 
 #: includes/settings.php:238
 msgid "Сolors"
