@@ -78,7 +78,7 @@ class BgForReaders {
 			else {
 
 				// Загружаем рисунок фона с диска
-				$template = get_option('bg_forreaders_cover_image');
+				$template = BG_FORREADERS_STORAGE_URI."/".get_option('bg_forreaders_cover_image');
 				if ($template) {
 					$ext = substr(strrchr($template, '.'), 1);
 					switch ($ext) {
@@ -126,10 +126,10 @@ class BgForReaders {
 					$this->multiline ($publisher, $im, -get_option('bg_forreaders_bottom_offset'), $dx1, $dx2, $font, 12, $color);
 				}
 				// Создаем воременный файл изображения обложки
-				imagepng ($im, 'tmp_cover.png', 9); 
+				imagepng ($im, BG_FORREADERS_TMP_COVER, 9); 
 				// В конце освобождаем память, занятую картинкой.
 				imageDestroy($im);
-				$image_path = 'tmp_cover.png';
+				$image_path = BG_FORREADERS_TMP_COVER;
 			}
 		}
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
@@ -157,7 +157,7 @@ class BgForReaders {
 
 		unset($chtml);
 		$chtml=NULL;
-		if (file_exists('tmp_cover.png')) unlink ('tmp_cover.png');	// Удаляем временный файл
+		if (file_exists(BG_FORREADERS_TMP_COVER)) unlink (BG_FORREADERS_TMP_COVER);	// Удаляем временный файл
 		
 		return;
 	}

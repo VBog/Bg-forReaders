@@ -229,7 +229,8 @@ function bg_forreaders_options_page() {
 				<th scope="row"><?php _e('Cover image template', 'bg-forreaders') ?></th>
 				<td>
 				<input type="text" name="bg_forreaders_cover_image" value="<?php echo get_option('bg_forreaders_cover_image'); ?>" size="60" /><br>
-				<i><?php _e('(png, gif or jpg file. Size: 840x1188px)', 'bg-forreaders') ?></i>
+				<i><?php _e('(png, gif or jpg file. Size: 840x1188px)', 'bg-forreaders') ?></i><br>
+				<?php printf(__('The image file must be located in a folder', 'bg-forreaders')." <code>/". BG_FORREADERS_STORAGE_PATH."/</code>" ) ?>
 				</td>
 				</tr>
 

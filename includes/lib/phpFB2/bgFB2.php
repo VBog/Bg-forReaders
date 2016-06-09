@@ -318,11 +318,13 @@ $this->images ($content, $options).
 	}
 	function giftopng ($path) {
 		$img = imagecreatefromgif($path); 
-		imagepng ($img, 'tmp.png', 9); 
-		$image = file_get_contents('tmp.png');
+		$temp_file = tempnam(sys_get_temp_dir(), 'tmp').'.png';
+
+		imagepng ($img, $temp_file, 9); 
+		$image = file_get_contents($temp_file);
 		
-		imagedestroy($img);	// Освобождаем память
-		unlink ('tmp.png');	// Удаляем временный файл
+		imagedestroy($img);		// Освобождаем память
+		unlink ($temp_file);	// Удаляем временный файл
 		
 		return $image;
 	}
