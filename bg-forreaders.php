@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.3
+Version: 1.1.4
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.3' );
+define( 'BG_FORREADERS_VERSION', '1.1.4' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );

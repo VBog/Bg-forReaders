@@ -44,6 +44,10 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.4 =
+
+* Removed examples and utils folders from mPDF library v.6.0.
+
 = 1.1.3 =
 
 * Changed the location of the cover image files.
@@ -74,4 +78,4 @@ Startup version.
 
 == Upgrade Notice ==
 
-Changed the location of the cover image files.
+Removed examples and utils folders from mPDF library v.6.0.
