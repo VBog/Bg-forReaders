@@ -3,7 +3,7 @@ Contributors: VBog
 Tags: e-book,convertor,html,pdf,epub,mobi,fb2,reader
 Donate link: https://bogaiskov.ru/about-me/donate/
 Requires at least: 3.0.1
-Tested up to: 4.5
+Tested up to: 4.5.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -44,6 +44,10 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.5 =
+
+* Added option "create files for readers On/Off" for post type "post" as well as "page". But for "post" default is "On".
+
 = 1.1.4 =
 
 * Removed examples and utils folders from mPDF library v.6.0.
@@ -78,4 +82,4 @@ Startup version.
 
 == Upgrade Notice ==
 
-Removed examples and utils folders from mPDF library v.6.0.
+Added option "create files for readers On/Off" for post type "post" as well as "page". But for "post" default is "On".

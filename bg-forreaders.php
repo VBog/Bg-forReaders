@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.4
+Version: 1.1.5
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.4' );
+define( 'BG_FORREADERS_VERSION', '1.1.5' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -78,9 +78,6 @@ $formats = array(
 	'mobi' => 'mobi',
 	'fb2' => 'fb2'
 );
-// Не забыть удалить через версию 1.1.2
-delete_option('bg_forreaders_checktime');
-
 // Функция, исполняемая при активации плагина
 function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
@@ -177,6 +174,8 @@ function bg_forreaders ($post) {
 				return "";
 			}
 		}
+		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
+		if (!$for_readers_field) return "";
 	break;
 	case 'page' :
 		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
@@ -239,6 +238,8 @@ function bg_forreaders_save( $id ) {
 					return;
 				}
 			}
+			$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
+			if (!$for_readers_field) return;
 		break;
 		case 'page' :
 			$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
@@ -288,11 +289,12 @@ function bg_forreaders_version() {
 add_action('admin_init', 'bg_forreaders_extra_fields', 1);
 // Создание блока
 function bg_forreaders_extra_fields() {
-    add_meta_box( 'bg_forreaders_extra_fields', __('For Readers', 'bg-forreaders'), 'bg_forreaders_extra_fields_box_func', 'page', 'side', 'low'  );
+    add_meta_box( 'bg_forreaders_extra_fields', __('For Readers', 'bg-forreaders'), 'bg_forreaders_extra_fields_box_func', array('post', 'page'), 'side', 'low'  );
 }
 // Добавление полей
 function bg_forreaders_extra_fields_box_func( $post ){
 	wp_nonce_field( basename( __FILE__ ), 'bg_forreaders_extra_fields_nonce' );
+	add_post_meta($post->ID, 'for_readers', ($post->post_type == 'post'), true );
 	$html .= '<label><input type="checkbox" name="bg_forreaders_for_readers"';
 	$html .= (get_post_meta($post->ID, 'for_readers',true)) ? ' checked="checked"' : '';
 	$html .= ' /> '.__('create files for readers', 'bg-forreaders').'</label>';
@@ -504,6 +506,9 @@ function bg_forreaders_check_exceptions ($post) {
 				return 2;
 			}
 		}
+		// Исключение - произвольное поле not_for_readers
+		$for_readers = get_post_meta($post->ID, 'for_readers', true);
+		if (!$for_readers) return 3;
 	} elseif ($post->post_type == 'page') {
 		// Исключение - произвольное поле not_for_readers
 		$for_readers = get_post_meta($post->ID, 'for_readers', true);
