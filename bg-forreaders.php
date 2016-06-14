@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.5
+Version: 1.1.6
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.5' );
+define( 'BG_FORREADERS_VERSION', '1.1.6' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -294,7 +294,10 @@ function bg_forreaders_extra_fields() {
 // Добавление полей
 function bg_forreaders_extra_fields_box_func( $post ){
 	wp_nonce_field( basename( __FILE__ ), 'bg_forreaders_extra_fields_nonce' );
-	add_post_meta($post->ID, 'for_readers', ($post->post_type == 'post'), true );
+	if ($post->post_type == 'page') $meta_value = (get_option ('bg_forreaders_type_page')== 'on');
+	elseif ($post->post_type == 'post') $meta_value = (get_option ('bg_forreaders_type_post')== 'on');
+	else $meta_value = false;
+	add_post_meta($post->ID, 'for_readers', $meta_value, true );
 	$html .= '<label><input type="checkbox" name="bg_forreaders_for_readers"';
 	$html .= (get_post_meta($post->ID, 'for_readers',true)) ? ' checked="checked"' : '';
 	$html .= ' /> '.__('create files for readers', 'bg-forreaders').'</label>';
@@ -545,6 +548,8 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_single', 'on');
 	add_option('bg_forreaders_cats', 'excluded');
 	add_option('bg_forreaders_excat', '');
+	add_option('bg_forreaders_type_page', '');
+	add_option('bg_forreaders_type_post', 'on');
 	add_option('bg_forreaders_author_field', 'post');
 	add_option('bg_forreaders_publishing_year', 'post');
 	add_option('bg_forreaders_genre', 'genre');
@@ -596,6 +601,8 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_single');
 	delete_option('bg_forreaders_cats');
 	delete_option('bg_forreaders_excat');
+	delete_option('bg_forreaders_type_page');
+	delete_option('bg_forreaders_type_post');
 	delete_option('bg_forreaders_author_field');
 	delete_option('bg_forreaders_publishing_year');
 	delete_option('bg_forreaders_genre');
