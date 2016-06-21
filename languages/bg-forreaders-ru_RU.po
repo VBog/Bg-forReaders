@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bg forReaders\n"
-"POT-Creation-Date: 2016-06-09 09:57+0300\n"
-"PO-Revision-Date: 2016-06-09 10:05+0300\n"
+"POT-Creation-Date: 2016-06-14 11:21+0300\n"
+"PO-Revision-Date: 2016-06-14 11:22+0300\n"
 "Last-Translator: Vadim Bogaiskov <vadim.bogaiskov@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -29,61 +29,61 @@ msgstr ""
 "Чтобы нормально функционировать Bg forReaders требуется PHP 5.3. Пожалуйста, "
 "обновите PHP. Плагин был автоматически деактивирован."
 
-#: bg-forreaders.php:202
+#: bg-forreaders.php:201
 #, php-format
 msgid "Download &#171;%s&#187; as %s"
 msgstr "Скачать &#171;%s&#187; в формате %s"
 
-#: bg-forreaders.php:210
+#: bg-forreaders.php:209
 #, php-format
 msgid "Download as %s"
 msgstr "Скачать в формате %s"
 
-#: bg-forreaders.php:275 includes/settings.php:15
+#: bg-forreaders.php:276 includes/settings.php:15
 msgid "Plugin's &#171;For Readers&#187; settings"
 msgstr "Настройки плагина &#171;Для чтения&#187;"
 
-#: bg-forreaders.php:275 bg-forreaders.php:291
+#: bg-forreaders.php:276 bg-forreaders.php:292
 msgid "For Readers"
-msgstr "Для чтения"
+msgstr "Файлы для чтения"
 
-#: bg-forreaders.php:298
+#: bg-forreaders.php:303
 msgid "create files for readers"
 msgstr "создание файлов для чтения"
 
-#: bg-forreaders.php:327
+#: bg-forreaders.php:332
 msgid "Never"
 msgstr "Никогда"
 
-#: bg-forreaders.php:331
+#: bg-forreaders.php:336
 msgid "Once"
 msgstr "Однажды"
 
-#: bg-forreaders.php:335
+#: bg-forreaders.php:340
 msgid "Minutely"
 msgstr "Ежеминутно"
 
-#: bg-forreaders.php:339
+#: bg-forreaders.php:344
 msgid "Every 5 minutes"
 msgstr "Каждые 5 минут"
 
-#: bg-forreaders.php:343
+#: bg-forreaders.php:348
 msgid "Every 15 minutes"
 msgstr "Каждые 15 минут"
 
-#: bg-forreaders.php:347
+#: bg-forreaders.php:352
 msgid "Twice Hourly"
 msgstr "Дважды в час"
 
-#: bg-forreaders.php:351
+#: bg-forreaders.php:356
 msgid "Every 3 hours"
 msgstr "Каждые 3 часа"
 
-#: bg-forreaders.php:355
+#: bg-forreaders.php:360
 msgid "Every 6 hours"
 msgstr "Каждые 6 часов"
 
-#: bg-forreaders.php:359
+#: bg-forreaders.php:364
 msgid "Weekly"
 msgstr "Еженедельно"
 
@@ -119,7 +119,7 @@ msgstr "HTML"
 msgid "WP Cron"
 msgstr "WP Cron"
 
-#: includes/settings.php:27 includes/settings.php:434
+#: includes/settings.php:27 includes/settings.php:439
 msgid "Batch mode"
 msgstr "Пакетный режим"
 
@@ -176,42 +176,50 @@ msgid "Show icons on the single post only"
 msgstr "Показывать иконки только в одиночной записи"
 
 #: includes/settings.php:95
+msgid "Create files for readers by default"
+msgstr "Создание файлов для чтения по умолчанию"
+
+#: includes/settings.php:97
 msgid "Categories"
 msgstr "Рубрики"
 
-#: includes/settings.php:97
+#: includes/settings.php:98
 msgid "allowed"
 msgstr "разрешенные"
 
-#: includes/settings.php:98
+#: includes/settings.php:99
 msgid "excluded"
 msgstr "исключенные"
 
-#: includes/settings.php:100
+#: includes/settings.php:101
 msgid ""
 "(to allow/exclude prepartion of the post for readers enter the category "
-"nicenames separated by commas)"
+"slugs separated by commas)"
 msgstr ""
-"(чтобы разрешить/исключить обработку поста для чтения введите nicename "
+"(чтобы разрешить/исключить обработку поста для чтения введите слаги (slugs) "
 "категорий, разделенные запятыми)"
 
-#: includes/settings.php:105
-msgid "When will created files for readers?"
-msgstr "Когда создавать файлы для читателей?"
+#: includes/settings.php:102
+msgid "Post type"
+msgstr "Тип записи"
 
-#: includes/settings.php:107
+#: includes/settings.php:109
+msgid "When will created files for readers?"
+msgstr "Когда создавать файлы для чтения?"
+
+#: includes/settings.php:111
 msgid "while current post is displayed"
 msgstr "при отображении текущей записи"
 
-#: includes/settings.php:108
+#: includes/settings.php:112
 msgid "while current post is saved"
 msgstr "при созданении текущий записи"
 
-#: includes/settings.php:109
+#: includes/settings.php:113
 msgid "in offline query from stack"
 msgstr "при автономном запросе из стека"
 
-#: includes/settings.php:114
+#: includes/settings.php:118
 #, php-format
 msgid "(%s element in stack now)"
 msgid_plural "(%s elements in stack now)"
@@ -219,189 +227,189 @@ msgstr[0] "(сейчас в стеке %s элемент)"
 msgstr[1] "(сейчас в стеке %s элемента)"
 msgstr[2] "(сейчас в стеке %s элементов)"
 
-#: includes/settings.php:129 includes/settings.php:168
-#: includes/settings.php:275 includes/settings.php:302
-#: includes/settings.php:332 includes/settings.php:426
+#: includes/settings.php:134 includes/settings.php:173
+#: includes/settings.php:280 includes/settings.php:307
+#: includes/settings.php:337 includes/settings.php:431
 msgid "Save Changes"
 msgstr "Сохранить изменения"
 
-#: includes/settings.php:138
+#: includes/settings.php:143
 msgid "PHP version"
 msgstr "Версия PHP "
 
-#: includes/settings.php:140
+#: includes/settings.php:145
 msgid "Bit OS"
 msgstr "Bit OS"
 
-#: includes/settings.php:145 includes/settings.php:474
+#: includes/settings.php:150 includes/settings.php:479
 msgid "Memory limit"
 msgstr "Лимит памяти"
 
-#: includes/settings.php:148
+#: includes/settings.php:153
 msgid "Set memory limit:"
 msgstr "Установить лимит памяти:"
 
-#: includes/settings.php:149 includes/settings.php:469
-#: includes/settings.php:470
+#: includes/settings.php:154 includes/settings.php:474
+#: includes/settings.php:475
 msgid "MB"
 msgstr "МБ"
 
-#: includes/settings.php:154
+#: includes/settings.php:159
 msgid "Time limit"
 msgstr "Лимит времени"
 
-#: includes/settings.php:157
+#: includes/settings.php:162
 msgid "Set time limit:"
 msgstr "Установить лимит времени:"
 
-#: includes/settings.php:158 includes/settings.php:482
+#: includes/settings.php:163 includes/settings.php:487
 msgid "sec."
 msgstr "сек."
 
-#: includes/settings.php:177
+#: includes/settings.php:182
 msgid "Custom field for author name"
 msgstr "Пользовательское поле для имени автора"
 
-#: includes/settings.php:180
+#: includes/settings.php:185
 msgid "(if you specify as \"post\", author is post author)"
 msgstr "(если вы укажете \"post\", автор - автор сообщения)"
 
-#: includes/settings.php:185
+#: includes/settings.php:190
 msgid "Custom field for publishing year"
 msgstr "Пользовательское поле для года издания"
 
-#: includes/settings.php:188
+#: includes/settings.php:193
 msgid ""
 "(if you specify as \"post\", publishing year is publishing year of the post)"
 msgstr "(если вы укажете \"post\", год издания - год публикации поста)"
 
-#: includes/settings.php:193
+#: includes/settings.php:198
 msgid "Genre"
 msgstr "Жанр"
 
-#: includes/settings.php:196
+#: includes/settings.php:201
 msgid ""
 "(if you specify as \"genre\", genre is content of custom fields \"genre\")"
 msgstr ""
 "(если вы укажете \"genre\", жанр - содержимое пользовательского поля \"genre"
 "\")"
 
-#: includes/settings.php:201
+#: includes/settings.php:206
 msgid "Book header in  the text"
 msgstr "Заголовок книги в тексте"
 
-#: includes/settings.php:203
+#: includes/settings.php:208
 msgid "add book title"
 msgstr "добавить название книги"
 
-#: includes/settings.php:204
+#: includes/settings.php:209
 msgid "add book author"
 msgstr "добавить автора книги"
 
-#: includes/settings.php:209
+#: includes/settings.php:214
 msgid "Cover content"
 msgstr "Содержание обложки"
 
-#: includes/settings.php:211
+#: includes/settings.php:216
 msgid "title"
 msgstr "название"
 
-#: includes/settings.php:213
+#: includes/settings.php:218
 msgid "author"
 msgstr "автор"
 
-#: includes/settings.php:214
+#: includes/settings.php:219
 msgid "site name"
 msgstr "название сайта"
 
-#: includes/settings.php:215
+#: includes/settings.php:220
 msgid "year"
 msgstr "год"
 
-#: includes/settings.php:221
+#: includes/settings.php:226
 msgid "Use post thumbnail as cover"
 msgstr "Использовать миниатюру поста как обложку"
 
-#: includes/settings.php:224
+#: includes/settings.php:229
 msgid "(If there is post thumbnail, it will be used as cover)"
 msgstr "(Если есть миниатюра, она будет использоваться в качестве обложки)"
 
-#: includes/settings.php:229
+#: includes/settings.php:234
 msgid "Cover image template"
 msgstr "Шаблон изображения обложки"
 
-#: includes/settings.php:232
+#: includes/settings.php:237
 msgid "(png, gif or jpg file. Size: 840x1188px)"
 msgstr "(png, gif или  jpg файл. Размер: 840x1188px)"
 
-#: includes/settings.php:233
+#: includes/settings.php:238
 msgid "The image file must be located in a folder"
 msgstr "Файл изображения должен быть расположен в папке"
 
-#: includes/settings.php:238
+#: includes/settings.php:243
 msgid "Сolors"
 msgstr "Цвет"
 
-#: includes/settings.php:240
+#: includes/settings.php:245
 msgid "text:"
 msgstr "текст:"
 
-#: includes/settings.php:241
+#: includes/settings.php:246
 msgid "background:"
 msgstr "фон:"
 
-#: includes/settings.php:246
+#: includes/settings.php:251
 msgid "Offset of the text field on the cover"
 msgstr "Смещение текстового поля на обложке"
 
-#: includes/settings.php:250
+#: includes/settings.php:255
 msgid "left:"
 msgstr "слева:"
 
-#: includes/settings.php:252
+#: includes/settings.php:257
 msgid "right:"
 msgstr "справа:"
 
-#: includes/settings.php:256
+#: includes/settings.php:261
 msgid "top:"
 msgstr "сверху:"
 
-#: includes/settings.php:258
+#: includes/settings.php:263
 msgid "bottom:"
 msgstr "снизу:"
 
-#: includes/settings.php:289
+#: includes/settings.php:294
 msgid "CSS styles table"
 msgstr "Таблица стилей CSS"
 
-#: includes/settings.php:292
+#: includes/settings.php:297
 msgid "Enter the css styling table for display text in readers."
 msgstr "Введите таблицу стилей для отображения текста в ридере."
 
-#: includes/settings.php:310
+#: includes/settings.php:315
 msgid "Allowed tags and attributes"
 msgstr "Разрешенные теги и атрибуты"
 
-#: includes/settings.php:313
+#: includes/settings.php:318
 msgid "Enter the allowed tags separated by commas."
 msgstr "Введите разрешенные теги через запятую."
 
-#: includes/settings.php:314
+#: includes/settings.php:319
 msgid ""
 "Near in brackets enter the allowed attributes separated by vertical bar."
 msgstr ""
 "Рядом в квадратных скобках введите разрешенные атрибуты, разделенные "
 "вертикальной чертой."
 
-#: includes/settings.php:315
+#: includes/settings.php:320
 msgid "(For example, a[href|name|id],b,strong,i,em,u)"
 msgstr "(Напимер, a[href|name|id],b,strong,i,em,u)"
 
-#: includes/settings.php:320
+#: includes/settings.php:325
 msgid "External links"
 msgstr "Внешние ссылки"
 
-#: includes/settings.php:322
+#: includes/settings.php:327
 msgid ""
 "(If not allowed, the attribute href=\"...\" with external link will removed "
 "from tag &lt;a&gt;)."
@@ -409,47 +417,47 @@ msgstr ""
 "(Если не разрешено, то атрибут href= \"...\" с внешней ссылкой будет удален "
 "из тега &lt;a&gt;)."
 
-#: includes/settings.php:346
+#: includes/settings.php:351
 msgid "Now:"
 msgstr "Сейчас:"
 
-#: includes/settings.php:347 includes/settings.php:365
-#: includes/settings.php:383 includes/settings.php:386
-#: includes/settings.php:404 includes/settings.php:407
+#: includes/settings.php:352 includes/settings.php:370
+#: includes/settings.php:388 includes/settings.php:391
+#: includes/settings.php:409 includes/settings.php:412
 msgid "GMT"
 msgstr "(время по Гринвичу)"
 
-#: includes/settings.php:351
+#: includes/settings.php:356
 msgid "Generate files for posts from stack"
 msgstr "Создание файлов для постов из стека"
 
-#: includes/settings.php:363 includes/settings.php:384
-#: includes/settings.php:405
+#: includes/settings.php:368 includes/settings.php:389
+#: includes/settings.php:410
 msgid "Next time:"
 msgstr "Cледующий раз:"
 
-#: includes/settings.php:365 includes/settings.php:386
-#: includes/settings.php:407
+#: includes/settings.php:370 includes/settings.php:391
+#: includes/settings.php:412
 msgid "never"
 msgstr "никогда"
 
-#: includes/settings.php:370
+#: includes/settings.php:375
 msgid "Generate files for all allowed posts"
 msgstr "Создание файлов для всех разрешенных сообщений"
 
-#: includes/settings.php:382 includes/settings.php:403
+#: includes/settings.php:387 includes/settings.php:408
 msgid "after"
 msgstr "после"
 
-#: includes/settings.php:391
+#: includes/settings.php:396
 msgid "Update Log file"
 msgstr "Обновление файла журнала"
 
-#: includes/settings.php:412 includes/settings.php:450
+#: includes/settings.php:417 includes/settings.php:455
 msgid "Log file"
 msgstr "Файл журнала"
 
-#: includes/settings.php:436
+#: includes/settings.php:441
 #, php-format
 msgid ""
 "You can use script %s<br>to generate files for readers in batch mode (using "
@@ -459,15 +467,15 @@ msgstr ""
 "пакетном режиме ( с помощью <b>интерфейса командной строки</b> или <b>cron</"
 "b>)."
 
-#: includes/settings.php:437
+#: includes/settings.php:442
 msgid "<h3>Options:</h3>"
 msgstr "<h3>Параметры:</h3>"
 
-#: includes/settings.php:438
+#: includes/settings.php:443
 msgid "<u>First parameter</u>"
 msgstr "<u>Первый параметр</u>"
 
-#: includes/settings.php:439
+#: includes/settings.php:444
 msgid ""
 "<b>id = [post id list separated by commas]</b> - process all the posts in "
 "the list;"
@@ -475,11 +483,11 @@ msgstr ""
 "<b>id = [список id постов через запятую] </b> - обработать все сообщения из "
 "списка;"
 
-#: includes/settings.php:440 includes/settings.php:442
+#: includes/settings.php:445 includes/settings.php:447
 msgid "<i>or</i>"
 msgstr "<i>или</i>"
 
-#: includes/settings.php:441
+#: includes/settings.php:446
 msgid ""
 "<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) "
 "on the site ignoring exceptions,<br>see General tab."
@@ -487,27 +495,27 @@ msgstr ""
 "<b>all = [с], [по]</b> - обработка все посты этого диапазона ([с] - [по]) на "
 "сайте, игнорируя исключения,<br> см. вкладку Общие."
 
-#: includes/settings.php:443
+#: includes/settings.php:448
 msgid "<b>stack</b> - process first element (post-id) from stack."
 msgstr "<b>stack</b> - обработать первый элемент (post-id) из стека."
 
-#: includes/settings.php:444
+#: includes/settings.php:449
 msgid "<u>Second parameter</u>"
 msgstr "<u>Второй параметр</u>"
 
-#: includes/settings.php:445
+#: includes/settings.php:450
 msgid "<b>echo</b> - output progress info to the screen."
 msgstr "<b>echo</b> - вывод на экран информации о выполнении."
 
-#: includes/settings.php:469 includes/settings.php:470
+#: includes/settings.php:474 includes/settings.php:475
 msgid "N/A"
 msgstr "Недоступно"
 
-#: includes/settings.php:475
+#: includes/settings.php:480
 msgid "Memory usage"
 msgstr "Использовано памяти"
 
-#: includes/settings.php:486
+#: includes/settings.php:491
 msgid "Max. execution time"
 msgstr "Макс. время выполнения"
 
@@ -534,6 +542,13 @@ msgstr "VBog"
 #. Author URI of the plugin/theme
 msgid "https://bogaiskov.ru"
 msgstr "https://bogaiskov.ru"
+
+#~ msgid ""
+#~ "(to allow/exclude prepartion of the post for readers enter the category "
+#~ "nicenames separated by commas)"
+#~ msgstr ""
+#~ "(чтобы разрешить/исключить обработку поста для чтения введите nicename "
+#~ "категорий, разделенные запятыми)"
 
 #~ msgid "(1 element now)"
 #~ msgid_plural "(%s elements now)"

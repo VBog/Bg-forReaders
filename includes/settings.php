@@ -92,12 +92,16 @@ function bg_forreaders_options_page() {
 				</tr>
 				
 				<tr valign="top">
-				<th scope="row"><?php _e('Categories', 'bg-forreaders') ?></th>
+				<th scope="row"><?php _e('Create files for readers by default', 'bg-forreaders') ?></th>
 				<td>
+				<b><?php _e('Categories', 'bg-forreaders') ?>:</b>&nbsp;&nbsp;
 				<input type="radio" name="bg_forreaders_cats" <?php if(get_option('bg_forreaders_cats')=='allowed') echo "checked" ?> value="allowed" /> <?php _e('allowed', 'bg-forreaders') ?>&nbsp;
 				<input type="radio" name="bg_forreaders_cats" <?php if(get_option('bg_forreaders_cats')=='excluded') echo "checked" ?> value="excluded" /> <?php _e('excluded', 'bg-forreaders') ?><br>
 				<input type="text" name="bg_forreaders_excat" value="<?php echo get_option('bg_forreaders_excat'); ?>" size="60" /><br>
-				<i><?php _e('(to allow/exclude prepartion of the post for readers enter the category nicenames separated by commas)', 'bg-forreaders') ?></i>
+				<i><?php _e('(to allow/exclude prepartion of the post for readers enter the category slugs separated by commas)', 'bg-forreaders') ?></i><br><br>
+				<b><?php _e('Post type', 'bg-forreaders') ?>:</b>&nbsp;&nbsp;
+				<input type="checkbox" name="bg_forreaders_type_page" <?php if(get_option('bg_forreaders_type_page')) echo "checked" ?> value="on" />&nbsp;<code>'page'</code>&nbsp;&nbsp;
+				<input type="checkbox" name="bg_forreaders_type_post" <?php if(get_option('bg_forreaders_type_post')) echo "checked" ?> value="on" />&nbsp;<code>'post'</code> 
 				</td>
 				</tr>
 
@@ -123,6 +127,7 @@ function bg_forreaders_options_page() {
 				<input type="hidden" name="page_options" value="bg_forreaders_pdf, bg_forreaders_epub, bg_forreaders_mobi,	bg_forreaders_fb2, 
 							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_separator,
 							bg_forreaders_zoom, bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
+							bg_forreaders_type_page, bg_forreaders_type_post,
 							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_offline_query" />
 
 				<p class="submit">

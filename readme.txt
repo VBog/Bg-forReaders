@@ -44,6 +44,14 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.7 =
+
+* Fixed bug.
+
+= 1.1.6 =
+
+* Added choise of default value for option "create files for readers On/Off" in plugin's settings.
+
 = 1.1.5 =
 
 * Added option "create files for readers On/Off" for post type "post" as well as "page". But for "post" default is "On".
@@ -82,4 +90,4 @@ Startup version.
 
 == Upgrade Notice ==
 
-Added option "create files for readers On/Off" for post type "post" as well as "page". But for "post" default is "On".
+Added choise of default value for option "create files for readers On/Off" in plugin's settings.
