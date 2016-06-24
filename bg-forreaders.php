@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.6
+Version: 1.1.8
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.6' );
+define( 'BG_FORREADERS_VERSION', '1.1.8' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -89,9 +89,6 @@ function bg_forreaders_activate() {
 	bg_forreaders_add_options ();
 }
 register_activation_hook( __FILE__, 'bg_forreaders_activate' );
-
-// Активируем параметры плагина, если они не сохранились
-// bg_forreaders_activate();
 
 // Загрузка интернационализации
 add_action( 'plugins_loaded', 'bg_forreaders_load_textdomain' );
@@ -174,10 +171,18 @@ function bg_forreaders ($post) {
 				return "";
 			}
 		}
+		// Создаем во всех уже опубликованных постах произвольное поле 'for_readers' 
+		// (если оно еще не существует) со значением по умолчанию
+		add_post_meta($post->ID, 'for_readers', (get_option('bg_forreaders_type_post')=='on'), true );
+		// Теперь поле наверняка существует - проверяем его значение
 		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
 		if (!$for_readers_field) return "";
 	break;
 	case 'page' :
+		// Создаем во всех уже опубликованных постах произвольное поле 'for_readers' 
+		// (если оно еще не существует) со значением по умолчанию
+		add_post_meta($post->ID, 'for_readers', (get_option('bg_forreaders_type_page')=='on'), true );
+		// Теперь поле наверняка существует - проверяем его значение
 		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
 		if (!$for_readers_field) return "";
 	break;
@@ -585,6 +590,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_extlinks', 'on');
 	
 	add_option('bg_forreaders_stack', array());
+
 }
 function bg_forreaders_delete_options (){
 
