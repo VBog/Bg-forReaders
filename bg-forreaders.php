@@ -3,11 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-<<<<<<< HEAD
-Version: 1.1.7
-=======
-Version: 1.1.8
->>>>>>> origin/master
+Version: 1.1.9
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -53,11 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-<<<<<<< HEAD
-define( 'BG_FORREADERS_VERSION', '1.1.7' );
-=======
-define( 'BG_FORREADERS_VERSION', '1.1.8' );
->>>>>>> origin/master
+define( 'BG_FORREADERS_VERSION', '1.1.9' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -180,13 +172,8 @@ function bg_forreaders ($post) {
 			}
 		}
 		// Создаем во всех уже опубликованных постах произвольное поле 'for_readers' 
-<<<<<<< HEAD
-		// (если оно еще не существует) со значением по умолчанию true	
-		add_post_meta($post->ID, 'for_readers', true, true );
-=======
 		// (если оно еще не существует) со значением по умолчанию
 		add_post_meta($post->ID, 'for_readers', (get_option('bg_forreaders_type_post')=='on'), true );
->>>>>>> origin/master
 		// Теперь поле наверняка существует - проверяем его значение
 		$for_readers_field = get_post_meta($post->ID, 'for_readers', true);
 		if (!$for_readers_field) return "";

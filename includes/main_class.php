@@ -78,8 +78,8 @@ class BgForReaders {
 			else {
 
 				// Загружаем рисунок фона с диска
-				$template = BG_FORREADERS_STORAGE_URI."/".get_option('bg_forreaders_cover_image');
-				if ($template) {
+				if (get_option('bg_forreaders_cover_image')) {
+					$template = BG_FORREADERS_STORAGE_URI."/".get_option('bg_forreaders_cover_image');
 					$ext = substr(strrchr($template, '.'), 1);
 					switch ($ext) {
 						case 'jpg':
@@ -93,7 +93,7 @@ class BgForReaders {
 							 $im = @imageCreateFromPng($template);
 							 break;
 						default:
-							return $im = false;
+							$im = false;
 					}
 				} else $im = false;
 				
