@@ -3,7 +3,7 @@ Contributors: VBog
 Tags: e-book,convertor,html,pdf,epub,mobi,fb2,reader
 Donate link: https://bogaiskov.ru/about-me/donate/
 Requires at least: 3.0.1
-Tested up to: 4.5.2
+Tested up to: 4.5.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -44,9 +44,15 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 1.1.7 =
 
 * Fixed bug.
+=======
+= 1.1.7-8 =
+
+* Fixed bugs.
+>>>>>>> origin/master
 
 = 1.1.6 =
 
@@ -90,4 +96,8 @@ Startup version.
 
 == Upgrade Notice ==
 
+<<<<<<< HEAD
 Added choise of default value for option "create files for readers On/Off" in plugin's settings.
+=======
+Fixed bugs.
+>>>>>>> origin/master
