@@ -378,6 +378,7 @@ class BgForReaders {
 	}
 	
 	function idtoname($html) {
+			return preg_replace('/<a([^>]*?)id\s*=/is','<a$1name=',$html);
 	}
 
 	// Функция очищает внутренние ссылки и атрибуты id и name от не буквенно-цифровых символов
