@@ -279,6 +279,7 @@ $this->images ($content, $options).
 		// Ищем все вхождения изображений 
 		//$this->images ($content, $options).
 		
+		$upload_dir = (object) wp_upload_dir();
 		$template = '/<img\s+([^>]*?)src\s*=\s*([\"\'])([^>]*?)(\2)/is';
 		preg_match_all($template, $content, $matches, PREG_OFFSET_CAPTURE);
 
@@ -286,7 +287,8 @@ $this->images ($content, $options).
 		$cnt = count($matches[0]);
 		for ($i=0; $i<$cnt; $i++) {
 			preg_match($template, $matches[0][$i][0], $mt);
-			$text .= $this->create_binary($mt[3]);
+			$path = str_replace ($upload_dir->baseurl, $upload_dir->basedir, $mt[3]);
+			$text .= $this->create_binary($path);
 		}
 
 		return $text;
