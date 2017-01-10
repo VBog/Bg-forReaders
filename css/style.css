@@ -1,0 +1,51 @@
+div.bg_forreaders {
+	height: 88px;	
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+	font-size: 0em;
+}
+
+.bg_forreaders div {
+	padding: 0px;
+	margin: 0px;
+	border: 0px;
+	display: inline;
+}
+.bg_forreaders span a {
+	padding: 0px 0px 4em 0px;
+	margin: 0px;
+	border: 0px;
+	font-size: 0.8em !important;
+	box-shadow: none !important;
+	text-decoration:  none !important;
+}
+
+.bg_forreaders div a {
+	padding: 0px 69px 88px 0px;
+	margin: 0px 10px 0px 0px;
+	border: 0px;
+	font-size: 0em !important;
+	box-shadow: none !important;
+	text-decoration:  none !important;
+}
+
+.bg_forreaders .pdf {
+	background: url(document-pdf.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+
+.bg_forreaders .epub {
+	background: url(document-epub.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+
+.bg_forreaders .mobi{
+	background: url(document-mobi.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+
+.bg_forreaders .fb2 {
+	background: url(document-fb2.png) no-repeat 50% 50%;
+	background-size: contain;
+}

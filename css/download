@@ -1,6 +1,7 @@
 <?php
 // имя запрашиваемого файла
-$file_name = $_GET['file'];
+$file_name = basename($_GET['file']);
+
 
 // убедимся, что это файл, прежде чем что-нибудь делать!
 if(is_file($file_name)) {

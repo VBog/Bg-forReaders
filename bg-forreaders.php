@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.10
+Version: 1.1.12
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.10' );
+define( 'BG_FORREADERS_VERSION', '1.1.12' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -98,8 +98,37 @@ function bg_forreaders_load_textdomain() {
 
 // Динамическая таблица стилей для плагина
 function bg_forreaders_frontend_styles () {
-	$css_path = '/css/style.php?zoom='.get_option('bg_forreaders_zoom').'&storage='.urlencode (BG_FORREADERS_STORAGE_URL.'/');
-	wp_enqueue_style( "bg_forreaders_styles", plugins_url( $css_path, plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
+	wp_enqueue_style( "bg_forreaders_styles", plugins_url( "/css/style.css", plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
+	$bg_forreaders = BG_FORREADERS_STORAGE_URL.'/';
+	$zoom=(float) get_option('bg_forreaders_zoom');
+	$custom_css = "
+div.bg_forreaders {"
+	.(($zoom)?("height: ".(88*$zoom)."px;"):"")."
+	font-size: ".($zoom?0:1)."em;
+}
+.bg_forreaders div a {
+	padding: 0px ".(69*$zoom)."px ".(88*$zoom)."px 0px;
+	margin: 0px ".(10*$zoom)."px 0px 0px;
+}
+.bg_forreaders .pdf {
+	background: url(".$bg_forreaders."document-pdf.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+.bg_forreaders .epub {
+	background: url(".$bg_forreaders."document-epub.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+
+.bg_forreaders .mobi{
+	background: url(". $bg_forreaders."document-mobi.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+.bg_forreaders .fb2 {
+	background: url(".$bg_forreaders."document-fb2.png) no-repeat 50% 50%;
+	background-size: contain;
+}
+	";
+	wp_add_inline_style( 'bg_forreaders_styles', $custom_css );
 }
 add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
 
@@ -303,7 +332,7 @@ function bg_forreaders_extra_fields_box_func( $post ){
 	elseif ($post->post_type == 'post') $meta_value = (get_option ('bg_forreaders_type_post')== 'on');
 	else $meta_value = false;
 	add_post_meta($post->ID, 'for_readers', $meta_value, true );
-	$html .= '<label><input type="checkbox" name="bg_forreaders_for_readers"';
+	$html = '<label><input type="checkbox" name="bg_forreaders_for_readers"';
 	$html .= (get_post_meta($post->ID, 'for_readers',true)) ? ' checked="checked"' : '';
 	$html .= ' /> '.__('create files for readers', 'bg-forreaders').'</label>';
  
