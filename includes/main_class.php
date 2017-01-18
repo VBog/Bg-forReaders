@@ -23,8 +23,12 @@ class BgForReaders {
 		$content = $post->post_content;
 		// Выполнить все шорт-коды
 		$content = do_shortcode ( $content );
-		// Удаляем указания на текущую страницу в ссылках с якорями
-		$content = preg_replace("/". preg_quote( $plink, '/' ).'.*?#/is', '#', $content);
+		// Удаляем указания на текущую страницу в абсолютных ссылках с якорями (включая множественные страницы)
+		$content = preg_replace("/". preg_quote( $plink, '/' ).'(\/\d+\/)?#/is', '#', $content);
+		// Удаляем  указания на текущую страницу в относительных ссылках с якорями
+		$site_url = get_site_url();
+		$plink = str_replace ($site_url."/", "", $plink);
+		$content = preg_replace("/". preg_quote( $plink, '/' ).'(\/\d+\/)?#/is', '#', $content);
 
 		// Очищаем текст от лишних тегов разметки
 		$chtml = new BgClearHTML();
@@ -131,7 +135,7 @@ class BgForReaders {
 				imageDestroy($im);
 				$image_path = BG_FORREADERS_TMP_COVER;
 			}
-		}
+		} else $image_path = "";
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
 		$options = array(
 			"title"=> $post->post_title,
@@ -364,9 +368,7 @@ class BgForReaders {
 			"version"=> '1.0',
 			"cover"=> $options["thumb"],
 			"publisher"=>get_bloginfo( 'name' )." ".get_bloginfo( 'url' ),
-			"css"=> get_option('bg_forreaders_css'), 
-			"tags"=> BG_FORREADERS_FB2_TAGS,
-			"entities" => BG_FORREADERS_FB2_ENTITIES
+			"css"=> get_option('bg_forreaders_css') 
 		);
 
 		$fb2 = new bgFB2();

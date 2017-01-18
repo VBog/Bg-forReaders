@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bg forReaders\n"
-"POT-Creation-Date: 2016-06-14 11:21+0300\n"
-"PO-Revision-Date: 2016-06-14 11:22+0300\n"
+"POT-Creation-Date: 2017-01-18 00:07+0300\n"
+"PO-Revision-Date: 2017-01-18 00:15+0300\n"
 "Last-Translator: Vadim Bogaiskov <vadim.bogaiskov@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: bg-forreaders.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -29,61 +29,84 @@ msgstr ""
 "Чтобы нормально функционировать Bg forReaders требуется PHP 5.3. Пожалуйста, "
 "обновите PHP. Плагин был автоматически деактивирован."
 
-#: bg-forreaders.php:201
+#: bg-forreaders.php:265
 #, php-format
 msgid "Download &#171;%s&#187; as %s"
 msgstr "Скачать &#171;%s&#187; в формате %s"
 
-#: bg-forreaders.php:209
+#: bg-forreaders.php:273
 #, php-format
 msgid "Download as %s"
 msgstr "Скачать в формате %s"
 
-#: bg-forreaders.php:276 includes/settings.php:15
+#: bg-forreaders.php:325
+msgid "Files will generated immediately (if it allowed while saving)."
+msgstr ""
+"Файлы будут созданы немедленно (если это разрешено во время сохранения)."
+
+#: bg-forreaders.php:331
+msgid "Files will generated in offline query (if it allowed)."
+msgstr "Файлы будут созданные при автономном запросе (если это разрешено)."
+
+#: bg-forreaders.php:333
+msgid "Files will generated while current post is displayed (if it allowed)."
+msgstr ""
+"Файлы будут созданы, в процессе отображения текущего сообщения на экране "
+"(если это разрешено)."
+
+#: bg-forreaders.php:334
+msgid "Selected no mode for file generation."
+msgstr "Не выбран режим не для создания файлов."
+
+#: bg-forreaders.php:346 includes/settings.php:15
 msgid "Plugin's &#171;For Readers&#187; settings"
 msgstr "Настройки плагина &#171;Для чтения&#187;"
 
-#: bg-forreaders.php:276 bg-forreaders.php:292
+#: bg-forreaders.php:346 bg-forreaders.php:362
 msgid "For Readers"
 msgstr "Файлы для чтения"
 
-#: bg-forreaders.php:303
+#: bg-forreaders.php:374
 msgid "create files for readers"
 msgstr "создание файлов для чтения"
 
-#: bg-forreaders.php:332
+#: bg-forreaders.php:382
+msgid "Create files"
+msgstr "Создать файлы"
+
+#: bg-forreaders.php:411
 msgid "Never"
 msgstr "Никогда"
 
-#: bg-forreaders.php:336
+#: bg-forreaders.php:415
 msgid "Once"
 msgstr "Однажды"
 
-#: bg-forreaders.php:340
+#: bg-forreaders.php:419
 msgid "Minutely"
 msgstr "Ежеминутно"
 
-#: bg-forreaders.php:344
+#: bg-forreaders.php:423
 msgid "Every 5 minutes"
 msgstr "Каждые 5 минут"
 
-#: bg-forreaders.php:348
+#: bg-forreaders.php:427
 msgid "Every 15 minutes"
 msgstr "Каждые 15 минут"
 
-#: bg-forreaders.php:352
+#: bg-forreaders.php:431
 msgid "Twice Hourly"
 msgstr "Дважды в час"
 
-#: bg-forreaders.php:356
+#: bg-forreaders.php:435
 msgid "Every 3 hours"
 msgstr "Каждые 3 часа"
 
-#: bg-forreaders.php:360
+#: bg-forreaders.php:439
 msgid "Every 6 hours"
 msgstr "Каждые 6 часов"
 
-#: bg-forreaders.php:364
+#: bg-forreaders.php:443
 msgid "Weekly"
 msgstr "Еженедельно"
 

@@ -3,7 +3,7 @@ Contributors: VBog
 Tags: e-book,convertor,html,pdf,epub,mobi,fb2,reader
 Donate link: https://bogaiskov.ru/about-me/donate/
 Requires at least: 3.0.1
-Tested up to: 4.7.0
+Tested up to: 4.7.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -43,6 +43,12 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 2. Icons form
 
 == Changelog ==
+
+= 1.1.13 =
+
+* In editor dashboard added the button to Create Files without saving of a post.
+* Allowed relative links to anchors in multi-page mode. 
+* Fixed bugs. 
 
 = 1.1.12 =
 

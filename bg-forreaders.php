@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.12
+Version: 1.1.13
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.12' );
+define( 'BG_FORREADERS_VERSION', '1.1.13' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -132,6 +132,18 @@ div.bg_forreaders {"
 }
 add_action( 'wp_enqueue_scripts' , 'bg_forreaders_frontend_styles' );
 
+// JS скрипт 
+function bg_forreaders_admin_enqueue_scripts () {
+	wp_enqueue_script( 'bg_forreaders_proc', plugins_url( 'js/bg_forreaders_admin.js', __FILE__ ), false, BG_FORREADERS_VERSION, true );
+	wp_localize_script( 'bg_forreaders_proc', 'bg_forreaders', 
+		array( 
+			'nonce' => wp_create_nonce('bg-forreaders-nonce') 
+		) 
+	);
+}	 
+if ( is_admin() ) {
+	add_action( 'admin_enqueue_scripts' , 'bg_forreaders_admin_enqueue_scripts' ); 
+}
 // Функция, исполняемая при удалении плагина
 function bg_forreaders_uninstall() {
 	removeDirectory(BG_FORREADERS_STORAGE_URI);
@@ -159,6 +171,24 @@ if ( defined('ABSPATH') && defined('WPINC') ) {
 	add_filter( 'the_content', 'bg_forreaders_proc' );
 }
 
+/*****************************************************************************************
+	Генератор ответа AJAX
+	
+******************************************************************************************/
+add_action ('wp_ajax_bg_forreaders', 'bg_forreaders_callback');
+add_action ('wp_ajax_nopriv_bg_forreaders', 'bg_forreaders_callback');
+
+function bg_forreaders_callback() {
+
+	$nonce = $_POST['nonce'];	// проверяем nonce код, если проверка не пройдена прерываем обработку
+	if( !wp_verify_nonce( $nonce, 'bg-forreaders-nonce' ) )	wp_die();
+	
+	if (isset($_POST['id']) && $_POST['id']) {
+		echo bg_forreaders_generate_files($_POST['id']);
+	}
+
+	wp_die();
+}
 /*****************************************************************************************
 	Функции запуска плагина
 	
@@ -284,18 +314,24 @@ function bg_forreaders_save( $id ) {
 		endswitch;
 		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 			// пропустим если это автосохранение
 		if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
-	
-	// 	Генерация файлов для чтения
-		if (get_option('bg_forreaders_while_saved')) {				// Сразу
-			$bg_forreaders = new BgForReaders();
-			$bg_forreaders->generate ($id);
-		} elseif (get_option('bg_forreaders_offline_query')) {		// Ставим в очередь
-			$stack = get_option ('bg_forreaders_stack');
-			$stack[] = $id;
-			$stack = array_unique ($stack);
-			update_option('bg_forreaders_stack', $stack);
-		}
+		bg_forreaders_generate_files($id);
 	}
+}
+// 	Генерация файлов для чтения
+function bg_forreaders_generate_files($id) {
+	if (get_option('bg_forreaders_while_saved')) {				// Сразу
+		$bg_forreaders = new BgForReaders();
+		$bg_forreaders->generate ($id);
+		return __('Files will generated immediately (if it allowed while saving).', 'bg-forreaders');
+	} elseif (get_option('bg_forreaders_offline_query')) {		// Ставим в очередь
+		$stack = get_option ('bg_forreaders_stack');
+		$stack[] = $id;
+		$stack = array_unique ($stack);
+		update_option('bg_forreaders_stack', $stack);
+		return __('Files will generated in offline query (if it allowed).', 'bg-forreaders');
+	} elseif (get_option('bg_forreaders_while_displayed')) {	// При отображении поста
+		return __('Files will generated while current post is displayed (if it allowed).', 'bg-forreaders');
+	} else return  __('Selected no mode for file generation.', 'bg-forreaders');
 }
 add_action( 'save_post', 'bg_forreaders_save', 10 );
 //add_action('wp_insert_post_data', 'bg_forreaders_save', 20, 2 );
@@ -331,11 +367,20 @@ function bg_forreaders_extra_fields_box_func( $post ){
 	if ($post->post_type == 'page') $meta_value = (get_option ('bg_forreaders_type_page')== 'on');
 	elseif ($post->post_type == 'post') $meta_value = (get_option ('bg_forreaders_type_post')== 'on');
 	else $meta_value = false;
+	// Дополнительное поле поста
 	add_post_meta($post->ID, 'for_readers', $meta_value, true );
-	$html = '<label><input type="checkbox" name="bg_forreaders_for_readers"';
+	$html = '<label><input type="checkbox" name="bg_forreaders_for_readers" id="bg_forreaders_for_readers"';
 	$html .= (get_post_meta($post->ID, 'for_readers',true)) ? ' checked="checked"' : '';
-	$html .= ' /> '.__('create files for readers', 'bg-forreaders').'</label>';
- 
+	$html .= ' /> '.__('create files for readers', 'bg-forreaders').'</label><br><br>';
+	if (get_option('bg_forreaders_while_saved') 
+		|| get_option('bg_forreaders_offline_query') 
+		|| get_option('bg_forreaders_while_displayed')) {	
+		$html .= '<input type="button" id="bg_forreaders_generate" class="button button-primary button-large"';
+		$html .= ' post_id="'.$post->ID.'"';
+		$html .= (get_post_meta($post->ID, 'for_readers',true)) ? '' : ' disabled';
+//		$html .= ' onclick="bg_forreaders_generate($post->ID)"';
+		$html .= 'value="'.__('Create files', 'bg-forreaders').'" /> ';
+	}
 	echo $html;
 }
 // Сохранение значений произвольных полей при сохранении поста
