@@ -379,7 +379,7 @@ function bg_forreaders_extra_fields_box_func( $post ){
 		$html .= ' post_id="'.$post->ID.'"';
 		$html .= (get_post_meta($post->ID, 'for_readers',true)) ? '' : ' disabled';
 //		$html .= ' onclick="bg_forreaders_generate($post->ID)"';
-		$html .= 'value="'.__('Create files', 'bg-forreaders').'" /> ';
+		$html .= ' value="'.__('Create files', 'bg-forreaders').'" /> ';
 	}
 	echo $html;
 }
