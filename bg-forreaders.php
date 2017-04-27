@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.13
+Version: 1.1.14
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.13' );
+define( 'BG_FORREADERS_VERSION', '1.1.14' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -262,7 +262,7 @@ function bg_forreaders ($post) {
 		// Если такового нет, проверяем наличие обычного файла
 		if (file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) {
 			if (get_option('bg_forreaders_'.$type) == 'on') {
-				$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), $post->post_title, $document_type);
+				$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), strip_tags($post->post_title), $document_type);
 				$link_type = get_option('bg_forreaders_links');
 				if ($link_type == 'php') $href = BG_FORREADERS_STORAGE_URL."?file=".$filename;
 				else $href = BG_FORREADERS_STORAGE_URL."/".$filename;

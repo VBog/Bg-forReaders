@@ -120,7 +120,7 @@ class BgForReaders {
 				$dx2 = get_option('bg_forreaders_right_offset');
 				// Выводим строки названия книги
 				if (get_option('bg_forreaders_cover_title')=='on')
-					$this->multiline ($post->post_title, $im, 'middle', $dx1, $dx2, $font, 24, $color);
+					$this->multiline (strip_tags($post->post_title), $im, 'middle', $dx1, $dx2, $font, 24, $color);
 				// Выводим имя автора
 				if (get_option('bg_forreaders_cover_author')=='on')
 					$this->multiline ($author, $im, get_option('bg_forreaders_top_offset'), $dx1, $dx2, $font, 16, $color);
@@ -138,7 +138,7 @@ class BgForReaders {
 		} else $image_path = "";
 		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
 		$options = array(
-			"title"=> $post->post_title,
+			"title"=> strip_tags($post->post_title),
 			"author"=> $author,
 			"guid"=>$post->guid,
 			"url"=>$post->guid,
@@ -151,7 +151,7 @@ class BgForReaders {
 						__("Unknown subject")			
 		);
 		if (get_option('bg_forreaders_add_author')) $content = '<p><em>'.$author.'</em></p>'.$content;
-		if (get_option('bg_forreaders_add_title')) $content = '<h1>'.$post->post_title.'</h1>'.$content;
+		if (get_option('bg_forreaders_add_title')) $content = '<h1>'.strip_tags($post->post_title).'</h1>'.$content;
 
 		if (!$this->file_updated ($filename, "pdf", $post->post_modified_gmt)) $this->topdf($content, $options);
 		if (!$this->file_updated ($filename, "epub", $post->post_modified_gmt)) $this->toepub($content, $options);

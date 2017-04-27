@@ -44,6 +44,10 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.1.14 =
+
+* Disable any tags in headers (<h1>-<h6>).
+
 = 1.1.13 =
 
 * In editor dashboard added the button to Create Files without saving of a post.
