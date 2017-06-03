@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.1.14
+Version: 1.2.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.1.14' );
+define( 'BG_FORREADERS_VERSION', '1.2.0' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -170,6 +170,14 @@ if ( defined('ABSPATH') && defined('WPINC') ) {
 // Регистрируем крючок для обработки контента при его загрузке
 	add_filter( 'the_content', 'bg_forreaders_proc' );
 }
+
+// Регистрируем шорт-код noread
+	add_shortcode( 'noread', 'bg_forreaders_noread' );
+// [noread]
+function bg_forreaders_noread( $atts, $content = null ) {
+	 return do_shortcode($content);
+}
+
 
 /*****************************************************************************************
 	Генератор ответа AJAX

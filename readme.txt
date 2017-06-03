@@ -38,11 +38,19 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 **A.:** Just replace image files `document_pdf.png, document_pdf.png, document_epub.png,  document_mobi.png, document_fb2.png`, in folder `http://yoursite.com/wp-content/upload/bg_forreaders`. 
 
+**Q.:** How can I say to plugin to ignore some text on the site for readers?
+
+**A.:** Place this text into shortcode `[noread]...[/noread]`. 
+
 == Screenshots ==
 1. Plugin settings
 2. Icons form
 
 == Changelog ==
+
+= 1.2.0 =
+
+* Added shortcode [noread]...[/noread].
 
 = 1.1.14 =
 

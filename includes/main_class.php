@@ -21,6 +21,8 @@ class BgForReaders {
 		$post = get_post($id);
 		$plink = get_permalink($id);
 		$content = $post->post_content;
+		// Удаляем текст внутри шорткода [noread]...[/noread]
+		$content = preg_replace('/\[noread\].*?\[\/noread\]/is', '', $content);
 		// Выполнить все шорт-коды
 		$content = do_shortcode ( $content );
 		// Удаляем указания на текущую страницу в абсолютных ссылках с якорями (включая множественные страницы)
