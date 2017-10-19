@@ -3,7 +3,7 @@ Contributors: VBog
 Tags: e-book,convertor,html,pdf,epub,mobi,fb2,reader
 Donate link: https://bogaiskov.ru/about-me/donate/
 Requires at least: 3.0.1
-Tested up to: 4.7.1
+Tested up to: 4.8.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -36,7 +36,7 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 **Q.:** How can I change icons of download form  at my site?
 
-**A.:** Just replace image files `document_pdf.png, document_pdf.png, document_epub.png,  document_mobi.png, document_fb2.png`, in folder `http://yoursite.com/wp-content/upload/bg_forreaders`. 
+**A.:** Just replace image files `document_pdf.png, document_epub.png,  document_mobi.png, document_fb2.png`, in folder `http://yoursite.com/wp-content/upload/bg_forreaders`. 
 
 **Q.:** How can I say to plugin to ignore some text on the site for readers?
 
@@ -47,6 +47,12 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 2. Icons form
 
 == Changelog ==
+
+= 1.2.1 =
+
+* Allowed tag <a> in headers (<h1>-<h6>).
+* Fixed some bugs in fb2.
+* Added option `Allow paragraphs in table cells of fb2`.
 
 = 1.2.0 =
 

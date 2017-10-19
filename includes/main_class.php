@@ -370,7 +370,8 @@ class BgForReaders {
 			"version"=> '1.0',
 			"cover"=> $options["thumb"],
 			"publisher"=>get_bloginfo( 'name' )." ".get_bloginfo( 'url' ),
-			"css"=> get_option('bg_forreaders_css') 
+			"css"=> get_option('bg_forreaders_css'),
+			"allow_p"=> get_option('bg_forreaders_allow_p')
 		);
 
 		$fb2 = new bgFB2();

@@ -47,10 +47,10 @@ class BgClearHTML {
 			if (!array_key_exists ( "td" , $allow_attributes )) $allow_attributes['td'] = "";
 		}
 		
-		// Удаляем теги внутри всех заголовков
+		// Удаляем теги внутри всех заголовков, кроме ссылок
 		$content = preg_replace_callback ('/<(h[1-6])(.*?)>(.*?)<\/\1>/is',
 			function ($match) {
-				return '<'.$match[1].$match[2].'>'.strip_tags($match[3]).'</'.$match[1].'>';
+				return '<'.$match[1].$match[2].'>'.strip_tags($match[3], '<a>').'</'.$match[1].'>';
 			} ,$content);
 		
 		// Удаляем все теги кроме разрешенных

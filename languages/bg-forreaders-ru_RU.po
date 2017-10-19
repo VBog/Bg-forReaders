@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Bg forReaders\n"
-"POT-Creation-Date: 2017-01-18 00:07+0300\n"
-"PO-Revision-Date: 2017-01-18 00:15+0300\n"
+"POT-Creation-Date: 2017-10-19 22:20+0300\n"
+"PO-Revision-Date: 2017-10-19 22:23+0300\n"
 "Last-Translator: Vadim Bogaiskov <vadim.bogaiskov@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.0.4\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: bg-forreaders.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -29,88 +29,88 @@ msgstr ""
 "Чтобы нормально функционировать Bg forReaders требуется PHP 5.3. Пожалуйста, "
 "обновите PHP. Плагин был автоматически деактивирован."
 
-#: bg-forreaders.php:265
+#: bg-forreaders.php:273
 #, php-format
 msgid "Download &#171;%s&#187; as %s"
 msgstr "Скачать &#171;%s&#187; в формате %s"
 
-#: bg-forreaders.php:273
+#: bg-forreaders.php:281
 #, php-format
 msgid "Download as %s"
 msgstr "Скачать в формате %s"
 
-#: bg-forreaders.php:325
+#: bg-forreaders.php:333
 msgid "Files will generated immediately (if it allowed while saving)."
 msgstr ""
 "Файлы будут созданы немедленно (если это разрешено во время сохранения)."
 
-#: bg-forreaders.php:331
+#: bg-forreaders.php:339
 msgid "Files will generated in offline query (if it allowed)."
 msgstr "Файлы будут созданные при автономном запросе (если это разрешено)."
 
-#: bg-forreaders.php:333
+#: bg-forreaders.php:341
 msgid "Files will generated while current post is displayed (if it allowed)."
 msgstr ""
 "Файлы будут созданы, в процессе отображения текущего сообщения на экране "
 "(если это разрешено)."
 
-#: bg-forreaders.php:334
+#: bg-forreaders.php:342
 msgid "Selected no mode for file generation."
 msgstr "Не выбран режим не для создания файлов."
 
-#: bg-forreaders.php:346 includes/settings.php:15
+#: bg-forreaders.php:354 includes/settings.php:15
 msgid "Plugin's &#171;For Readers&#187; settings"
 msgstr "Настройки плагина &#171;Для чтения&#187;"
 
-#: bg-forreaders.php:346 bg-forreaders.php:362
+#: bg-forreaders.php:354 bg-forreaders.php:370
 msgid "For Readers"
 msgstr "Файлы для чтения"
 
-#: bg-forreaders.php:374
+#: bg-forreaders.php:382
 msgid "create files for readers"
 msgstr "создание файлов для чтения"
 
-#: bg-forreaders.php:382
+#: bg-forreaders.php:390
 msgid "Create files"
 msgstr "Создать файлы"
 
-#: bg-forreaders.php:411
+#: bg-forreaders.php:419
 msgid "Never"
 msgstr "Никогда"
 
-#: bg-forreaders.php:415
+#: bg-forreaders.php:423
 msgid "Once"
 msgstr "Однажды"
 
-#: bg-forreaders.php:419
+#: bg-forreaders.php:427
 msgid "Minutely"
 msgstr "Ежеминутно"
 
-#: bg-forreaders.php:423
+#: bg-forreaders.php:431
 msgid "Every 5 minutes"
 msgstr "Каждые 5 минут"
 
-#: bg-forreaders.php:427
+#: bg-forreaders.php:435
 msgid "Every 15 minutes"
 msgstr "Каждые 15 минут"
 
-#: bg-forreaders.php:431
+#: bg-forreaders.php:439
 msgid "Twice Hourly"
 msgstr "Дважды в час"
 
-#: bg-forreaders.php:435
+#: bg-forreaders.php:443
 msgid "Every 3 hours"
 msgstr "Каждые 3 часа"
 
-#: bg-forreaders.php:439
+#: bg-forreaders.php:447
 msgid "Every 6 hours"
 msgstr "Каждые 6 часов"
 
-#: bg-forreaders.php:443
+#: bg-forreaders.php:451
 msgid "Weekly"
 msgstr "Еженедельно"
 
-#: includes/main_class.php:147
+#: includes/main_class.php:153
 msgid "Unknown subject"
 msgstr "Неизвестная тема"
 
@@ -142,7 +142,7 @@ msgstr "HTML"
 msgid "WP Cron"
 msgstr "WP Cron"
 
-#: includes/settings.php:27 includes/settings.php:439
+#: includes/settings.php:27 includes/settings.php:446
 msgid "Batch mode"
 msgstr "Пакетный режим"
 
@@ -252,7 +252,7 @@ msgstr[2] "(сейчас в стеке %s элементов)"
 
 #: includes/settings.php:134 includes/settings.php:173
 #: includes/settings.php:280 includes/settings.php:307
-#: includes/settings.php:337 includes/settings.php:431
+#: includes/settings.php:344 includes/settings.php:438
 msgid "Save Changes"
 msgstr "Сохранить изменения"
 
@@ -264,7 +264,7 @@ msgstr "Версия PHP "
 msgid "Bit OS"
 msgstr "Bit OS"
 
-#: includes/settings.php:150 includes/settings.php:479
+#: includes/settings.php:150 includes/settings.php:486
 msgid "Memory limit"
 msgstr "Лимит памяти"
 
@@ -272,8 +272,8 @@ msgstr "Лимит памяти"
 msgid "Set memory limit:"
 msgstr "Установить лимит памяти:"
 
-#: includes/settings.php:154 includes/settings.php:474
-#: includes/settings.php:475
+#: includes/settings.php:154 includes/settings.php:481
+#: includes/settings.php:482
 msgid "MB"
 msgstr "МБ"
 
@@ -285,7 +285,7 @@ msgstr "Лимит времени"
 msgid "Set time limit:"
 msgstr "Установить лимит времени:"
 
-#: includes/settings.php:163 includes/settings.php:487
+#: includes/settings.php:163 includes/settings.php:494
 msgid "sec."
 msgstr "сек."
 
@@ -440,47 +440,60 @@ msgstr ""
 "(Если не разрешено, то атрибут href= \"...\" с внешней ссылкой будет удален "
 "из тега &lt;a&gt;)."
 
-#: includes/settings.php:351
+#: includes/settings.php:332
+msgid "Allow paragraphs in table cells of fb2"
+msgstr "Разрешить абзацы  в ячейках таблицы fb2"
+
+#: includes/settings.php:334
+msgid ""
+"(Standard fb2 does not allow the paragraphs in the cells of the tables, but "
+"most readers understand the &lt;p&gt; and &lt;cite&gt; tags inside &lt;"
+"td&gt;)."
+msgstr ""
+"(Стандарт fb2 не разрешает абзацы в ячейках таблицы, но большинство ридеров "
+"понимают теги &lt;p&gt; и &lt;cite&gt; внутри &lt;td&gt;)."
+
+#: includes/settings.php:358
 msgid "Now:"
 msgstr "Сейчас:"
 
-#: includes/settings.php:352 includes/settings.php:370
-#: includes/settings.php:388 includes/settings.php:391
-#: includes/settings.php:409 includes/settings.php:412
+#: includes/settings.php:359 includes/settings.php:377
+#: includes/settings.php:395 includes/settings.php:398
+#: includes/settings.php:416 includes/settings.php:419
 msgid "GMT"
 msgstr "(время по Гринвичу)"
 
-#: includes/settings.php:356
+#: includes/settings.php:363
 msgid "Generate files for posts from stack"
 msgstr "Создание файлов для постов из стека"
 
-#: includes/settings.php:368 includes/settings.php:389
-#: includes/settings.php:410
+#: includes/settings.php:375 includes/settings.php:396
+#: includes/settings.php:417
 msgid "Next time:"
 msgstr "Cледующий раз:"
 
-#: includes/settings.php:370 includes/settings.php:391
-#: includes/settings.php:412
+#: includes/settings.php:377 includes/settings.php:398
+#: includes/settings.php:419
 msgid "never"
 msgstr "никогда"
 
-#: includes/settings.php:375
+#: includes/settings.php:382
 msgid "Generate files for all allowed posts"
 msgstr "Создание файлов для всех разрешенных сообщений"
 
-#: includes/settings.php:387 includes/settings.php:408
+#: includes/settings.php:394 includes/settings.php:415
 msgid "after"
 msgstr "после"
 
-#: includes/settings.php:396
+#: includes/settings.php:403
 msgid "Update Log file"
 msgstr "Обновление файла журнала"
 
-#: includes/settings.php:417 includes/settings.php:455
+#: includes/settings.php:424 includes/settings.php:462
 msgid "Log file"
 msgstr "Файл журнала"
 
-#: includes/settings.php:441
+#: includes/settings.php:448
 #, php-format
 msgid ""
 "You can use script %s<br>to generate files for readers in batch mode (using "
@@ -490,15 +503,15 @@ msgstr ""
 "пакетном режиме ( с помощью <b>интерфейса командной строки</b> или <b>cron</"
 "b>)."
 
-#: includes/settings.php:442
+#: includes/settings.php:449
 msgid "<h3>Options:</h3>"
 msgstr "<h3>Параметры:</h3>"
 
-#: includes/settings.php:443
+#: includes/settings.php:450
 msgid "<u>First parameter</u>"
 msgstr "<u>Первый параметр</u>"
 
-#: includes/settings.php:444
+#: includes/settings.php:451
 msgid ""
 "<b>id = [post id list separated by commas]</b> - process all the posts in "
 "the list;"
@@ -506,11 +519,11 @@ msgstr ""
 "<b>id = [список id постов через запятую] </b> - обработать все сообщения из "
 "списка;"
 
-#: includes/settings.php:445 includes/settings.php:447
+#: includes/settings.php:452 includes/settings.php:454
 msgid "<i>or</i>"
 msgstr "<i>или</i>"
 
-#: includes/settings.php:446
+#: includes/settings.php:453
 msgid ""
 "<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) "
 "on the site ignoring exceptions,<br>see General tab."
@@ -518,27 +531,27 @@ msgstr ""
 "<b>all = [с], [по]</b> - обработка все посты этого диапазона ([с] - [по]) на "
 "сайте, игнорируя исключения,<br> см. вкладку Общие."
 
-#: includes/settings.php:448
+#: includes/settings.php:455
 msgid "<b>stack</b> - process first element (post-id) from stack."
 msgstr "<b>stack</b> - обработать первый элемент (post-id) из стека."
 
-#: includes/settings.php:449
+#: includes/settings.php:456
 msgid "<u>Second parameter</u>"
 msgstr "<u>Второй параметр</u>"
 
-#: includes/settings.php:450
+#: includes/settings.php:457
 msgid "<b>echo</b> - output progress info to the screen."
 msgstr "<b>echo</b> - вывод на экран информации о выполнении."
 
-#: includes/settings.php:474 includes/settings.php:475
+#: includes/settings.php:481 includes/settings.php:482
 msgid "N/A"
 msgstr "Недоступно"
 
-#: includes/settings.php:480
+#: includes/settings.php:487
 msgid "Memory usage"
 msgstr "Использовано памяти"
 
-#: includes/settings.php:491
+#: includes/settings.php:498
 msgid "Max. execution time"
 msgstr "Макс. время выполнения"
 

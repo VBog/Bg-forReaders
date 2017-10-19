@@ -328,10 +328,17 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 
+				<tr valign="top">
+				<th scope="row"><?php _e('Allow paragraphs in table cells of fb2', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_allow_p" <?php if(get_option('bg_forreaders_allow_p')) echo "checked" ?> value="on" />	<i><?php _e('(Standard fb2 does not allow the paragraphs in the cells of the tables, but most readers understand the &lt;p&gt; and &lt;cite&gt; tags inside &lt;td&gt;).', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+
 				</table>
 
 				<input type="hidden" name="action" value="update" />
-				<input type="hidden" name="page_options" value="bg_forreaders_tags, bg_forreaders_extlinks" />
+				<input type="hidden" name="page_options" value="bg_forreaders_tags, bg_forreaders_extlinks, bg_forreaders_allow_p" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />

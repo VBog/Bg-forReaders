@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Bg forReaders\n"
-"POT-Creation-Date: 2017-01-18 00:07+0300\n"
+"POT-Creation-Date: 2017-10-19 22:20+0300\n"
 "PO-Revision-Date: 2016-04-25 09:48+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 2.0.4\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: bg-forreaders.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -26,85 +26,85 @@ msgid ""
 "Plugin has been auto-deactivated."
 msgstr ""
 
-#: bg-forreaders.php:265
+#: bg-forreaders.php:273
 #, php-format
 msgid "Download &#171;%s&#187; as %s"
 msgstr ""
 
-#: bg-forreaders.php:273
+#: bg-forreaders.php:281
 #, php-format
 msgid "Download as %s"
 msgstr ""
 
-#: bg-forreaders.php:325
+#: bg-forreaders.php:333
 msgid "Files will generated immediately (if it allowed while saving)."
 msgstr ""
 
-#: bg-forreaders.php:331
+#: bg-forreaders.php:339
 msgid "Files will generated in offline query (if it allowed)."
 msgstr ""
 
-#: bg-forreaders.php:333
+#: bg-forreaders.php:341
 msgid "Files will generated while current post is displayed (if it allowed)."
 msgstr ""
 
-#: bg-forreaders.php:334
+#: bg-forreaders.php:342
 msgid "Selected no mode for file generation."
 msgstr ""
 
-#: bg-forreaders.php:346 includes/settings.php:15
+#: bg-forreaders.php:354 includes/settings.php:15
 msgid "Plugin's &#171;For Readers&#187; settings"
 msgstr ""
 
-#: bg-forreaders.php:346 bg-forreaders.php:362
+#: bg-forreaders.php:354 bg-forreaders.php:370
 msgid "For Readers"
 msgstr ""
 
-#: bg-forreaders.php:374
+#: bg-forreaders.php:382
 msgid "create files for readers"
 msgstr ""
 
-#: bg-forreaders.php:382
+#: bg-forreaders.php:390
 msgid "Create files"
 msgstr ""
 
-#: bg-forreaders.php:411
+#: bg-forreaders.php:419
 msgid "Never"
 msgstr ""
 
-#: bg-forreaders.php:415
+#: bg-forreaders.php:423
 msgid "Once"
 msgstr ""
 
-#: bg-forreaders.php:419
+#: bg-forreaders.php:427
 msgid "Minutely"
 msgstr ""
 
-#: bg-forreaders.php:423
+#: bg-forreaders.php:431
 msgid "Every 5 minutes"
 msgstr ""
 
-#: bg-forreaders.php:427
+#: bg-forreaders.php:435
 msgid "Every 15 minutes"
 msgstr ""
 
-#: bg-forreaders.php:431
+#: bg-forreaders.php:439
 msgid "Twice Hourly"
 msgstr ""
 
-#: bg-forreaders.php:435
+#: bg-forreaders.php:443
 msgid "Every 3 hours"
 msgstr ""
 
-#: bg-forreaders.php:439
+#: bg-forreaders.php:447
 msgid "Every 6 hours"
 msgstr ""
 
-#: bg-forreaders.php:443
+#: bg-forreaders.php:451
 msgid "Weekly"
 msgstr ""
 
-#: includes/main_class.php:147
+#: includes/main_class.php:153
 msgid "Unknown subject"
 msgstr ""
 
@@ -136,7 +136,7 @@ msgstr ""
 msgid "WP Cron"
 msgstr ""
 
-#: includes/settings.php:27 includes/settings.php:439
+#: includes/settings.php:27 includes/settings.php:446
 msgid "Batch mode"
 msgstr ""
 
@@ -243,7 +243,7 @@ msgstr[1] ""
 
 #: includes/settings.php:134 includes/settings.php:173
 #: includes/settings.php:280 includes/settings.php:307
-#: includes/settings.php:337 includes/settings.php:431
+#: includes/settings.php:344 includes/settings.php:438
 msgid "Save Changes"
 msgstr ""
 
@@ -255,7 +255,7 @@ msgstr ""
 msgid "Bit OS"
 msgstr ""
 
-#: includes/settings.php:150 includes/settings.php:479
+#: includes/settings.php:150 includes/settings.php:486
 msgid "Memory limit"
 msgstr ""
 
@@ -263,8 +263,8 @@ msgstr ""
 msgid "Set memory limit:"
 msgstr ""
 
-#: includes/settings.php:154 includes/settings.php:474
-#: includes/settings.php:475
+#: includes/settings.php:154 includes/settings.php:481
+#: includes/settings.php:482
 msgid "MB"
 msgstr ""
 
@@ -276,7 +276,7 @@ msgstr ""
 msgid "Set time limit:"
 msgstr ""
 
-#: includes/settings.php:163 includes/settings.php:487
+#: includes/settings.php:163 includes/settings.php:494
 msgid "sec."
 msgstr ""
 
@@ -425,98 +425,109 @@ msgid ""
 "from tag &lt;a&gt;)."
 msgstr ""
 
-#: includes/settings.php:351
+#: includes/settings.php:332
+msgid "Allow paragraphs in table cells of fb2"
+msgstr ""
+
+#: includes/settings.php:334
+msgid ""
+"(Standard fb2 does not allow the paragraphs in the cells of the tables, but "
+"most readers understand the &lt;p&gt; and &lt;cite&gt; tags inside &lt;"
+"td&gt;)."
+msgstr ""
+
+#: includes/settings.php:358
 msgid "Now:"
 msgstr ""
 
-#: includes/settings.php:352 includes/settings.php:370
-#: includes/settings.php:388 includes/settings.php:391
-#: includes/settings.php:409 includes/settings.php:412
+#: includes/settings.php:359 includes/settings.php:377
+#: includes/settings.php:395 includes/settings.php:398
+#: includes/settings.php:416 includes/settings.php:419
 msgid "GMT"
 msgstr ""
 
-#: includes/settings.php:356
+#: includes/settings.php:363
 msgid "Generate files for posts from stack"
 msgstr ""
 
-#: includes/settings.php:368 includes/settings.php:389
-#: includes/settings.php:410
+#: includes/settings.php:375 includes/settings.php:396
+#: includes/settings.php:417
 msgid "Next time:"
 msgstr ""
 
-#: includes/settings.php:370 includes/settings.php:391
-#: includes/settings.php:412
+#: includes/settings.php:377 includes/settings.php:398
+#: includes/settings.php:419
 msgid "never"
 msgstr ""
 
-#: includes/settings.php:375
+#: includes/settings.php:382
 msgid "Generate files for all allowed posts"
 msgstr ""
 
-#: includes/settings.php:387 includes/settings.php:408
+#: includes/settings.php:394 includes/settings.php:415
 msgid "after"
 msgstr ""
 
-#: includes/settings.php:396
+#: includes/settings.php:403
 msgid "Update Log file"
 msgstr ""
 
-#: includes/settings.php:417 includes/settings.php:455
+#: includes/settings.php:424 includes/settings.php:462
 msgid "Log file"
 msgstr ""
 
-#: includes/settings.php:441
+#: includes/settings.php:448
 #, php-format
 msgid ""
 "You can use script %s<br>to generate files for readers in batch mode (using "
 "<b>cli</b> or <b>cron</b>)."
 msgstr ""
 
-#: includes/settings.php:442
+#: includes/settings.php:449
 msgid "<h3>Options:</h3>"
 msgstr ""
 
-#: includes/settings.php:443
+#: includes/settings.php:450
 msgid "<u>First parameter</u>"
 msgstr ""
 
-#: includes/settings.php:444
+#: includes/settings.php:451
 msgid ""
 "<b>id = [post id list separated by commas]</b> - process all the posts in "
 "the list;"
 msgstr ""
 
-#: includes/settings.php:445 includes/settings.php:447
+#: includes/settings.php:452 includes/settings.php:454
 msgid "<i>or</i>"
 msgstr ""
 
-#: includes/settings.php:446
+#: includes/settings.php:453
 msgid ""
 "<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) "
 "on the site ignoring exceptions,<br>see General tab."
 msgstr ""
 
-#: includes/settings.php:448
+#: includes/settings.php:455
 msgid "<b>stack</b> - process first element (post-id) from stack."
 msgstr ""
 
-#: includes/settings.php:449
+#: includes/settings.php:456
 msgid "<u>Second parameter</u>"
 msgstr ""
 
-#: includes/settings.php:450
+#: includes/settings.php:457
 msgid "<b>echo</b> - output progress info to the screen."
 msgstr ""
 
-#: includes/settings.php:474 includes/settings.php:475
+#: includes/settings.php:481 includes/settings.php:482
 msgid "N/A"
 msgstr ""
 
-#: includes/settings.php:480
+#: includes/settings.php:487
 msgid "Memory usage"
 msgstr ""
 
-#: includes/settings.php:491
+#: includes/settings.php:498
 msgid "Max. execution time"
 msgstr ""
 
