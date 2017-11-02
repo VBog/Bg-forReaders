@@ -138,7 +138,7 @@ class BgForReaders {
 				$image_path = BG_FORREADERS_TMP_COVER;
 			}
 		} else $image_path = "";
-		$filename = BG_FORREADERS_STORAGE_URI."/".$post->post_name."_".$post->ID;
+		$filename = BG_FORREADERS_STORAGE_URI."/".translit($post->post_name)."_".$post->ID;
 		$options = array(
 			"title"=> strip_tags($post->post_title),
 			"author"=> $author,

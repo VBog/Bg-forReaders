@@ -3,7 +3,7 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.2.1
+Version: 1.2.2
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.2.1' );
+define( 'BG_FORREADERS_VERSION', '1.2.2' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -192,7 +192,8 @@ function bg_forreaders_callback() {
 	if( !wp_verify_nonce( $nonce, 'bg-forreaders-nonce' ) )	wp_die();
 	
 	if (isset($_POST['id']) && $_POST['id']) {
-		echo bg_forreaders_generate_files($_POST['id']);
+		$id = (int)$_POST['id'];
+		echo bg_forreaders_generate_files($id);
 	}
 
 	wp_die();
@@ -265,8 +266,8 @@ function bg_forreaders ($post) {
 	$forreaders = "";
 	foreach ($formats as $type => $document_type) {
 		// Сначала проверяем наличие защищенного файла
-		$filename = $post->post_name."_".$post->ID."p.".$type;
-		if (!file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) $filename = $post->post_name."_".$post->ID.".".$type;
+		$filename = translit($post->post_name)."_".$post->ID."p.".$type;
+		if (!file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) $filename = translit($post->post_name)."_".$post->ID.".".$type;
 		// Если такового нет, проверяем наличие обычного файла
 		if (file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) {
 			if (get_option('bg_forreaders_'.$type) == 'on') {
@@ -404,7 +405,8 @@ function bg_forreaders_extra_fields_update( $post_id ){
 	if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;
 	// проверяем, права пользователя, может ли он редактировать записи
 	if ( !current_user_can( 'edit_post', $post_id ) ) return $post_id;
-	update_post_meta($post_id, 'for_readers', $_POST['bg_forreaders_for_readers']);
+	$for_readers = isset ($_POST['bg_forreaders_for_readers'])? sanitize_key($_POST['bg_forreaders_for_readers']):"";
+	update_post_meta($post_id, 'for_readers', $for_readers);
 }
 
 /*****************************************************************************************
@@ -605,6 +607,21 @@ function bg_forreaders_check_exceptions ($post) {
 		if (!$for_readers) return 3;
 	}
 	return false;
+}
+// Транслитерация
+function translit($s) {
+  $s = (string) urldecode($s); // преобразуем в строковое значение
+  $s = strip_tags($s); // убираем HTML-теги
+  $s = str_replace(array("\n", "\r"), " ", $s); // убираем перевод каретки
+  $s = preg_replace("/\s+/", ' ', $s); // удаляем повторяющие пробелы
+  $s = trim($s); // убираем пробелы в начале и конце строки
+  $s = strtr($s, array(
+  'А'=>'a','Б'=>'b','В'=>'v','Г'=>'g','Ѓ'=>'g','Ґ'=>'g','Д'=>'d','Ђ'=>'dz','Е'=>'e','Ё'=>'yo','Є'=>'ye','Ж'=>'zh','З'=>'z','Ѕ'=>'z','И'=>'i','I'=>'i','Ї'=>'i','Й'=>'j','Ј'=>'j','К'=>'k','Ќ'=>'k','Л'=>'l','Љ'=>'l','М'=>'m','Н'=>'n','Њ'=>'n','О'=>'o','П'=>'p','Р'=>'r','С'=>'s','Т'=>'t','Ћ'=>'tc','У'=>'u','Ў'=>'u','Ф'=>'f','Х'=>'h','Ц'=>'c','Ч'=>'ch','Џ'=>'dh','Ш'=>'sh','Щ'=>'shh','Ы'=>'y','Э'=>'e','Ю'=>'yu','Я'=>'ya','Ъ'=>'','Ь'=>'','Ѣ'=>'ye','Ѳ'=>'fh','Ѵ'=>'yh','Ѫ'=>'o',
+  'а'=>'a','б'=>'b','в'=>'v','г'=>'g','ѓ'=>'g','ґ'=>'g','д'=>'d','ђ'=>'dz','е'=>'e','ё'=>'yo','є'=>'ye','ж'=>'zh','з'=>'z','ѕ'=>'z','и'=>'i','i'=>'i','ї'=>'i','й'=>'j','ј'=>'j','к'=>'k','ќ'=>'k','л'=>'l','љ'=>'l','м'=>'m','н'=>'n','њ'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','ћ'=>'tc','у'=>'u','ў'=>'u','ф'=>'f','х'=>'h','ц'=>'c','ч'=>'ch','џ'=>'dh','ш'=>'sh','щ'=>'shh','ы'=>'y','э'=>'e','ю'=>'yu','я'=>'ya','ъ'=>'','ь'=>'','ѣ'=>'ye','ѳ'=>'fh','ѵ'=>'yh','ѫ'=>'o'));
+  $s = function_exists('mb_strtolower') ? mb_strtolower($s) : strtolower($s); // переводим строку в нижний регистр (иногда надо задать локаль)
+  $s = preg_replace("/[^0-9a-z-_ ]/i", "", $s); // очищаем строку от недопустимых символов
+  $s = str_replace(" ", "-", $s); // заменяем пробелы знаком минус
+  return $s; // возвращаем результат
 }
 
 // Функция обновляет файл журнала

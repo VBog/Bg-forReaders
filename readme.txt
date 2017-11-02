@@ -2,8 +2,9 @@
 Contributors: VBog
 Tags: e-book,convertor,html,pdf,epub,mobi,fb2,reader
 Donate link: https://bogaiskov.ru/about-me/donate/
+Requires PHP: 5.3
 Requires at least: 3.0.1
-Tested up to: 4.8.2
+Tested up to: 4.8.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -48,9 +49,14 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.2.2 =
+
+* Added transliteration of file names for Slavic languages (Belorussian, Bulgarian, Serbian, Macedonian, Russian, Ukrainian).
+
+
 = 1.2.1 =
 
-* Allowed tag <a> in headers (<h1>-<h6>).
+* Allowed tag `<a>` in headers (`<h1>-<h6>`).
 * Fixed some bugs in fb2.
 * Added option `Allow paragraphs in table cells of fb2`.
 
