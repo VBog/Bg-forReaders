@@ -49,6 +49,14 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 1.2.4 =
+
+* Fixed bug from version 1.2.3.
+
+= 1.2.3 =
+
+* Fixed issue with `<br>` tag inside text formatting tags in fb2.
+
 = 1.2.2 =
 
 * Added transliteration of file names for Slavic languages (Belorussian, Bulgarian, Serbian, Macedonian, Russian, Ukrainian).
@@ -66,7 +74,7 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 = 1.1.14 =
 
-* Disable any tags in headers (<h1>-<h6>).
+* Disable any tags in headers (`<h1>-<h6>`).
 
 = 1.1.13 =
 
