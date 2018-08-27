@@ -3,14 +3,14 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 1.2.4
+Version: 2.1.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
 Text Domain: bg-forreaders
 Domain Path: /languages
 */
-/*  Copyright 2016  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
+/*  Copyright 2016-2018  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '1.2.4' );
+define( 'BG_FORREADERS_VERSION', '2.1.0' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -58,6 +58,10 @@ define( 'BG_FORREADERS_STORAGE_URL', $upload_dir['baseurl'] ."/". BG_FORREADERS_
 define( 'BG_FORREADERS_STORAGE_URI', $upload_dir['basedir'] ."/". BG_FORREADERS_STORAGE );
 define( 'BG_FORREADERS_STORAGE_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_STORAGE_URI  ) );
 define( 'BG_FORREADERS_TMP_COVER', BG_FORREADERS_STORAGE_URI."/".'tmp_cover.png' );
+
+$bg_forreaders_site_url = get_site_url();
+define ('OPDS_FEED', $bg_forreaders_site_url."/feed/opds/");
+define ('OPDS_NAME', preg_replace ('/[\.\/]/', '_', substr ($bg_forreaders_site_url, strpos($bg_forreaders_site_url, ':')+3)));
 
 // Для всех форматов
 define( 'BG_FORREADERS_CSS', "");
@@ -78,6 +82,26 @@ $formats = array(
 	'mobi' => 'mobi',
 	'fb2' => 'fb2'
 );
+$bg_forreaders_mimes = array(
+	'epub'=>'application/epub+zip',
+	'fb2'=>'application/x-fictionbook',
+	'pdf'=>'application/pdf',
+	'mobi'=>'application/x-mobipocket-ebook',
+	
+	'zip'=>'application/zip',
+	'rtf'=>'application/rtf',
+	'doc'=>'application/msword',
+	'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+	'htm'=>'text/html',
+	'html'=>'text/html',
+	'txt'=>'text/plain',
+	'djvu'=>'image/x-djvu',
+
+	'mp3'=>'audio/mpeg',
+	'm4a'=>'audio/m4a',
+	'm4b'=>'audio/m4b'
+);
+
 // Функция, исполняемая при активации плагина
 function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
@@ -165,6 +189,7 @@ register_uninstall_hook(__FILE__, 'bg_forreaders_uninstall');
 // Подключаем дополнительные модули
 include_once('includes/main_class.php' );
 include_once('includes/settings.php' );
+if (get_option('bg_forreaders_generate_opds')) include_once('includes/rss-opds.php' );
 
 if ( defined('ABSPATH') && defined('WPINC') ) {
 // Регистрируем крючок для обработки контента при его загрузке
@@ -632,6 +657,24 @@ function bg_forreaders_update_debug_file() {
 	}
 }
 
+// Фильтр изменяет имя папки для сохранения для некоторых типов файлов
+if (get_option('bg_forreaders_book_folder')) 
+	add_filter('upload_dir', 'bg_forreaders_upload_dir');
+function bg_forreaders_upload_dir( $param ){
+	global $bg_forreaders_mimes;
+	if (empty($_POST['name'])) return $param;
+	
+    $extension = substr(strrchr($_POST['name'],'.'),1);
+	foreach ($bg_forreaders_mimes as $ext => $mime) {
+		if ($extension == $ext) {
+			$param['path'] = BG_FORREADERS_STORAGE_URI;
+			$param['url'] = BG_FORREADERS_STORAGE_URL;
+			break;
+		}
+	}
+
+    return $param;
+}
 /*****************************************************************************************
 	Параметры плагина
 	
@@ -674,6 +717,8 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_while_displayed', '');
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_offline_query', '');
+	add_option('bg_forreaders_generate_opds', '');
+	
 	add_option('bg_forreaders_memory_limit', '1024');
 	add_option('bg_forreaders_time_limit', '900');
 
@@ -728,6 +773,8 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_while_displayed');
 	delete_option('bg_forreaders_while_saved');
 	delete_option('bg_forreaders_offline_query');
+	delete_option('bg_forreaders_generate_opds');
+	
 	delete_option('bg_forreaders_memory_limit');
 	delete_option('bg_forreaders_time_limit');
 

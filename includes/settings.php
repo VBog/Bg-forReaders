@@ -5,6 +5,7 @@
 *******************************************************************************************/
 function bg_forreaders_options_page() {
 	global $formats;
+	global $bg_forreaders_mimes;
 	
 	bg_forreaders_add_options ();
 
@@ -121,6 +122,22 @@ function bg_forreaders_options_page() {
 				</td>
 				</tr>
 				
+				<tr valign="top">
+				<th scope="row"><?php _e('Generate OPDS catalogue?', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_generate_opds" <?php if(get_option('bg_forreaders_generate_opds')) echo "checked" ?> value="on" /> <code><?php echo OPDS_FEED; ?></code><br /> 
+				<i><?php _e('(for post type "post" only)', 'bg-forreaders') ?></i>
+				</td>
+				</tr>
+				
+				<tr valign="top">
+				<th scope="row"><?php _e('Upload books to bg_forreaders folder', 'bg-forreaders') ?></th>
+				<td>
+				<input type="checkbox" name="bg_forreaders_book_folder" <?php if(get_option('bg_forreaders_book_folder')) echo "checked" ?> value="on" /> <?php printf(__('Uploades book files to <code>%s</code> folder when you use Add Media button on the edit screen', 'bg-forreaders'), BG_FORREADERS_STORAGE_PATH); ?><br />
+				<i><?php printf(__('(for file type <code>%s</code>)', 'bg-forreaders'), implode (',', array_keys($bg_forreaders_mimes))) ?></i>
+				</td>
+				</tr>
+				
 				</table>
 
 				<input type="hidden" name="action" value="update" />
@@ -128,7 +145,8 @@ function bg_forreaders_options_page() {
 							bg_forreaders_links, bg_forreaders_before, bg_forreaders_after, bg_forreaders_prompt, bg_forreaders_separator,
 							bg_forreaders_zoom, bg_forreaders_single, bg_forreaders_cats, bg_forreaders_excat,
 							bg_forreaders_type_page, bg_forreaders_type_post,
-							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_offline_query" />
+							bg_forreaders_while_displayed, bg_forreaders_while_saved, bg_forreaders_offline_query,
+							bg_forreaders_generate_opds, bg_forreaders_book_folder" />
 
 				<p class="submit">
 				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
