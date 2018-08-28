@@ -63,6 +63,10 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 == Changelog ==
 
+= 2.1.1 =
+
+* Fixed small bugs.
+
 = 2.1.0 =
 
 * Option to upload book files to `wp-content/uploads/bg_forreaders` folder when you use Add Media button on the edit screen

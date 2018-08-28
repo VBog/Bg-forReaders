@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Bg forReaders\n"
-"POT-Creation-Date: 2018-08-24 10:55+0300\n"
+"POT-Creation-Date: 2018-08-28 22:59+0300\n"
 "PO-Revision-Date: 2016-04-25 09:48+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -26,81 +26,81 @@ msgid ""
 "Plugin has been auto-deactivated."
 msgstr ""
 
-#: bg-forreaders.php:279
+#: bg-forreaders.php:299
 #, php-format
 msgid "Download &#171;%s&#187; as %s"
 msgstr ""
 
-#: bg-forreaders.php:287
+#: bg-forreaders.php:307
 #, php-format
 msgid "Download as %s"
 msgstr ""
 
-#: bg-forreaders.php:339
+#: bg-forreaders.php:359
 msgid "Files will generated immediately (if it allowed while saving)."
 msgstr ""
 
-#: bg-forreaders.php:345
+#: bg-forreaders.php:365
 msgid "Files will generated in offline query (if it allowed)."
 msgstr ""
 
-#: bg-forreaders.php:347
+#: bg-forreaders.php:367
 msgid "Files will generated while current post is displayed (if it allowed)."
 msgstr ""
 
-#: bg-forreaders.php:348
+#: bg-forreaders.php:368
 msgid "Selected no mode for file generation."
 msgstr ""
 
-#: bg-forreaders.php:360 includes/settings.php:15
+#: bg-forreaders.php:380 includes/settings.php:16
 msgid "Plugin's &#171;For Readers&#187; settings"
 msgstr ""
 
-#: bg-forreaders.php:360 bg-forreaders.php:376
+#: bg-forreaders.php:380 bg-forreaders.php:396
 msgid "For Readers"
 msgstr ""
 
-#: bg-forreaders.php:388
+#: bg-forreaders.php:408
 msgid "create files for readers"
 msgstr ""
 
-#: bg-forreaders.php:396
+#: bg-forreaders.php:416
 msgid "Create files"
 msgstr ""
 
-#: bg-forreaders.php:426
+#: bg-forreaders.php:446
 msgid "Never"
 msgstr ""
 
-#: bg-forreaders.php:430
+#: bg-forreaders.php:450
 msgid "Once"
 msgstr ""
 
-#: bg-forreaders.php:434
+#: bg-forreaders.php:454
 msgid "Minutely"
 msgstr ""
 
-#: bg-forreaders.php:438
+#: bg-forreaders.php:458
 msgid "Every 5 minutes"
 msgstr ""
 
-#: bg-forreaders.php:442
+#: bg-forreaders.php:462
 msgid "Every 15 minutes"
 msgstr ""
 
-#: bg-forreaders.php:446
+#: bg-forreaders.php:466
 msgid "Twice Hourly"
 msgstr ""
 
-#: bg-forreaders.php:450
+#: bg-forreaders.php:470
 msgid "Every 3 hours"
 msgstr ""
 
-#: bg-forreaders.php:454
+#: bg-forreaders.php:474
 msgid "Every 6 hours"
 msgstr ""
 
-#: bg-forreaders.php:458
+#: bg-forreaders.php:478
 msgid "Weekly"
 msgstr ""
 
@@ -128,438 +128,454 @@ msgstr ""
 msgid "updated"
 msgstr ""
 
-#: includes/rss-opds.php:176
+#: includes/rss-opds.php:177
 msgid "Book on the site"
 msgstr ""
 
-#: includes/settings.php:17
+#: includes/settings.php:18
 msgid "Version"
 msgstr ""
 
-#: includes/settings.php:20
+#: includes/settings.php:21
 msgid "General"
 msgstr ""
 
-#: includes/settings.php:21
+#: includes/settings.php:22
 msgid "System settings"
 msgstr ""
 
-#: includes/settings.php:22
+#: includes/settings.php:23
 msgid "Options"
 msgstr ""
 
-#: includes/settings.php:23
+#: includes/settings.php:24
 msgid "CSS"
 msgstr ""
 
-#: includes/settings.php:24
+#: includes/settings.php:25
 msgid "HTML"
 msgstr ""
 
-#: includes/settings.php:25
+#: includes/settings.php:26
 msgid "WP Cron"
 msgstr ""
 
-#: includes/settings.php:27 includes/settings.php:455
+#: includes/settings.php:28 includes/settings.php:464
 msgid "Batch mode"
 msgstr ""
 
-#: includes/settings.php:40
+#: includes/settings.php:41
 msgid "File types"
 msgstr ""
 
-#: includes/settings.php:49
+#: includes/settings.php:50
 msgid "Type of download links"
 msgstr ""
 
-#: includes/settings.php:51
+#: includes/settings.php:52
 msgid "using php-script"
 msgstr ""
 
-#: includes/settings.php:52
+#: includes/settings.php:53
 msgid "using html5 atribute \"download\""
 msgstr ""
 
-#: includes/settings.php:53
+#: includes/settings.php:54
 msgid "simple html link"
 msgstr ""
 
-#: includes/settings.php:58
+#: includes/settings.php:59
 msgid "Location of download links"
 msgstr ""
 
-#: includes/settings.php:60
+#: includes/settings.php:61
 msgid "before the text"
 msgstr ""
 
-#: includes/settings.php:61
+#: includes/settings.php:62
 msgid "after the text"
 msgstr ""
 
-#: includes/settings.php:66
+#: includes/settings.php:67
 msgid "Prompt to download"
 msgstr ""
 
-#: includes/settings.php:69 includes/settings.php:77
+#: includes/settings.php:70 includes/settings.php:78
 msgid "(you can use html-tags in the text)"
 msgstr ""
 
-#: includes/settings.php:74
+#: includes/settings.php:75
 msgid "Separator"
 msgstr ""
 
-#: includes/settings.php:82
+#: includes/settings.php:83
 msgid "Icon size"
 msgstr ""
 
-#: includes/settings.php:88
+#: includes/settings.php:89
 msgid "Show icons on the single post only"
 msgstr ""
 
-#: includes/settings.php:95
+#: includes/settings.php:96
 msgid "Create files for readers by default"
 msgstr ""
 
-#: includes/settings.php:97
+#: includes/settings.php:98
 msgid "Categories"
 msgstr ""
 
-#: includes/settings.php:98
+#: includes/settings.php:99
 msgid "allowed"
 msgstr ""
 
-#: includes/settings.php:99
+#: includes/settings.php:100
 msgid "excluded"
 msgstr ""
 
-#: includes/settings.php:101
+#: includes/settings.php:102
 msgid ""
 "(to allow/exclude prepartion of the post for readers enter the category "
 "slugs separated by commas)"
 msgstr ""
 
-#: includes/settings.php:102
+#: includes/settings.php:103
 msgid "Post type"
 msgstr ""
 
-#: includes/settings.php:109
+#: includes/settings.php:110
 msgid "When will created files for readers?"
 msgstr ""
 
-#: includes/settings.php:111
+#: includes/settings.php:112
 msgid "while current post is displayed"
 msgstr ""
 
-#: includes/settings.php:112
+#: includes/settings.php:113
 msgid "while current post is saved"
 msgstr ""
 
-#: includes/settings.php:113
+#: includes/settings.php:114
 msgid "in offline query from stack"
 msgstr ""
 
-#: includes/settings.php:118
+#: includes/settings.php:119
 #, php-format
 msgid "(%s element in stack now)"
 msgid_plural "(%s elements in stack now)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/settings.php:125
+#: includes/settings.php:126
 msgid "Generate OPDS catalogue?"
 msgstr ""
 
-#: includes/settings.php:128
+#: includes/settings.php:129
 msgid "(for post type \"post\" only)"
 msgstr ""
 
-#: includes/settings.php:143 includes/settings.php:182
-#: includes/settings.php:289 includes/settings.php:316
-#: includes/settings.php:353 includes/settings.php:447
+#: includes/settings.php:134
+msgid "Upload books to bg_forreaders folder"
+msgstr ""
+
+#: includes/settings.php:136
+#, php-format
+msgid ""
+"Uploades book files to <code>%s</code> folder when you use Add Media button "
+"on the edit screen"
+msgstr ""
+
+#: includes/settings.php:137
+#, php-format
+msgid "(for file type <code>%s</code>)"
+msgstr ""
+
+#: includes/settings.php:152 includes/settings.php:191
+#: includes/settings.php:298 includes/settings.php:325
+#: includes/settings.php:362 includes/settings.php:456
 msgid "Save Changes"
 msgstr ""
 
-#: includes/settings.php:152
+#: includes/settings.php:161
 msgid "PHP version"
 msgstr ""
 
-#: includes/settings.php:154
+#: includes/settings.php:163
 msgid "Bit OS"
 msgstr ""
 
-#: includes/settings.php:159 includes/settings.php:495
+#: includes/settings.php:168 includes/settings.php:504
 msgid "Memory limit"
 msgstr ""
 
-#: includes/settings.php:162
+#: includes/settings.php:171
 msgid "Set memory limit:"
 msgstr ""
 
-#: includes/settings.php:163 includes/settings.php:490
-#: includes/settings.php:491
+#: includes/settings.php:172 includes/settings.php:499
+#: includes/settings.php:500
 msgid "MB"
 msgstr ""
 
-#: includes/settings.php:168
+#: includes/settings.php:177
 msgid "Time limit"
 msgstr ""
 
-#: includes/settings.php:171
+#: includes/settings.php:180
 msgid "Set time limit:"
 msgstr ""
 
-#: includes/settings.php:172 includes/settings.php:503
+#: includes/settings.php:181 includes/settings.php:512
 msgid "sec."
 msgstr ""
 
-#: includes/settings.php:191
+#: includes/settings.php:200
 msgid "Custom field for author name"
 msgstr ""
 
-#: includes/settings.php:194
+#: includes/settings.php:203
 msgid "(if you specify as \"post\", author is post author)"
 msgstr ""
 
-#: includes/settings.php:199
+#: includes/settings.php:208
 msgid "Custom field for publishing year"
 msgstr ""
 
-#: includes/settings.php:202
+#: includes/settings.php:211
 msgid ""
 "(if you specify as \"post\", publishing year is publishing year of the post)"
 msgstr ""
 
-#: includes/settings.php:207
+#: includes/settings.php:216
 msgid "Genre"
 msgstr ""
 
-#: includes/settings.php:210
+#: includes/settings.php:219
 msgid ""
 "(if you specify as \"genre\", genre is content of custom fields \"genre\")"
 msgstr ""
 
-#: includes/settings.php:215
+#: includes/settings.php:224
 msgid "Book header in  the text"
 msgstr ""
 
-#: includes/settings.php:217
+#: includes/settings.php:226
 msgid "add book title"
 msgstr ""
 
-#: includes/settings.php:218
+#: includes/settings.php:227
 msgid "add book author"
 msgstr ""
 
-#: includes/settings.php:223
+#: includes/settings.php:232
 msgid "Cover content"
 msgstr ""
 
-#: includes/settings.php:225
+#: includes/settings.php:234
 msgid "title"
 msgstr ""
 
-#: includes/settings.php:227
+#: includes/settings.php:236
 msgid "author"
 msgstr ""
 
-#: includes/settings.php:228
+#: includes/settings.php:237
 msgid "site name"
 msgstr ""
 
-#: includes/settings.php:229
+#: includes/settings.php:238
 msgid "year"
 msgstr ""
 
-#: includes/settings.php:235
+#: includes/settings.php:244
 msgid "Use post thumbnail as cover"
 msgstr ""
 
-#: includes/settings.php:238
+#: includes/settings.php:247
 msgid "(If there is post thumbnail, it will be used as cover)"
 msgstr ""
 
-#: includes/settings.php:243
+#: includes/settings.php:252
 msgid "Cover image template"
 msgstr ""
 
-#: includes/settings.php:246
+#: includes/settings.php:255
 msgid "(png, gif or jpg file. Size: 840x1188px)"
 msgstr ""
 
-#: includes/settings.php:247
+#: includes/settings.php:256
 msgid "The image file must be located in a folder"
 msgstr ""
 
-#: includes/settings.php:252
+#: includes/settings.php:261
 msgid "Сolors"
 msgstr ""
 
-#: includes/settings.php:254
+#: includes/settings.php:263
 msgid "text:"
 msgstr ""
 
-#: includes/settings.php:255
+#: includes/settings.php:264
 msgid "background:"
 msgstr ""
 
-#: includes/settings.php:260
+#: includes/settings.php:269
 msgid "Offset of the text field on the cover"
 msgstr ""
 
-#: includes/settings.php:264
+#: includes/settings.php:273
 msgid "left:"
 msgstr ""
 
-#: includes/settings.php:266
+#: includes/settings.php:275
 msgid "right:"
 msgstr ""
 
-#: includes/settings.php:270
+#: includes/settings.php:279
 msgid "top:"
 msgstr ""
 
-#: includes/settings.php:272
+#: includes/settings.php:281
 msgid "bottom:"
 msgstr ""
 
-#: includes/settings.php:303
+#: includes/settings.php:312
 msgid "CSS styles table"
 msgstr ""
 
-#: includes/settings.php:306
+#: includes/settings.php:315
 msgid "Enter the css styling table for display text in readers."
 msgstr ""
 
-#: includes/settings.php:324
+#: includes/settings.php:333
 msgid "Allowed tags and attributes"
 msgstr ""
 
-#: includes/settings.php:327
+#: includes/settings.php:336
 msgid "Enter the allowed tags separated by commas."
 msgstr ""
 
-#: includes/settings.php:328
+#: includes/settings.php:337
 msgid ""
 "Near in brackets enter the allowed attributes separated by vertical bar."
 msgstr ""
 
-#: includes/settings.php:329
+#: includes/settings.php:338
 msgid "(For example, a[href|name|id],b,strong,i,em,u)"
 msgstr ""
 
-#: includes/settings.php:334
+#: includes/settings.php:343
 msgid "External links"
 msgstr ""
 
-#: includes/settings.php:336
+#: includes/settings.php:345
 msgid ""
 "(If not allowed, the attribute href=\"...\" with external link will removed "
 "from tag &lt;a&gt;)."
 msgstr ""
 
-#: includes/settings.php:341
+#: includes/settings.php:350
 msgid "Allow paragraphs in table cells of fb2"
 msgstr ""
 
-#: includes/settings.php:343
+#: includes/settings.php:352
 msgid ""
 "(Standard fb2 does not allow the paragraphs in the cells of the tables, but "
 "most readers understand the &lt;p&gt; and &lt;cite&gt; tags inside &lt;"
 "td&gt;)."
 msgstr ""
 
-#: includes/settings.php:367
+#: includes/settings.php:376
 msgid "Now:"
 msgstr ""
 
-#: includes/settings.php:368 includes/settings.php:386
-#: includes/settings.php:404 includes/settings.php:407
-#: includes/settings.php:425 includes/settings.php:428
+#: includes/settings.php:377 includes/settings.php:395
+#: includes/settings.php:413 includes/settings.php:416
+#: includes/settings.php:434 includes/settings.php:437
 msgid "GMT"
 msgstr ""
 
-#: includes/settings.php:372
+#: includes/settings.php:381
 msgid "Generate files for posts from stack"
 msgstr ""
 
-#: includes/settings.php:384 includes/settings.php:405
-#: includes/settings.php:426
+#: includes/settings.php:393 includes/settings.php:414
+#: includes/settings.php:435
 msgid "Next time:"
 msgstr ""
 
-#: includes/settings.php:386 includes/settings.php:407
-#: includes/settings.php:428
+#: includes/settings.php:395 includes/settings.php:416
+#: includes/settings.php:437
 msgid "never"
 msgstr ""
 
-#: includes/settings.php:391
+#: includes/settings.php:400
 msgid "Generate files for all allowed posts"
 msgstr ""
 
-#: includes/settings.php:403 includes/settings.php:424
+#: includes/settings.php:412 includes/settings.php:433
 msgid "after"
 msgstr ""
 
-#: includes/settings.php:412
+#: includes/settings.php:421
 msgid "Update Log file"
 msgstr ""
 
-#: includes/settings.php:433 includes/settings.php:471
+#: includes/settings.php:442 includes/settings.php:480
 msgid "Log file"
 msgstr ""
 
-#: includes/settings.php:457
+#: includes/settings.php:466
 #, php-format
 msgid ""
 "You can use script %s<br>to generate files for readers in batch mode (using "
 "<b>cli</b> or <b>cron</b>)."
 msgstr ""
 
-#: includes/settings.php:458
+#: includes/settings.php:467
 msgid "<h3>Options:</h3>"
 msgstr ""
 
-#: includes/settings.php:459
+#: includes/settings.php:468
 msgid "<u>First parameter</u>"
 msgstr ""
 
-#: includes/settings.php:460
+#: includes/settings.php:469
 msgid ""
 "<b>id = [post id list separated by commas]</b> - process all the posts in "
 "the list;"
 msgstr ""
 
-#: includes/settings.php:461 includes/settings.php:463
+#: includes/settings.php:470 includes/settings.php:472
 msgid "<i>or</i>"
 msgstr ""
 
-#: includes/settings.php:462
+#: includes/settings.php:471
 msgid ""
 "<b>all = [from],[to]</b> - process all the posts of this range ([from]-[to]) "
 "on the site ignoring exceptions,<br>see General tab."
 msgstr ""
 
-#: includes/settings.php:464
+#: includes/settings.php:473
 msgid "<b>stack</b> - process first element (post-id) from stack."
 msgstr ""
 
-#: includes/settings.php:465
+#: includes/settings.php:474
 msgid "<u>Second parameter</u>"
 msgstr ""
 
-#: includes/settings.php:466
+#: includes/settings.php:475
 msgid "<b>echo</b> - output progress info to the screen."
 msgstr ""
 
-#: includes/settings.php:490 includes/settings.php:491
+#: includes/settings.php:499 includes/settings.php:500
 msgid "N/A"
 msgstr ""
 
-#: includes/settings.php:496
+#: includes/settings.php:505
 msgid "Memory usage"
 msgstr ""
 
-#: includes/settings.php:507
+#: includes/settings.php:516
 msgid "Max. execution time"
 msgstr ""
 

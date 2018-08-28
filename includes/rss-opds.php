@@ -50,6 +50,7 @@ function bg_forreaders_opdsRSSFunc(){
 	} elseif (isset($_GET['offset'])) {	// По 10 последних файлов со смещением offset
 		$posts = query_posts( array(
 			'offset' => $_GET['offset'],
+			'ignore_sticky_posts' => true,
 			'category__in' => $include,
 			'category__not_in' => $exclude,
 			'meta_key'=> 'for_readers',
@@ -72,6 +73,7 @@ function bg_forreaders_opdsRSSFunc(){
 		if (!empty($postids)) {
 			$posts = query_posts( array(
 				'post__in' => $postids,
+				'ignore_sticky_posts' => true,
 				'category__in' => $include,
 				'category__not_in' => $exclude,
 				'posts_per_page' => -1
@@ -118,6 +120,7 @@ function bg_forreaders_the_folders($parent, $include, $exclude) {
 	endforeach;
 	if ($parent) {
 		$posts = query_posts( array(
+			'ignore_sticky_posts' => true,
 			'category__in' => $parent,
 			'meta_key'=> 'for_readers',
 			'posts_per_page' => -1
