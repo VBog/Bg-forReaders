@@ -3,6 +3,10 @@ class BgClearHTML {
 	
 	// Оставляет в тексте только разрешенные теги и атрибуты
 	public function prepare ($content, $allow_attributes) {
+		
+		// ЦС шрифт прописываем в style
+		$content = preg_replace('/class="(.*)ponomar(.*)"/Us', 'class="$1 $2" style="font-family: hirmosponomar"', $content);	
+		
 		// Удаляем JS-скрипты
 		$content = preg_replace("/<script.*?script>/s", "", $content);
 		// Заменяем <br/> и <hr/> на <br /> и <hr />
@@ -77,7 +81,7 @@ class BgClearHTML {
 				} else {
 					$attrs = explode( "|", $allow_attributes[$tag] );
 					foreach ($attrs as $attr) {		// Разрешенные атрибуты
-						if (preg_match('/'.$attr.'\s*=\s*([\"\'])(.*?)(\1)/is', $mt[2], $value))
+						if (preg_match('/\s'.$attr.'\s*=\s*([\"\'])(.*?)(\1)/is', $mt[2], $value))
 							$newattr .= ' '.$attr.'="'.str_replace( "\"", "'", $value[2] ).'"';
 					}
 				}

@@ -33,7 +33,6 @@ function bg_forreaders_opdsRSSFunc(){
 	echo '<?xml version="1.0" encoding="'.get_option('blog_charset').'" ?'.'>'.PHP_EOL; 
 ?>
 <feed xml:lang="ru-RU" xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
-	<title><?php _e('OPDS catalogue', 'bg-forreaders') ?> "<?php bloginfo('name'); ?>"</title>
 	<link rel="search" title="<?php _e('Search', 'bg-forreaders') ?>" type="application/atom+xml" href="<?php echo OPDS_FEED; ?>?q={searchTerms}"/>
 	<updated><?php echo date('c'); ?></updated>
 	<author>
@@ -42,13 +41,27 @@ function bg_forreaders_opdsRSSFunc(){
 	</author>
 <?php
 	if (empty ($_GET)) {					// Стартовая страница: рубрики верхнего уровня
+?>	
+		<title><?php _e('OPDS catalogue', 'bg-forreaders') ?> "<?php bloginfo('name'); ?>"</title>
+<?php		
 		bg_forreaders_the_folders(0, $include, $exclude);
 
 	} elseif (isset($_GET['cat'])) {		// Подрубрики
+?>	
+	<title><?php bloginfo('name'); ?> - <?php echo get_cat_name( $_GET['cat'] ) ?></title>
+<?php		
 		bg_forreaders_the_folders($_GET['cat'], $include, $exclude);
 
 	} elseif (isset($_GET['offset'])) {	// По 10 последних файлов со смещением offset
+	$next = $_GET['offset'];
+?>
+	<title><?php bloginfo('name'); ?> - <?php _e('New', 'bg-forreaders') ?> (<?php echo ($next+1)." - ".($next+10); ?>)</title>
+<?php
 		$posts = query_posts( array(
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			'has_password'=> false,
+			'post_password' => "",
 			'offset' => $_GET['offset'],
 			'ignore_sticky_posts' => true,
 			'category__in' => $include,
@@ -68,11 +81,16 @@ function bg_forreaders_opdsRSSFunc(){
 	</entry>	
 <?php
 	} elseif (isset($_GET['q'])) {			// Поисковый запрос
+?>	
+	<title><?php bloginfo('name'); ?> - "<?php echo $_GET['q']; ?>"</title>
+<?php		
 		global $wpdb;
 		$postids = $wpdb->get_col("SELECT ID FROM wp_posts WHERE post_title LIKE '%".$_GET['q']."%' ");
 		if (!empty($postids)) {
 			$posts = query_posts( array(
 				'post__in' => $postids,
+				'has_password'=> false,
+				'post_password' => "",
 				'ignore_sticky_posts' => true,
 				'category__in' => $include,
 				'category__not_in' => $exclude,
@@ -109,9 +127,10 @@ function bg_forreaders_the_folders($parent, $include, $exclude) {
 <?php
 	endif;
 	foreach( $categories as $category ):
+		$numTerms = wp_count_terms( 'category', array('parent' => $category->term_id) );
 ?>
 	<entry>
-		<title><?php echo $category->name." (".$category->category_count.")"; ?></title>
+		<title><?php echo $category->name." (".($category->category_count+$numTerms).")"; ?></title>
 		<id>urn:<?php echo OPDS_NAME; ?>:cat:<?php echo $category->term_id; ?></id>
 		<link href="<?php echo OPDS_FEED."?cat=".$category->term_id; ?>" type="application/atom+xml"/>
 		<content type="text/html"><?php echo strip_tags (html_entity_decode($category->description?$category->description:'---'),"<br>" ); ?></content>
@@ -121,6 +140,8 @@ function bg_forreaders_the_folders($parent, $include, $exclude) {
 	if ($parent) {
 		$posts = query_posts( array(
 			'ignore_sticky_posts' => true,
+			'has_password'=> false,
+			'post_password' => "",
 			'category__in' => $parent,
 			'meta_key'=> 'for_readers',
 			'posts_per_page' => -1
@@ -134,6 +155,12 @@ function bg_forreaders_the_folders($parent, $include, $exclude) {
 function bg_forreaders_the_books() {
 	global $post;
 	global $bg_forreaders_mimes;
+	
+	$cover_image = get_option('bg_forreaders_cover_image');
+	if ($cover_image) {
+		if (file_exists(BG_FORREADERS_STORAGE_URI."/".$cover_image))$cover_image = BG_FORREADERS_STORAGE_URL."/".$cover_image;
+		else $cover_image = "";
+	}
 	
 	while(have_posts()) : the_post(); 
 		$thumb_id = get_post_thumbnail_id();
@@ -157,7 +184,7 @@ function bg_forreaders_the_books() {
 ?>
 	<entry>
 		<id>urn:<?php echo OPDS_NAME; ?>:p:<?php the_ID(); ?></id>
-		<title><?php the_title(); ?></title>
+		<title><?php  echo strip_tags (html_entity_decode(get_the_title())); ?></title>
 		<author>
 		  <name><?php echo $author; ?></name>
 		</author>
@@ -174,8 +201,11 @@ function bg_forreaders_the_books() {
 			<?php endif; ?>
 		<?php endforeach; ?>
 		<?php if ($thumb_url): ?>
-		<link rel="x-stanza-cover-image-thumbnail" href="<?php echo $thumb_url[0]; ?>" type="image/<?php echo substr(strrchr($thumb_url[0], '.'), 1); ?>"/> 
-		<link rel="x-stanza-cover-image" href="<?php echo $thumb_url[0]; ?>" type="image/<?php echo substr(strrchr($thumb_url[0], '.'), 1); ?>"/> 
+		<link rel="x-stanza-cover-image-thumbnail" href="<?php echo $thumb_url[0]; ?>" type="image/<?php echo substr(strrchr($thumb_url[0], '.'), 1); ?>"/>
+		<link rel="x-stanza-cover-image" href="<?php echo $thumb_url[0]; ?>" type="image/<?php echo substr(strrchr($thumb_url[0], '.'), 1); ?>"/>
+		<?php elseif ($cover_image): ?>
+		<link rel="x-stanza-cover-image-thumbnail" href="<?php echo $cover_image; ?>" type="image/<?php echo substr(strrchr($cover_image, '.'), 1); ?>"/>
+		<link rel="x-stanza-cover-image" href="<?php echo $cover_image; ?>" type="image/<?php echo substr(strrchr($cover_image, '.'), 1); ?>"/> 
 		<?php endif; ?>
 		<link href="<?php the_permalink(); ?>" rel="alternate" type="text/html" title="<?php _e('Book on the site', 'bg-forreaders') ?>" />		 
 	</entry>

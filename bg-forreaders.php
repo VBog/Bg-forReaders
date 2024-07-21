@@ -3,14 +3,14 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 2.1.1
+Version: 3.0
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
 Text Domain: bg-forreaders
 Domain Path: /languages
 */
-/*  Copyright 2016-2018  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
+/*  Copyright 2016-2021  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,21 +35,21 @@ Domain Path: /languages
 if ( !defined('ABSPATH') ) {
 	die( 'Sorry, you are not allowed to access this page directly.' ); 
 }
-if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+if ( version_compare( PHP_VERSION, '7.1', '<' ) ) {
     add_action( 'admin_notices', 'bg_forreaders_no_activate_notice' );
     add_action( 'admin_init', 'bg_forreaders_deactivate_self' );
     return;
 }
 
 function bg_forreaders_no_activate_notice() {
-	echo '<div class="error"><p>'.__('Bg forReaders requires PHP 5.3 to function properly. Please upgrade PHP. The Plugin has been auto-deactivated.', 'bg-forreaders') .'</p></div>'; 
+	echo '<div class="error"><p>'.__('Bg forReaders requires PHP 7.1 to function properly. Please upgrade PHP. The Plugin has been auto-deactivated.', 'bg-forreaders') .'</p></div>'; 
 	if ( isset( $_GET['activate'] ) ) unset( $_GET['activate'] );
 }
 function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '2.1.1' );
+define( 'BG_FORREADERS_VERSION', '3.0' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -69,7 +69,7 @@ define( 'BG_FORREADERS_TAGS',
 "img[src|alt],div[id],blockquote[id],
 h1[align|id],h2[align|id],h3[align|id],h4[align|id],h5[align|id],h6[align|id],
 hr,p[align|id],br,ol[id],ul[id],li[id],a[href|name|id],
-table[id],tr[align],th[id|colspan|rowspan|align],td[id|colspan|rowspan|align],
+table[id],tr[align],th[id|colspan|rowspan|align|valign],td[id|colspan|rowspan|align|valign],
 b,strong,i,em,u,sub,sup,strike,code");
 
 define( 'BG_FORREADERS_DEBUG_FILE', dirname(__FILE__ )."/forreaders.log");
@@ -106,10 +106,14 @@ $bg_forreaders_mimes = array(
 function bg_forreaders_activate() {
 	if (!file_exists(BG_FORREADERS_STORAGE_URI)) @mkdir( BG_FORREADERS_STORAGE_URI );
 	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/index.php')) @copy( BG_FORREADERS_URI.'/css/download', BG_FORREADERS_STORAGE_URI.'/index.php' );
-	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-pdf.png')) @copy( BG_FORREADERS_URI.'/css/document-pdf.png', BG_FORREADERS_STORAGE_URI.'/document-pdf.png' );
-	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-epub.png')) @copy( BG_FORREADERS_URI.'/css/document-epub.png', BG_FORREADERS_STORAGE_URI.'/document-epub.png' );
-	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-mobi.png')) @copy( BG_FORREADERS_URI.'/css/document-mobi.png', BG_FORREADERS_STORAGE_URI.'/document-mobi.png' );
-	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-fb2.png')) @copy( BG_FORREADERS_URI.'/css/document-fb2.png', BG_FORREADERS_STORAGE_URI.'/document-fb2.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-pdf.png') && !file_exists(BG_FORREADERS_STORAGE_URI.'/document-pdf.svg')) 
+			@copy( BG_FORREADERS_URI.'/css/document-pdf.png', BG_FORREADERS_STORAGE_URI.'/document-pdf.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-epub.png') && !file_exists(BG_FORREADERS_STORAGE_URI.'/document-epub.svg')) 
+			@copy( BG_FORREADERS_URI.'/css/document-epub.png', BG_FORREADERS_STORAGE_URI.'/document-epub.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-mobi.png') && !file_exists(BG_FORREADERS_STORAGE_URI.'/document-mobi.svg')) 
+			@copy( BG_FORREADERS_URI.'/css/document-mobi.png', BG_FORREADERS_STORAGE_URI.'/document-mobi.png' );
+	if (!file_exists(BG_FORREADERS_STORAGE_URI.'/document-fb2.png') && !file_exists(BG_FORREADERS_STORAGE_URI.'/document-fb2.svg')) 
+			@copy( BG_FORREADERS_URI.'/css/document-fb2.png', BG_FORREADERS_STORAGE_URI.'/document-fb2.png' );
 	bg_forreaders_add_options ();
 }
 register_activation_hook( __FILE__, 'bg_forreaders_activate' );
@@ -125,6 +129,18 @@ function bg_forreaders_frontend_styles () {
 	wp_enqueue_style( "bg_forreaders_styles", plugins_url( "/css/style.css", plugin_basename(__FILE__) ), array() , BG_FORREADERS_VERSION  );
 	$bg_forreaders = BG_FORREADERS_STORAGE_URL.'/';
 	$zoom=(float) get_option('bg_forreaders_zoom');
+	if (file_exists(BG_FORREADERS_STORAGE_URI.'/document-pdf.png')) $bg_forreaders_pdf = BG_FORREADERS_STORAGE_URL.'/document-pdf.png';
+	elseif (file_exists(BG_FORREADERS_STORAGE_URI.'/document-pdf.svg')) $bg_forreaders_pdf = BG_FORREADERS_STORAGE_URL.'/document-pdf.svg';
+	else $bg_forreaders_pdf = BG_FORREADERS_URI.'/document-pdf.png';
+	if (file_exists(BG_FORREADERS_STORAGE_URI.'/document-epub.png')) $bg_forreaders_epub = BG_FORREADERS_STORAGE_URL.'/document-epub.png';
+	elseif (file_exists(BG_FORREADERS_STORAGE_URI.'/document-epub.svg')) $bg_forreaders_epub = BG_FORREADERS_STORAGE_URL.'/document-epub.svg';
+	else $bg_forreaders_epub = BG_FORREADERS_URI.'/document-epub.png';
+	if (file_exists(BG_FORREADERS_STORAGE_URI.'/document-mobi.png')) $bg_forreaders_mobi = BG_FORREADERS_STORAGE_URL.'/document-mobi.png';
+	elseif (file_exists(BG_FORREADERS_STORAGE_URI.'/document-mobi.svg')) $bg_forreaders_mobi = BG_FORREADERS_STORAGE_URL.'/document-mobi.svg';
+	else $bg_forreaders_mobi = BG_FORREADERS_URI.'/document-mobi.png';
+	if (file_exists(BG_FORREADERS_STORAGE_URI.'/document-fb2.png')) $bg_forreaders_fb2 = BG_FORREADERS_STORAGE_URL.'/document-fb2.png';
+	elseif (file_exists(BG_FORREADERS_STORAGE_URI.'/document-fb2.svg')) $bg_forreaders_fb2 = BG_FORREADERS_STORAGE_URL.'/document-fb2.svg';
+	else $bg_forreaders_fb2 = BG_FORREADERS_URI.'/document-fb2.png';
 	$custom_css = "
 div.bg_forreaders {"
 	.(($zoom)?("height: ".(88*$zoom)."px;"):"")."
@@ -135,22 +151,22 @@ div.bg_forreaders {"
 	margin: 0px ".(10*$zoom)."px 0px 0px;
 }
 .bg_forreaders .pdf {
-	background: url(".$bg_forreaders."document-pdf.png) no-repeat 50% 50%;
+	background: url(".$bg_forreaders_pdf.") no-repeat 50% 50%;
 	background-size: contain;
 }
 .bg_forreaders .epub {
-	background: url(".$bg_forreaders."document-epub.png) no-repeat 50% 50%;
+	background: url(".$bg_forreaders_epub.") no-repeat 50% 50%;
 	background-size: contain;
 }
 
 .bg_forreaders .mobi{
-	background: url(". $bg_forreaders."document-mobi.png) no-repeat 50% 50%;
+	background: url(". $bg_forreaders_mobi.") no-repeat 50% 50%;
 	background-size: contain;
 }
 .bg_forreaders .fb2 {
-	background: url(".$bg_forreaders."document-fb2.png) no-repeat 50% 50%;
+	background: url(".$bg_forreaders_fb2.") no-repeat 50% 50%;
 	background-size: contain;
-}
+}				  
 	";
 	wp_add_inline_style( 'bg_forreaders_styles', $custom_css );
 }
@@ -309,8 +325,12 @@ function bg_forreaders ($post) {
 			}
 		}
 	}
+	ob_start();
+	do_action('bg_forreaders_after_items');
+	$afterItems = ob_get_clean();
+	
 	if ($forreaders) 
-		$forreaders = get_option('bg_forreaders_prompt').'<div class="bg_forreaders">'.$forreaders.'</div>'.get_option('bg_forreaders_separator');
+		$forreaders = get_option('bg_forreaders_prompt').'<div class="bg_forreaders">'.$forreaders.$afterItems.'</div>'.get_option('bg_forreaders_separator');
 	
 	return $forreaders;
 }
@@ -319,6 +339,8 @@ function bg_forreaders ($post) {
 function bg_forreaders_save( $id ) {
 	global $formats;
 
+	if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 			// пропустим если это автосохранение
+	if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
 	$post = get_post($id);
 	if( isset($post) && ($post->post_type == 'post' || $post->post_type == 'page') ) { 			// убедимся что мы редактируем нужный тип поста
 		switch (get_current_screen()->id) :										// убедимся что мы на нужной странице админки
@@ -346,8 +368,6 @@ function bg_forreaders_save( $id ) {
 		default:
 			return;
 		endswitch;
-		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE  ) return; 			// пропустим если это автосохранение
-		if ( ! current_user_can('edit_post', $id ) ) return; 					// убедимся что пользователь может редактировать запись
 		bg_forreaders_generate_files($id);
 	}
 }
@@ -718,6 +738,7 @@ function bg_forreaders_add_options (){
 	add_option('bg_forreaders_while_saved', 'on');
 	add_option('bg_forreaders_offline_query', '');
 	add_option('bg_forreaders_generate_opds', '');
+	add_option('bg_forreaders_book_folder', '');
 	
 	add_option('bg_forreaders_memory_limit', '1024');
 	add_option('bg_forreaders_time_limit', '900');
@@ -774,6 +795,7 @@ function bg_forreaders_delete_options (){
 	delete_option('bg_forreaders_while_saved');
 	delete_option('bg_forreaders_offline_query');
 	delete_option('bg_forreaders_generate_opds');
+	delete_option('bg_forreaders_book_folder');
 	
 	delete_option('bg_forreaders_memory_limit');
 	delete_option('bg_forreaders_time_limit');

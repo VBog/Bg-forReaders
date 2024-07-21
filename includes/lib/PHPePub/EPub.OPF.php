@@ -304,7 +304,7 @@ class Metadata {
         }
 
         foreach ($this->meta as $data) {
-            list($name, $content) = each($data);
+            list($name, $content) = [key($data), current($data)];
             $metadata .= "\t\t<meta name=\"" . $name . "\" content=\"" . $content . "\" />\n";
         }
 
@@ -418,13 +418,13 @@ class DublinCore {
         $dc = "\t\t<dc:" . $this->dcName;
 
         if (sizeof($this->attr) > 0) {
-            while (list($name, $content) = each($this->attr)) {
+            foreach ($this->attr as $name => $content) {
                 $dc .= " " . $name . "=\"" . $content . "\"";
             }
         }
 
         if ($bookVersion === EPub::BOOK_VERSION_EPUB2 && sizeof($this->opfAttr) > 0) {
-            while (list($name, $content) = each($this->opfAttr)) {
+            foreach ($this->opfAttr as $name => $content) {
                 $dc .= " opf:" . $name . "=\"" . $content . "\"";
             }
         }

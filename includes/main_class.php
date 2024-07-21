@@ -26,11 +26,11 @@ class BgForReaders {
 		// Выполнить все шорт-коды
 		$content = do_shortcode ( $content );
 		// Удаляем указания на текущую страницу в абсолютных ссылках с якорями (включая множественные страницы)
-		$content = preg_replace("/". preg_quote( $plink, '/' ).'(\/\d+\/)?#/is', '#', $content);
+		$content = preg_replace("/". preg_quote( $plink, '/' ).'(\/\d+\/?)?#/is', '#', $content);
 		// Удаляем  указания на текущую страницу в относительных ссылках с якорями
 		$site_url = get_site_url();
 		$plink = str_replace ($site_url."/", "", $plink);
-		$content = preg_replace("/". preg_quote( $plink, '/' ).'(\/\d+\/)?#/is', '#', $content);
+		$content = preg_replace("/". preg_quote( $plink, '/' ).'(\/\d+\/?)?#/is', '#', $content);
 
 		// Очищаем текст от лишних тегов разметки
 		$chtml = new BgClearHTML();
@@ -220,8 +220,8 @@ class BgForReaders {
 		for ($i=0; $i<$cnt; $i++) {
 			$textbox = imagettfbbox($font_size, 0, $font, $lines[$i]);
 			$wt = abs($textbox[4] - $textbox[0]);
-			$px = ($width-$wt)/2 + $dx1;
-			$py = $y - $height*($cnt-$i);
+			$px = intval(($width-$wt)/2 + $dx1);
+			$py = intval($y - $height*($cnt-$i));
 			imagettftext($im, $font_size ,0, $px, $py, $color, $font, $lines[$i]);
 		}
 		return;
@@ -247,10 +247,20 @@ class BgForReaders {
 // Portable Document Format (PDF)
 	function topdf ($html, $options) {
 
-		require_once "lib/mpdf60/mpdf.php";
+		require_once __DIR__ . '/lib/mpdf80/vendor/autoload.php';
+
 		$filepdf = $options["filename"] . '.pdf';
 		
-		$pdf = new mPDF();
+		$defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+		$fontData = $defaultFontConfig['fontdata'];
+		
+		$pdf = new \Mpdf\Mpdf([
+			'fontdata' => $fontData + [
+				"hirmosponomar" => [
+					'R' => "HirmosPonomar.ttf",
+				],
+			]
+		]);
 		$pdf->ignore_invalid_utf8 = true;
 		$pdf->SetTitle($options["title"]);
 		$pdf->SetAuthor($options["author"]);

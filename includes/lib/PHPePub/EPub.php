@@ -380,7 +380,7 @@ class EPub {
             $partCount = 0;
             $this->chapterCount++;
 
-            $oneChapter = each($chapter);
+            $oneChapter = [key($chapter), current($chapter)];
             while ($oneChapter) {
                 list($k, $v) = $oneChapter;
                 if ($this->encodeHTML === TRUE) {
@@ -395,7 +395,7 @@ class EPub {
                 $this->addFile($partName . "." . $extension, $partName, $v, "application/xhtml+xml");
                 $this->opf->addItemRef($partName);
 
-                $oneChapter = each($chapter);
+                $oneChapter = [key($chapter), current($chapter)];
             }
 			$partName = $name . "_1." . $extension;
             $navPoint = new NavPoint($this->decodeHtmlEntities($chapterName), $partName, $partName);
@@ -1694,9 +1694,9 @@ class EPub {
         }
         $tocData .= ">\n";
 
-        while (list($item, $descriptive) = each($this->referencesOrder)) {
+        foreach ($this->referencesOrder as $item=>$descriptive) {
             if ($item === "text") {
-                while (list($chapterName, $navPoint) = each($this->ncx->chapterList)) {
+                foreach ($this->ncx->chapterList as $chapterName => $navPoint) {
 					$fileName = $navPoint->getContentSrc();
 					$level = $navPoint->getLevel() -2;
 					$tocData .= "\t<p>" . str_repeat(" &#160;  &#160;  &#160;", $level) . "<a href=\"" . $fileName . "\">" . $chapterName . "</a></p>\n";
@@ -1838,7 +1838,7 @@ class EPub {
         }
 
 		reset($this->ncx->chapterList);
-        list($firstChapterName, $firstChapterNavPoint) = each($this->ncx->chapterList);
+        list($firstChapterName, $firstChapterNavPoint) = [key($this->ncx->chapterList), current($this->ncx->chapterList)];
 		$firstChapterFileName = $firstChapterNavPoint->getContentSrc();
         $this->opf->addReference(Reference::TEXT, $this->decodeHtmlEntities($firstChapterName), $firstChapterFileName);
 

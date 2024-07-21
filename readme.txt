@@ -2,9 +2,9 @@
 Contributors: VBog
 Tags: OPDS,e-book,html,pdf,epub,mobi,fb2,reader,convertor,catalog
 Donate link: https://bogaiskov.ru/about-me/donate/
-Requires PHP: 5.3
+Requires PHP: 7.1
 Requires at least: 3.0.1
-Tested up to: 4.9.8
+Tested up to: 6.0
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,7 +23,7 @@ Plugin displays a icons form for download converted files before and/or after co
 
 You can create OPDS catalogue on your site with this plugin, if you enable the option.
 
-OPDS catalog support the file-types: `'epub', 'fb2', 'pdf', 'mobi', 'zip', 'rtf', 'doc', 'docx', 'htm', 'html', 'txt', 'djvu'', 'mp3', 'm4a', 'm4b'`.
+OPDS catalog support the file-types: `'epub', 'fb2', 'pdf', 'mobi', 'zip', 'rtf', 'doc', 'docx', 'htm', 'html', 'txt', 'djvu', 'mp3', 'm4a', 'm4b'`.
 
 Allowed filename: 
 * `<post_slug>_<post_ID>.ext`
@@ -57,13 +57,45 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 
 **A.:** OPDS catalogue URL `http://yoursite.com/feed/opds`. 
 
+**Q.:** I have set the Generate OPDS catalogue option, but my OPDS catalogue isn't available yet. What should I do now?
+
+**A.:** In this case, to display your OPDS catalogue, you’ll first need to flush your WordPress rewrite rules. In the WordPress admin dashboard, click Settings -> Permalinks. Once here, just click Save Changes, which will flush the rewrite rules.
+
 == Screenshots ==
 1. Plugin settings
 2. Icons form
 
 == Changelog ==
 
-= 2.1.1 =
+= 3.0 =
+
+* Updated mPDF library upto 8.1.
+* Added old cyrillic font Hirmos Ponomar.
+* Requires PHP version 7.1 and more. PHP 8.1 is supported.
+* Tested for WP version 6.0.
+
+= 2.1.7-9 =
+
+* Fixed small bugs.
+
+= 2.1.6 =
+
+* Allowed svg format for icons in download form.
+
+= 2.1.5 =
+
+* Fixed error while autosave post.
+
+= 2.1.4 =
+
+* Minor changes in fb2 convertor.
+* Fixed small bugs.
+
+= 2.1.3 =
+
+* Minor OPDS changes.
+
+= 2.1.1-2 =
 
 * Fixed small bugs.
 

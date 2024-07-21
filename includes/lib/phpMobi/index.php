@@ -2,7 +2,7 @@
 $urlDemo = false;
 if(isset($_GET["download"])){
 	//Only need to include the MOBI file, all other files are included automatically
-	include("MOBIClass/MOBI.php");
+	include_once("MOBIClass/MOBI.php");
 
 	if($urlDemo){
 		//Set the url (note that this file isn't created for eBook viewing, it's just

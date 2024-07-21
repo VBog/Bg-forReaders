@@ -96,20 +96,22 @@ class RecordFactory {
 		return $out;
 	}
 }
-function mb_str_split($string, $split_length = 1){
-	mb_internal_encoding('UTF-8');
-	mb_regex_encoding('UTF-8');
+if (!function_exists('mb_str_split')) {
+	function mb_str_split($string, $split_length = 1){
+		mb_internal_encoding('UTF-8');
+		mb_regex_encoding('UTF-8');
 
-	$split_length = ($split_length <= 0) ? 1 : $split_length;
+		$split_length = ($split_length <= 0) ? 1 : $split_length;
 
-	$mb_strlen = mb_strlen($string, 'utf-8');
+		$mb_strlen = mb_strlen($string, 'utf-8');
 
-	$array = array();
+		$array = array();
 
-	for($i = 0; $i < $mb_strlen; $i += $split_length){
-		$array[] = mb_substr($string, $i, $split_length);
+		for($i = 0; $i < $mb_strlen; $i += $split_length){
+			$array[] = mb_substr($string, $i, $split_length);
+		}
+
+		return $array;
 	}
-
-	return $array;
 }
 ?>
