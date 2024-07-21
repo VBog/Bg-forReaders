@@ -4,7 +4,7 @@ Tags: OPDS,e-book,html,pdf,epub,mobi,fb2,reader,convertor,catalog
 Donate link: https://bogaiskov.ru/about-me/donate/
 Requires PHP: 7.1
 Requires at least: 3.0.1
-Tested up to: 6.0
+Tested up to: 6.6
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -66,6 +66,12 @@ When you added letter "p" at the end of filename you said plugin that this is pr
 2. Icons form
 
 == Changelog ==
+
+= 3.2.1 =
+
+* Allowed download for some mime type.
+* Fixed any bugs. 
+* Tested for WP version 6.6.
 
 = 3.0 =
 

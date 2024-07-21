@@ -5,7 +5,7 @@ class BgClearHTML {
 	public function prepare ($content, $allow_attributes) {
 		
 		// ЦС шрифт прописываем в style
-		$content = preg_replace('/class="(.*)ponomar(.*)"/Us', 'class="$1 $2" style="font-family: hirmosponomar"', $content);	
+		$content = preg_replace('/class="([^"]*)ponomar([^"]*)"/us', 'class="$1 $2" style="font-family: hirmosponomar"', $content);	
 		
 		// Удаляем JS-скрипты
 		$content = preg_replace("/<script.*?script>/s", "", $content);

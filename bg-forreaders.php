@@ -3,14 +3,14 @@
 Plugin Name: Bg forReaders
 Plugin URI: https://bogaiskov.ru/bg_forreaders
 Description: Convert post content to most popular e-book formats for readers and displays a form for download.
-Version: 3.0
+Version: 3.2.1
 Author: VBog
 Author URI:  https://bogaiskov.ru
 License:     GPL2
 Text Domain: bg-forreaders
 Domain Path: /languages
 */
-/*  Copyright 2016-2021  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
+/*  Copyright 2016-2024  Vadim Bogaiskov  (email: vadim.bogaiskov@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ function bg_forreaders_deactivate_self() {
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 }
 
-define( 'BG_FORREADERS_VERSION', '3.0' );
+define( 'BG_FORREADERS_VERSION', '3.2.1' );
 $upload_dir = wp_upload_dir();
 define( 'BG_FORREADERS_URI', plugin_dir_path( __FILE__ ) );
 define( 'BG_FORREADERS_PATH', str_replace ( ABSPATH , '' , BG_FORREADERS_URI ) );
@@ -101,6 +101,30 @@ $bg_forreaders_mimes = array(
 	'm4a'=>'audio/m4a',
 	'm4b'=>'audio/m4b'
 );
+
+//Разрешаем загрузку
+add_filter( 'upload_mimes', 'bg_forreaders_custom_mime_types' );
+function bg_forreaders_custom_mime_types( $mimes ) {
+	global $bg_forreaders_mimes;
+	
+	foreach(['fb2', 'epub', 'pdf', 'mobi', 'doc', 'docx', 'rtf', 'txt', 'djvu'] as $type){
+		$mimes[$type]  = $bg_forreaders_mimes[$type];
+	}
+
+	return $mimes;
+}
+add_filter( 'wp_check_filetype_and_ext', 'bg_forreaders_add_allow_upload_extension_exception', 99, 4 );
+function bg_forreaders_add_allow_upload_extension_exception( $types, $file, $filename, $mimes ) {
+    // Do basic extension validation and MIME mapping
+    $wp_filetype = wp_check_filetype( $filename, $mimes );
+    $ext         = $wp_filetype['ext'];
+    $type        = $wp_filetype['type'];
+    if( in_array( $ext, ['fb2', 'epub', 'pdf', 'mobi', 'doc', 'docx', 'rtf', 'txt', 'djvu'] ) ) {
+        $types['ext'] = $ext;
+        $types['type'] = $type;
+    }
+    return $types;
+}
 
 // Функция, исполняемая при активации плагина
 function bg_forreaders_activate() {
@@ -305,23 +329,41 @@ function bg_forreaders ($post) {
 	
 	$zoom = get_option('bg_forreaders_zoom');
 	$forreaders = "";
+	$link_type = get_option('bg_forreaders_links');
+	$download = ($link_type == 'html5')? ' download':'';
+	
+	$hasCustom = false;
+	$customHrefs = [];
 	foreach ($formats as $type => $document_type) {
-		// Сначала проверяем наличие защищенного файла
-		$filename = translit($post->post_name)."_".$post->ID."p.".$type;
-		if (!file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) $filename = translit($post->post_name)."_".$post->ID.".".$type;
-		// Если такового нет, проверяем наличие обычного файла
-		if (file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) {
-			if (get_option('bg_forreaders_'.$type) == 'on') {
-				$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), strip_tags($post->post_title), $document_type);
-				$link_type = get_option('bg_forreaders_links');
-				if ($link_type == 'php') $href = BG_FORREADERS_STORAGE_URL."?file=".$filename;
-				else $href = BG_FORREADERS_STORAGE_URL."/".$filename;
-				$download = ($link_type == 'html5')? ' download':'';
-				if ($zoom) {
-					$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s"%s></a></div>', $type, $href, $title, $download);
-				} else {
-				$forreaders .= sprintf ('<span><a href="%s" title="%s"%s>%s</a></span><br>', $href, $title, $download, sprintf(__('Download as %s','bg-forreaders'), $document_type));
+		if( !empty( $customHrefs[$type] = get_post_meta($post->ID, 'bg_forreaders_custom_'.$type, true) ) )
+			$hasCustom = true;
+	}
+	
+	foreach ($formats as $type => $document_type) {
+		$href = $customHrefs[$type];
+		
+		if( empty($href) && !$hasCustom ){
+			// Сначала проверяем наличие защищенного файла
+			$filename = translit($post->post_name)."_".$post->ID."p.".$type;
+			if (!file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) 
+				$filename = translit($post->post_name)."_".$post->ID.".".$type;
+			// Если такового нет, проверяем наличие обычного файла
+			if (file_exists(BG_FORREADERS_STORAGE_PATH."/".$filename)) {
+				if (get_option('bg_forreaders_'.$type) == 'on') {
+					$title = sprintf(__('Download &#171;%s&#187; as %s','bg-forreaders'), strip_tags($post->post_title), $document_type);
+					if ($link_type == 'php') 
+						$href = BG_FORREADERS_STORAGE_URL."?file=".$filename;
+					else 
+						$href = BG_FORREADERS_STORAGE_URL."/".$filename;
 				}
+			}
+		}
+		
+		if(!empty($href)){
+			if ($zoom) {
+				$forreaders .= sprintf ('<div><a class="%s" href="%s" title="%s"%s></a></div>', $type, $href, $title, $download);
+			} else {
+				$forreaders .= sprintf ('<span><a href="%s" title="%s"%s>%s</a></span><br>', $href, $title, $download, sprintf(__('Download as %s','bg-forreaders'), $document_type));
 			}
 		}
 	}
@@ -417,6 +459,8 @@ function bg_forreaders_extra_fields() {
 }
 // Добавление полей
 function bg_forreaders_extra_fields_box_func( $post ){
+	global $formats;
+	
 	wp_nonce_field( basename( __FILE__ ), 'bg_forreaders_extra_fields_nonce' );
 	if ($post->post_type == 'page') $meta_value = (get_option ('bg_forreaders_type_page')== 'on');
 	elseif ($post->post_type == 'post') $meta_value = (get_option ('bg_forreaders_type_post')== 'on');
@@ -435,13 +479,19 @@ function bg_forreaders_extra_fields_box_func( $post ){
 //		$html .= ' onclick="bg_forreaders_generate($post->ID)"';
 		$html .= ' value="'.__('Create files', 'bg-forreaders').'" /> ';
 	}
-	echo $html;
+	
+	foreach ($formats as $type => $document_type) {
+		$html .= '<div><label>Особый '.$type.'<br><input style="width:100%" type="text" name="bg_forreaders_custom_'.$type.'" value="'.get_post_meta($post->ID, 'bg_forreaders_custom_'.$type, true).'"/></label></div>';
+	}
+	
+	echo apply_filters('bg_forreaders_admin_html', $html);
 }
 // Сохранение значений произвольных полей при сохранении поста
 add_action('save_post', 'bg_forreaders_extra_fields_update', 0);
 
 // Сохранение значений произвольных полей при сохранении поста
 function bg_forreaders_extra_fields_update( $post_id ){
+	global $formats;
 
 	// проверяем, пришёл ли запрос со страницы с метабоксом
 	if ( !isset( $_POST['bg_forreaders_extra_fields_nonce'] )
@@ -452,6 +502,14 @@ function bg_forreaders_extra_fields_update( $post_id ){
 	if ( !current_user_can( 'edit_post', $post_id ) ) return $post_id;
 	$for_readers = isset ($_POST['bg_forreaders_for_readers'])? sanitize_key($_POST['bg_forreaders_for_readers']):"";
 	update_post_meta($post_id, 'for_readers', $for_readers);
+	
+	foreach ($formats as $type => $document_type) {
+		$key = 'bg_forreaders_custom_'.$type;
+		if(isset($_POST[$key]) && ($val = sanitize_text_field($_POST[$key])))
+			update_post_meta($post_id, $key, $val);
+		else
+			delete_post_meta($post_id, $key);
+	}
 }
 
 /*****************************************************************************************
